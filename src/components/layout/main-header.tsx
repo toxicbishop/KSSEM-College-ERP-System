@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, UserCircle, Menu } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { ThemeToggle } from "./theme-toggle";
 import { getSystemSettings } from "@/services/system-settings";
 import { useEffect, useState } from "react";
@@ -84,10 +85,12 @@ export function MainHeader() {
           />
         </div>
         <ThemeToggle />
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <UserCircle className="h-6 w-6 text-muted-foreground" />
-          <span className="sr-only">User profile</span>
-        </Button>
+        <Link href="/profile">
+          <Button variant="ghost" size="icon" className="rounded-full">
+            <UserCircle className="h-6 w-6 text-muted-foreground hover:text-primary transition-colors" />
+            <span className="sr-only">User profile</span>
+          </Button>
+        </Link>
       </div>
     </header>
   );

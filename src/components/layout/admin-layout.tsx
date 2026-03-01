@@ -270,25 +270,6 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="mt-auto space-y-2 flex flex-col items-center">
-            <div
-              className={cn(
-                isSidebarCollapsed ? "w-full flex justify-center" : "",
-              )}>
-              {isSidebarCollapsed ? (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <ThemeToggle />
-                  </TooltipTrigger>
-                  <TooltipContent
-                    side="right"
-                    className="bg-background text-foreground border-border">
-                    <p>Toggle theme</p>
-                  </TooltipContent>
-                </Tooltip>
-              ) : (
-                <ThemeToggle />
-              )}
-            </div>
             {user ? (
               <Tooltip>
                 <TooltipTrigger asChild>

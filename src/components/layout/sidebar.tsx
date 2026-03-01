@@ -234,7 +234,7 @@ export function Sidebar({
 
         <div className="mt-auto space-y-2 flex flex-col items-center">
           <div className={cn(isCollapsed ? "w-full flex justify-center" : "")}>
-            {isCollapsed ? (
+            {isCollapsed && (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <ThemeToggle />
@@ -245,8 +245,6 @@ export function Sidebar({
                   <p>Toggle theme</p>
                 </TooltipContent>
               </Tooltip>
-            ) : (
-              <ThemeToggle />
             )}
           </div>
 
