@@ -33,7 +33,7 @@ const defaultSettings: SystemSettings = {
 export async function getSystemSettings(): Promise<SystemSettings> {
   const onServer = typeof window === "undefined";
   const isEdgeEnvironment =
-    onServer && typeof globalThis.EdgeRuntime === "string";
+    onServer && typeof (globalThis as any).EdgeRuntime === "string";
   const callContext = isEdgeEnvironment
     ? "server-edge"
     : onServer

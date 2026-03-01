@@ -103,11 +103,7 @@ export default function RootLayout({
           <GoogleAnalytics />
         </Suspense>
         <AuthProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange>
+          <ThemeProvider defaultTheme="system">
             {children}
             <Toaster />
             <Analytics /> {/* Vercel Analytics component */}
