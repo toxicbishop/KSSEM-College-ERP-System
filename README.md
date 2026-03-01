@@ -245,15 +245,35 @@ For server-side features (like some advanced data operations or Genkit flows tha
     Uncomment it and paste your Measurement ID after the `=`. Save the file.
 6.  Restart your app if it's running.
 
-### Step 17: Run the Application!
+### Step 17: (Optional) Enable HTTPS for Local Development
+
+The dev server supports HTTPS via locally-trusted certificates. This is useful if your browser blocks Firebase requests over plain HTTP (e.g., Brave with Shields enabled).
+
+1.  **Install `mkcert`** (generates trusted local certificates):
+    - **Windows (Scoop):** `scoop install mkcert`
+    - **Windows (Chocolatey, run as Admin):** `choco install mkcert -y`
+    - **macOS:** `brew install mkcert`
+    - **Linux:** `sudo apt install mkcert` (or see [mkcert docs](https://github.com/nicedoc/mkcert))
+
+2.  **Install the root certificate authority** (run once, may need Admin/sudo):
+
+    ```bash
+    mkcert -install
+    ```
+
+3.  That's it! The `npm run dev` script includes `--experimental-https`, which will auto-generate certificates in a `certificates/` folder using `mkcert`. Your app will be available at `https://localhost:9002`.
+
+> **Note:** The `certificates/` directory is already in `.gitignore` and should never be committed. Each developer generates their own local certificates.
+
+### Step 18: Run the Application!
 
 1.  In your Terminal (in `StudentApp` folder), type:
     ```bash
     npm run dev
     ```
-2.  Open your web browser to the "Local" address shown (e.g., `http://localhost:9002`).
+2.  Open your web browser to the address shown (e.g., `https://localhost:9002` if HTTPS is set up, or `http://localhost:9002`).
 
-### Step 18: Create Your First User (Admin)
+### Step 19: Create Your First User (Admin)
 
 1.  In the app, click **Sign Up**.
     - **Full Name:** "Admin User"
@@ -264,7 +284,7 @@ For server-side features (like some advanced data operations or Genkit flows tha
     - **Parent's Email:** `parent@example.com` (dummy)
 2.  Click **Sign Up**.
 
-### Step 19: Manually Set Admin Role in Firestore
+### Step 20: Manually Set Admin Role in Firestore
 
 1.  Go to the Firebase console > **Authentication**. Copy the **User UID** for `admin@gmail.com`.
 2.  Go to **Firestore Database**. Click the `users` collection.
@@ -274,11 +294,12 @@ For server-side features (like some advanced data operations or Genkit flows tha
     - If `role` does **not** exist: Click **+ Add field**. Field name: `role`, Type: `string`, Value: `admin`. Click **Add**.
 5.  The `admin@gmail.com` user is now an admin.
 
-### Step 20: Sign In as Admin
+### Step 21: Sign In as Admin
 
 1.  Go back to your app. Logout if logged in.
 2.  Sign in with `admin@gmail.com` and your password.
 3.  You should see the Admin Dashboard or admin features.
+4.  If using Brave browser and HTTPS is not set up, you may need to disable Brave Shields for localhost.
 
 **Congratulations! Initial setup is complete.**
 
