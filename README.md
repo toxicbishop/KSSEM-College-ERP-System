@@ -2,10 +2,6 @@
 
 This guide will walk you through setting up the KSSEM College ERP System on your computer. This application helps manage student information and provides a dashboard for students, faculty, and administrators.
 
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=toxicbishop/KSSEM-College-ERP-System.git&type=date&legend=top-left)](https://www.star-history.com/#toxicbishop/KSSEM-College-ERP-System.git&type=date&legend=top-left)
-
 ## What You'll Need (Prerequisites)
 
 Before you start, make sure you have the following:
