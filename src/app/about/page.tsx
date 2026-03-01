@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Github, Linkedin, Mail } from "lucide-react";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { Footer } from "@/components/layout/footer";
 
 export default function AboutPage() {
   return (
@@ -70,14 +71,14 @@ export default function AboutPage() {
             <div className="flex flex-col items-center gap-4 text-center">
               <Image
                 src="https://picsum.photos/200/200"
-                alt="Chinmay Ingle"
+                alt="Pranav Arun"
                 width={160}
                 height={160}
                 className="rounded-full object-cover shadow-lg"
                 data-ai-hint="professional headshot"
               />
               <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
-                Chinmay Ingle
+                Pranav Arun
               </h1>
               <p className="text-xl text-muted-foreground">
                 Full Stack Developer & AI Enthusiast
@@ -85,7 +86,7 @@ export default function AboutPage() {
               <div className="flex gap-4 mt-2">
                 <Button asChild variant="outline" size="icon">
                   <a
-                    href="https://github.com/ChinmayIngle"
+                    href="https://github.com/toxicbishop"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="GitHub Profile">
@@ -94,7 +95,7 @@ export default function AboutPage() {
                 </Button>
                 <Button asChild variant="outline" size="icon">
                   <a
-                    href="https://www.linkedin.com/in/chinmay-ingle-268598212/"
+                    href="https://www.linkedin.com/in/pranav-arun/"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="LinkedIn Profile">
@@ -103,7 +104,7 @@ export default function AboutPage() {
                 </Button>
                 <Button asChild variant="outline" size="icon">
                   <a
-                    href="mailto:chinmayingle26@gmail.com"
+                    href="mailto:pranav.arun@example.com"
                     aria-label="Send Email">
                     <Mail className="h-5 w-5" />
                   </a>
@@ -115,12 +116,12 @@ export default function AboutPage() {
             <div className="w-full text-left p-6 md:p-8 border rounded-lg bg-card">
               <h2 className="text-2xl font-bold mb-4">About Me</h2>
               <p className="text-muted-foreground leading-relaxed">
-                Hello! I'm Chinmay, a passionate software developer with a
-                strong foundation in web technologies and a keen interest in
-                building intelligent, user-centric applications. This Advanced
-                Student ERP project is a demonstration of my skills in creating
-                complex, full-stack solutions using modern tools like Next.js,
-                Firebase, and Google's Generative AI.
+                Hello! I'm Pranav, a passionate software developer with a strong
+                foundation in web technologies and a keen interest in building
+                intelligent, user-centric applications. This Advanced Student
+                ERP project is a demonstration of my skills in creating complex,
+                full-stack solutions using modern tools like Next.js, Firebase,
+                and Google's Generative AI.
               </p>
               <p className="text-muted-foreground leading-relaxed mt-4">
                 My goal is to leverage technology to solve real-world problems,
@@ -163,22 +164,7 @@ export default function AboutPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t py-6 md:py-8">
-        <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
-          <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
-            &copy; {new Date().getFullYear()} Chinmay Ingle. All Rights
-            Reserved.
-          </p>
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <Link href="#" className="hover:text-primary">
-              Privacy Policy
-            </Link>
-            <Link href="#" className="hover:text-primary">
-              Terms of Service
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

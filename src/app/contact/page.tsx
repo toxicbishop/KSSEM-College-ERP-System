@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Github, Linkedin, Mail, Send } from "lucide-react";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { Footer } from "@/components/layout/footer";
 import {
   Card,
   CardHeader,
@@ -196,66 +197,48 @@ export default function ContactPage() {
                 </CardContent>
               </Card>
 
-              {/* Contact Info */}
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Contact Information</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <Mail className="h-5 w-5 text-muted-foreground" />
-                      <a
-                        href="mailto:chinmayingle26@gmail.com"
-                        className="text-primary hover:underline">
-                        chinmayingle26@gmail.com
-                      </a>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Linkedin className="h-5 w-5 text-muted-foreground" />
-                      <a
-                        href="https://www.linkedin.com/in/chinmay-ingle-268598212/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline">
-                        LinkedIn Profile
-                      </a>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Github className="h-5 w-5 text-muted-foreground" />
-                      <a
-                        href="https://github.com/ChinmayIngle"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline">
-                        GitHub Profile
-                      </a>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Contact Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Mail className="h-5 w-5 text-muted-foreground" />
+                    <a
+                      href="mailto:pranav.arun@example.com"
+                      className="text-primary hover:underline">
+                      pranav.arun@example.com
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Linkedin className="h-5 w-5 text-muted-foreground" />
+                    <a
+                      href="https://www.linkedin.com/in/pranav-arun/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline">
+                      LinkedIn Profile
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Github className="h-5 w-5 text-muted-foreground" />
+                    <a
+                      href="https://github.com/toxicbishop"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline">
+                      GitHub Profile
+                    </a>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </motion.div>
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="border-t py-6 md:py-8">
-        <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
-          <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
-            &copy; {new Date().getFullYear()} Chinmay Ingle. All Rights
-            Reserved.
-          </p>
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <Link href="#" className="hover:text-primary">
-              Privacy Policy
-            </Link>
-            <Link href="#" className="hover:text-primary">
-              Terms of Service
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

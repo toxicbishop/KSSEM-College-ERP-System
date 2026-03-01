@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { Footer } from "@/components/layout/footer";
 import {
   Accordion,
   AccordionContent,
@@ -135,22 +136,7 @@ export default function FaqPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t py-6 md:py-8">
-        <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
-          <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
-            &copy; {new Date().getFullYear()} Chinmay Ingle. All Rights
-            Reserved.
-          </p>
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <Link href="#" className="hover:text-primary">
-              Privacy Policy
-            </Link>
-            <Link href="#" className="hover:text-primary">
-              Terms of Service
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
