@@ -351,41 +351,6 @@ If you need to switch the application to a different Firebase project (e.g., fro
 
 After these steps, your application should be connected to the new Firebase project.
 
-## Troubleshooting Common Issues
-
-- **"Firebase: Error (auth/api-key-not-valid)", "auth/invalid-api-key"**:
-  - Double-check `NEXT_PUBLIC_FIREBASE_...` values in `.env.local` against your Firebase project settings.
-  - Restart the app after changing `.env.local`.
-- **"Missing or insufficient permissions" (Firestore Error)**:
-  - Ensure Firestore rules were deployed to the correct project (`firebase deploy --only firestore:rules`).
-  - For admin functions, confirm `admin@gmail.com` user has `role: "admin"` in Firestore.
-- **`npm install` fails**:
-  - Check internet connection.
-  - Ensure Node.js LTS is installed.
-- **`npm run dev` fails**:
-  - Is Terminal in the correct `StudentApp` folder?
-  - Did `npm install` complete without errors? Try deleting `node_modules` and run `npm install` again.
-- **App shows blank page or errors in browser**:
-  - Open browser developer tools (F12) > Console for error messages.
-- **Firebase CLI `login` or `deploy` issues**:
-  - Try `firebase logout` then `firebase login --reauth`.
-  - Ensure you're logged into the correct Google account owning the Firebase project.
-  - Verify project association with `firebase use`.
-- **"Blocked cross-origin request" warning in terminal:**
-  - This is often a development-time warning. The `allowedDevOrigins` in `next.config.js` might need adjustment for your specific preview URL. For `http://localhost:PORT`, this shouldn't block functionality.
-- **Email Sending Fails**:
-  - Double-check your `SMTP_...` credentials in `.env.local`.
-  - If using Gmail, ensure you have set up an "App Password" and are using that, not your regular Google password.
-  - Check your email provider's dashboard for any blocked sign-in attempts.
-- **Server-Side Features Not Working (especially on Vercel):**
-  - Ensure `GOOGLE_APPLICATION_CREDENTIALS_B64` and other server-side keys (`GOOGLE_GENAI_API_KEY`, `SMTP_...`) are correctly set as environment variables in your Vercel project's settings.
-
-## Stopping the Application
-
-1.  Go to the Terminal window where `npm run dev` is running.
-2.  Press `Ctrl+C`.
-3.  Press `Y` and Enter if asked, or `Ctrl+C` again.
-
 ## License
 
 This project is licensed under the [MIT License](LICENSE.txt).
