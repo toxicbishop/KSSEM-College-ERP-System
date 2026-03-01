@@ -38,6 +38,5 @@ yarn-error.log*
 next-env.d.ts
 
 .genkit/*
-.env*
-.env.local
+.env
 firebase-service-account.json
