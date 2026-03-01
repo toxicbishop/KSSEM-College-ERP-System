@@ -118,7 +118,7 @@ export default function LandingPage() {
         <div className="container flex h-14 items-center">
           <div className="mr-4 flex items-center">
             <Image
-              src="/placeholder-logo.svg"
+              src="/collage-logo.png"
               alt="College Logo"
               width={32}
               height={32}

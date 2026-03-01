@@ -58,7 +58,7 @@ export default function MaintenancePage() {
       <Card className="w-full max-w-lg shadow-2xl">
         <CardHeader className="items-center">
           <Image
-            src="/placeholder-logo.svg"
+            src="/collage-logo.png"
             alt="Site Logo"
             width={60}
             height={60}

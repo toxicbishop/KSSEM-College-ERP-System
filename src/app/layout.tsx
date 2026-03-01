@@ -84,8 +84,8 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: appDescription,
     icons: {
-      icon: "/placeholder-logo.svg", // Standard favicon
-      apple: "/placeholder-logo.svg", // Apple touch icon
+      icon: "/collage-logo.png", // Standard favicon
+      apple: "/collage-logo.png", // Apple touch icon
     },
   };
 }

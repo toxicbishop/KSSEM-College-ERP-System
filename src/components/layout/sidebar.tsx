@@ -183,7 +183,7 @@ export function Sidebar({
               isCollapsed ? "justify-center pt-2" : "space-x-3",
             )}>
             <Image
-              src="/placeholder-logo.svg"
+              src="/collage-logo.png"
               alt={`${collegeName} Logo`}
               width={isCollapsed ? 32 : 40}
               height={isCollapsed ? 32 : 40}
