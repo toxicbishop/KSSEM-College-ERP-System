@@ -375,7 +375,7 @@ function ProfileDetailsLoader() {
       description: `Requesting to change ${requestFieldInfo.label}.`,
     });
     try {
-      const idToken = await clientAuth!.currentUser!.getIdToken(true); // Force refresh token
+      const idToken = await clientAuth!.currentUser!.getIdToken(); // Force refresh token
       await createProfileChangeRequest(
         idToken,
         requestFieldInfo.key,
@@ -460,11 +460,7 @@ function ProfileDetailsLoader() {
   }
 
   if (!profile) {
-    return (
-      <p className="text-center text-[#8A99BB]">
-        Profile not available.
-      </p>
-    );
+    return <p className="text-center text-[#8A99BB]">Profile not available.</p>;
   }
 
   return (
@@ -514,12 +510,8 @@ function ProfileDetailsLoader() {
                 {getInitials(profile.name || profile.email || "User")}
               </AvatarFallback>
             </Avatar>
-            <h3 className="text-lg font-semibold text-white">
-              {profile.name}
-            </h3>
-            <p className="text-sm text-[#8A99BB] break-all">
-              {profile.email}
-            </p>
+            <h3 className="text-lg font-semibold text-white">{profile.name}</h3>
+            <p className="text-sm text-[#8A99BB] break-all">{profile.email}</p>
           </div>
           <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
             <InfoItem

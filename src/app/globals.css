@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -56,50 +55,50 @@
   }
 
   .dark {
-    /* Dark Theme Colors */
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
+    /* Dark Theme Colors — Navy/Teal scheme matching admin dashboard */
+    --background: 215 28% 14%; /* #1B2430 — dark navy */
+    --foreground: 0 0% 98%; /* #fafafa — white text */
 
-    --card: 240 10% 5.9%; /* Slightly lighter than background for cards */
+    --card: 213 22% 17%; /* #222B36 — slightly lighter navy for cards */
     --card-foreground: 0 0% 98%;
 
-    --popover: 240 10% 3.9%;
+    --popover: 213 22% 17%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 190 50% 55%; /* Slightly brighter Teal/Blue for dark */
-    --primary-foreground: 0 0% 100%;
+    --primary: 168 65% 51%; /* #2dd4bf — teal accent */
+    --primary-foreground: 215 28% 14%; /* dark bg text on teal buttons */
 
-    --secondary: 240 4% 16%;
+    --secondary: 213 18% 20%; /* #29333F — subtle secondary */
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 240 4% 12%; /* Darker muted */
-    --muted-foreground: 240 5% 64%;
+    --muted: 213 18% 20%; /* #29333F — muted backgrounds */
+    --muted-foreground: 220 18% 64%; /* #8A99BB — blue-gray muted text */
 
-    --accent: 190 50% 25%; /* Darker Teal/Blue for accent */
+    --accent: 168 65% 30%; /* darker teal for accent */
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 4% 16%;
-    --input: 240 4% 16%;
-    --ring: 190 50% 55%;
+    --border: 213 16% 22%; /* #2a3441 — subtle navy border */
+    --input: 213 16% 22%;
+    --ring: 168 65% 51%; /* teal ring */
 
-    --chart-1: 190 50% 55%;
-    --chart-2: 190 45% 45%;
+    --chart-1: 168 65% 51%;
+    --chart-2: 168 50% 40%;
     --chart-3: 160 40% 50%;
     --chart-4: 45 80% 50%;
-    --chart-5: 0 70% 50%; /* Adjusted destructive-like color for charts */
+    --chart-5: 0 70% 50%;
 
     /* Dark Sidebar specific variables */
-    --sidebar-background: 240 10% 5.9%; /* Slightly lighter dark for sidebar, matching card */
-    --sidebar-foreground: 0 0% 90%; /* Lighter gray for general text */
-    --sidebar-primary: 190 50% 55%; /* Teal/Blue for icons and active text */
+    --sidebar-background: 215 28% 12%; /* Even darker navy for sidebar */
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 168 65% 51%; /* Teal */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 4% 16%; /* Darker accent for active item background */
-    --sidebar-accent-foreground: 190 50% 55%; /* Teal/Blue for active item text & icon */
-    --sidebar-border: 240 4% 10%; /* Darker border for sidebar */
-    --sidebar-ring: 190 50% 55%;
+    --sidebar-accent: 213 18% 20%; /* Subtle highlight */
+    --sidebar-accent-foreground: 168 65% 51%;
+    --sidebar-border: 215 20% 16%;
+    --sidebar-ring: 168 65% 51%;
   }
 }
 

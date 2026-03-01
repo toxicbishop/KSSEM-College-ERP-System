@@ -107,7 +107,7 @@ export default function DashboardPage() {
             } as StudentProfile;
           }
 
-          const idToken = await clientAuth!.currentUser!.getIdToken(true); // Force refresh token
+          const idToken = await clientAuth!.currentUser!.getIdToken(); // Use cached token to speed up loading
           const attendancePromise = getAttendanceRecords(idToken);
 
           const gradesPromise = getGrades(user.uid);
