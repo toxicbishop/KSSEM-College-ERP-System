@@ -113,7 +113,7 @@ const InfoItem = ({
   profileValue: any;
 }) => (
   <div className="mb-2">
-    <Label htmlFor={fieldName} className="font-semibold text-muted-foreground">
+    <Label htmlFor={fieldName} className="font-semibold text-[#8A99BB]">
       {label}:
     </Label>
     {isEditMode && isEditable ? (
@@ -131,7 +131,7 @@ const InfoItem = ({
       )
     ) : isEditMode && onEditRequest ? (
       <div className="flex items-center gap-2 mt-1">
-        <span className="text-foreground break-all">{value || "N/A"}</span>
+        <span className="text-white break-all">{value || "N/A"}</span>
         <Button
           variant="outline"
           size="sm"
@@ -141,7 +141,7 @@ const InfoItem = ({
         </Button>
       </div>
     ) : (
-      <span className="ml-2 text-foreground break-all">{value || "N/A"}</span>
+      <span className="ml-2 text-white break-all">{value || "N/A"}</span>
     )}
   </div>
 );
@@ -169,12 +169,12 @@ const DocumentOrActionItem = ({
   const IconComponent = icon;
 
   return (
-    <div className="mb-3 flex flex-col items-start gap-2 rounded-md border p-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="mb-3 flex flex-col items-start gap-2 rounded-md border-[#334155] p-3 text-white sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center">
         {IconComponent && (
-          <IconComponent className="mr-2 h-4 w-4 text-muted-foreground" />
+          <IconComponent className="mr-2 h-4 w-4 text-[#8A99BB]" />
         )}
-        <span className="text-sm font-medium text-foreground">{label}</span>
+        <span className="text-sm font-medium text-white">{label}</span>
       </div>
       <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
         {url && url !== "#" ? (
@@ -202,7 +202,7 @@ const DocumentOrActionItem = ({
             {actionLabel}
           </Button>
         ) : (
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm text-[#8A99BB]">
             {actionLabel || "Not Available"}
           </span>
         )}
@@ -456,12 +456,12 @@ function ProfileDetailsLoader() {
   }
 
   if (error) {
-    return <p className="text-center text-destructive">{error}</p>;
+    return <p className="text-center text-red-400">{error}</p>;
   }
 
   if (!profile) {
     return (
-      <p className="text-center text-muted-foreground">
+      <p className="text-center text-[#8A99BB]">
         Profile not available.
       </p>
     );
@@ -474,7 +474,7 @@ function ProfileDetailsLoader() {
           <Button
             onClick={handleSaveProfile}
             disabled={isSubmitting}
-            className="bg-green-600 hover:bg-green-700">
+            className="bg-[#2dd4bf] text-black hover:bg-[#2dd4bf]/90">
             {isSubmitting ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
@@ -489,10 +489,10 @@ function ProfileDetailsLoader() {
         )}
       </div>
 
-      <Card className="shadow-lg">
+      <Card className="shadow-lg bg-[#222B36] border-[#2a3441] text-white">
         <CardHeader>
           <CardTitle className="flex items-center text-xl">
-            <UserSquare className="mr-3 h-6 w-6 text-primary" />
+            <UserSquare className="mr-3 h-6 w-6 text-[#2dd4bf]" />
             Personal Information
           </CardTitle>
         </CardHeader>
@@ -510,14 +510,14 @@ function ProfileDetailsLoader() {
                 className="object-cover"
                 data-ai-hint="profile photo"
               />
-              <AvatarFallback className="bg-primary/10 text-primary">
+              <AvatarFallback className="bg-[#2dd4bf]/10 text-[#2dd4bf]">
                 {getInitials(profile.name || profile.email || "User")}
               </AvatarFallback>
             </Avatar>
-            <h3 className="text-lg font-semibold text-foreground">
+            <h3 className="text-lg font-semibold text-white">
               {profile.name}
             </h3>
-            <p className="text-sm text-muted-foreground break-all">
+            <p className="text-sm text-[#8A99BB] break-all">
               {profile.email}
             </p>
           </div>
@@ -567,7 +567,7 @@ function ProfileDetailsLoader() {
                   name={name as string}
                   value={currentValue || ""}
                   onChange={handleChange}
-                  className="input-class mt-1 block w-full rounded-md border-input bg-background p-2 text-sm shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 h-10">
+                  className="input-class mt-1 block w-full rounded-md border-[#334155] bg-[#0F172A] p-2 text-sm shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 h-10">
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
@@ -715,10 +715,10 @@ function ProfileDetailsLoader() {
         </CardContent>
       </Card>
 
-      <Card className="shadow-lg">
+      <Card className="shadow-lg bg-[#222B36] border-[#2a3441] text-white">
         <CardHeader>
           <CardTitle className="flex items-center text-xl">
-            <Users className="mr-3 h-6 w-6 text-primary" />
+            <Users className="mr-3 h-6 w-6 text-[#2dd4bf]" />
             My Classrooms & Batches
           </CardTitle>
         </CardHeader>
@@ -726,7 +726,7 @@ function ProfileDetailsLoader() {
           {loadingClassrooms ? (
             <Skeleton className="h-20 w-full" />
           ) : classroomsError ? (
-            <div className="flex items-center gap-2 text-destructive">
+            <div className="flex items-center gap-2 text-red-400">
               <AlertTriangle className="h-5 w-5" />
               <p>{classroomsError}</p>
             </div>
@@ -735,18 +735,18 @@ function ProfileDetailsLoader() {
               {enrolledClassrooms.map((enrollment) => (
                 <li
                   key={enrollment.classroomId}
-                  className="rounded-md border p-3">
+                  className="rounded-md border-[#334155] p-3 text-white">
                   <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
                     <div>
                       <h4 className="font-semibold">
                         {enrollment.classroomName}
                       </h4>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-[#8A99BB]">
                         Subject: {enrollment.classroomSubject}
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-[#8A99BB]">
                         Your Batch:{" "}
-                        <span className="font-medium text-primary">
+                        <span className="font-medium text-[#2dd4bf]">
                           {enrollment.studentBatchInClassroom ||
                             "N/A (Whole Class)"}
                         </span>
@@ -763,17 +763,17 @@ function ProfileDetailsLoader() {
               ))}
             </ul>
           ) : (
-            <p className="text-muted-foreground">
+            <p className="text-[#8A99BB]">
               You are not currently enrolled in any classrooms.
             </p>
           )}
         </CardContent>
       </Card>
 
-      <Card className="shadow-lg">
+      <Card className="shadow-lg bg-[#222B36] border-[#2a3441] text-white">
         <CardHeader>
           <CardTitle className="flex items-center text-xl">
-            <BookOpen className="mr-3 h-6 w-6 text-primary" />
+            <BookOpen className="mr-3 h-6 w-6 text-[#2dd4bf]" />
             Academic Details
           </CardTitle>
         </CardHeader>
@@ -905,10 +905,10 @@ function ProfileDetailsLoader() {
         </CardContent>
       </Card>
 
-      <Card className="shadow-lg">
+      <Card className="shadow-lg bg-[#222B36] border-[#2a3441] text-white">
         <CardHeader>
           <CardTitle className="flex items-center text-xl">
-            <FileText className="mr-3 h-6 w-6 text-primary" />
+            <FileText className="mr-3 h-6 w-6 text-[#2dd4bf]" />
             Documents
           </CardTitle>
         </CardHeader>
@@ -954,8 +954,8 @@ function ProfileDetailsLoader() {
           </div>
           <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-              <h4 className="mb-2 flex items-center text-md font-semibold text-foreground">
-                <FileImage className="mr-2 h-5 w-5 text-muted-foreground" />
+              <h4 className="mb-2 flex items-center text-md font-semibold text-white">
+                <FileImage className="mr-2 h-5 w-5 text-[#8A99BB]" />
                 Uploaded Photo
               </h4>
               <Avatar className="h-[100px] w-[100px] shadow-sm rounded-md">
@@ -970,14 +970,14 @@ function ProfileDetailsLoader() {
                   className="object-cover"
                   data-ai-hint="passport photo"
                 />
-                <AvatarFallback className="bg-primary/10 text-primary text-xl rounded-md">
+                <AvatarFallback className="bg-[#2dd4bf]/10 text-[#2dd4bf] text-xl rounded-md">
                   {getInitials(profile.name || "User")}
                 </AvatarFallback>
               </Avatar>
             </div>
             <div>
-              <h4 className="mb-2 flex items-center text-md font-semibold text-foreground">
-                <FileImage className="mr-2 h-5 w-5 text-muted-foreground" />
+              <h4 className="mb-2 flex items-center text-md font-semibold text-white">
+                <FileImage className="mr-2 h-5 w-5 text-[#8A99BB]" />
                 Uploaded Signature
               </h4>
               {(
@@ -996,21 +996,21 @@ function ProfileDetailsLoader() {
                   alt="Uploaded Signature"
                   width={200}
                   height={80}
-                  className="rounded-md border bg-white object-contain p-1 shadow-sm"
+                  className="rounded-md border-[#334155] bg-white object-contain p-1 shadow-sm"
                   data-ai-hint="signature"
                 />
               ) : (
-                <p className="text-sm text-muted-foreground">N/A</p>
+                <p className="text-sm text-[#8A99BB]">N/A</p>
               )}
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="shadow-lg">
+      <Card className="shadow-lg bg-[#222B36] border-[#2a3441] text-white">
         <CardHeader>
           <CardTitle className="flex items-center text-xl">
-            <ClipboardList className="mr-3 h-6 w-6 text-primary" />
+            <ClipboardList className="mr-3 h-6 w-6 text-[#2dd4bf]" />
             Exam Details
           </CardTitle>
         </CardHeader>
@@ -1101,7 +1101,7 @@ function ProfileDetailsLoader() {
                 id="currentValue"
                 value={requestOldValue}
                 readOnly
-                className="col-span-3 bg-muted"
+                className="col-span-3 bg-[#0F172A]"
               />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
@@ -1162,7 +1162,7 @@ function ProfileDetailsLoader() {
                 </div>
               )}
               {fetchClassmatesError && (
-                <p className="text-destructive text-center">
+                <p className="text-red-400 text-center">
                   {fetchClassmatesError}
                 </p>
               )}
@@ -1171,7 +1171,7 @@ function ProfileDetailsLoader() {
                 classmates.length > 0 && (
                   <Table>
                     <TableHeader>
-                      <TableRow>
+                      <TableRow className="border-[#334155] hover:bg-white/5">
                         <TableHead className="w-12"></TableHead>
                         <TableHead>Name</TableHead>
                         <TableHead>Student ID</TableHead>
@@ -1183,7 +1183,7 @@ function ProfileDetailsLoader() {
                         <TableRow key={classmate.userId}>
                           <TableCell>
                             <Avatar className="h-8 w-8">
-                              <AvatarFallback className="text-[10px] bg-primary/10 text-primary">
+                              <AvatarFallback className="text-[10px] bg-[#2dd4bf]/10 text-[#2dd4bf]">
                                 {getInitials(classmate.name)}
                               </AvatarFallback>
                             </Avatar>
@@ -1199,7 +1199,7 @@ function ProfileDetailsLoader() {
               {!loadingClassmates &&
                 !fetchClassmatesError &&
                 classmates.length === 0 && (
-                  <p className="text-muted-foreground text-center">
+                  <p className="text-[#8A99BB] text-center">
                     No other classmates found in this classroom.
                   </p>
                 )}
