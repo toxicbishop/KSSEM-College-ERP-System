@@ -1030,3 +1030,40 @@ E0301 08:52:00.777524   16476 watch.go:40] Failed to load config from "c:\\Code\
  {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0301 08:53:30.777447   16476 watch.go:40] Failed to load config from \"c:\\\\Code\\\\College-ERP\\\\dataconnect\": could not find dataconnect.yaml in `c:\\Code\\College-ERP\\dataconnect`\n"}}
 [debug] [2026-03-01T03:23:40.777Z] E0301 08:53:40.777424   16476 watch.go:40] Failed to load config from "c:\\Code\\College-ERP\\dataconnect": could not find dataconnect.yaml in `c:\Code\College-ERP\dataconnect`
  {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0301 08:53:40.777424   16476 watch.go:40] Failed to load config from \"c:\\\\Code\\\\College-ERP\\\\dataconnect\": could not find dataconnect.yaml in `c:\\Code\\College-ERP\\dataconnect`\n"}}
+[debug] [2026-03-01T03:23:50.777Z] E0301 08:53:50.777431   16476 watch.go:40] Failed to load config from "c:\\Code\\College-ERP\\dataconnect": could not find dataconnect.yaml in `c:\Code\College-ERP\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0301 08:53:50.777431   16476 watch.go:40] Failed to load config from \"c:\\\\Code\\\\College-ERP\\\\dataconnect\": could not find dataconnect.yaml in `c:\\Code\\College-ERP\\dataconnect`\n"}}
+[info] [Firebase Plugin] Stopping Data Connect toolkit
+[warn] !  Data Connect Emulator has exited upon receiving signal: SIGINT 
+[debug] [2026-03-01T03:24:43.973Z] [Firebase Plugin] Activating Firebase extension.
+[info] [Firebase Plugin] Checked firebase-tools, is up to date!
+[debug] [2026-03-01T03:24:57.180Z] [Firebase Plugin] requireAuthWrapper
+[debug] [2026-03-01T03:24:57.181Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-03-01T03:24:57.182Z] > authorizing via signed-in user (pranavarun19@gmail.com)
+[debug] [2026-03-01T03:24:57.185Z] Checked if tokens are valid: false, expires at: 1772335525615
+[debug] [2026-03-01T03:24:57.185Z] Checked if tokens are valid: false, expires at: 1772335525615
+[debug] [2026-03-01T03:24:57.186Z] > refreshing access token with scopes: []
+[debug] [2026-03-01T03:24:57.187Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-03-01T03:24:57.187Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-03-01T03:24:57.197Z] [Firebase Plugin] VSCode notification server listening on port 40001
+[info] [Firebase Plugin] Starting Data Connect toolkit (version 3.1.4) on port 50001
+[debug] [2026-03-01T03:24:57.768Z] 'fdc build' failed with error: Unable to build your Data Connect schema and connectors (exit code 1): E0301 08:54:57.765736    9712 cmd.go:43] Error loading data connect config: could not find dataconnect.yaml in `c:\Code\College-ERP\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"'fdc build' failed with error: Unable to build your Data Connect schema and connectors (exit code 1): E0301 08:54:57.765736    9712 cmd.go:43] Error loading data connect config: could not find dataconnect.yaml in `c:\\Code\\College-ERP\\dataconnect`\n"}}
+[debug] [2026-03-01T03:24:57.769Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"dataconnect"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2026-03-01T03:24:57.769Z] Ignoring unsupported arg: port {"metadata":{"emulator":{"name":"dataconnect"},"message":"Ignoring unsupported arg: port"}}
+[debug] [2026-03-01T03:24:57.769Z] Starting Data Connect Emulator with command {"binary":"C:\\Users\\Levono\\.cache\\firebase\\emulators\\dataconnect-emulator-3.1.4.exe","args":["--logtostderr","-v=2","dev","--listen=localhost:50001","--config_dir=c:\\Code\\College-ERP\\dataconnect","--enable_output_schema_extensions=true","--enable_output_generated_sdk=true"],"optionalArgs":["listen","config_dir","enable_output_schema_extensions","enable_output_generated_sdk"],"joinArgs":true,"shell":false,"port":9399} {"metadata":{"emulator":{"name":"dataconnect"},"message":"Starting Data Connect Emulator with command {\"binary\":\"C:\\\\Users\\\\Levono\\\\.cache\\\\firebase\\\\emulators\\\\dataconnect-emulator-3.1.4.exe\",\"args\":[\"--logtostderr\",\"-v=2\",\"dev\",\"--listen=localhost:50001\",\"--config_dir=c:\\\\Code\\\\College-ERP\\\\dataconnect\",\"--enable_output_schema_extensions=true\",\"--enable_output_generated_sdk=true\"],\"optionalArgs\":[\"listen\",\"config_dir\",\"enable_output_schema_extensions\",\"enable_output_generated_sdk\"],\"joinArgs\":true,\"shell\":false,\"port\":9399}"}}
+[info] i  dataconnect: Data Connect Emulator logging to dataconnect-debug.log {"metadata":{"emulator":{"name":"dataconnect"},"message":"Data Connect Emulator logging to \u001b[1mdataconnect-debug.log\u001b[22m"}}
+[debug] [2026-03-01T03:24:57.823Z] E0301 08:54:57.798154    6184 dev.go:83] Failed to load initial config from "c:\\Code\\College-ERP\\dataconnect": could not find dataconnect.yaml in `c:\Code\College-ERP\dataconnect`
+E0301 08:54:57.799214    6184 watch.go:116] watchAllDir unable to walk dir `c:\Code\College-ERP\dataconnect`: CreateFile c:\Code\College-ERP\dataconnect: The system cannot find the file specified.
+I0301 08:54:57.810734    6184 dev.go:104] Listening on address (HTTP + gRPC): 127.0.0.1:50001
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0301 08:54:57.798154    6184 dev.go:83] Failed to load initial config from \"c:\\\\Code\\\\College-ERP\\\\dataconnect\": could not find dataconnect.yaml in `c:\\Code\\College-ERP\\dataconnect`\nE0301 08:54:57.799214    6184 watch.go:116] watchAllDir unable to walk dir `c:\\Code\\College-ERP\\dataconnect`: CreateFile c:\\Code\\College-ERP\\dataconnect: The system cannot find the file specified.\nI0301 08:54:57.810734    6184 dev.go:104] Listening on address (HTTP + gRPC): 127.0.0.1:50001\n"}}
+[debug] [2026-03-01T03:24:58.135Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-03-01T03:24:58.135Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-03-01T03:24:58.160Z] [Firebase Plugin] User found:  pranavarun19@gmail.com
+[info] [Firebase Plugin] (Core:Project) New user detected, fetching projects
+[debug] [2026-03-01T03:24:58.161Z] Checked if tokens are valid: true, expires at: 1772339097136
+[debug] [2026-03-01T03:24:58.162Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=1000
+[error] [Firebase Plugin] error:  {}
+[debug] [2026-03-01T03:24:59.378Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2026-03-01T03:24:59.379Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[info] [Firebase Plugin] Stopping Data Connect toolkit
+[warn] !  Data Connect Emulator has exited upon receiving signal: SIGINT 
