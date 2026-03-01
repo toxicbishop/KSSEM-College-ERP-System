@@ -385,3 +385,7 @@ After these steps, your application should be connected to the new Firebase proj
 1.  Go to the Terminal window where `npm run dev` is running.
 2.  Press `Ctrl+C`.
 3.  Press `Y` and Enter if asked, or `Ctrl+C` again.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE.txt).
