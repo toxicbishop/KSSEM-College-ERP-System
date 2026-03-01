@@ -1,11 +1,11 @@
 // src/context/auth-context.tsx
-'use client';
+"use client";
 
-import type { User } from 'firebase/auth';
-import { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '@/lib/firebase/client';
-import { Loader2 } from 'lucide-react'; // Import Loader2
+import type { User } from "firebase/auth";
+import { createContext, useContext, useEffect, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebase/client";
+import { Loader2 } from "lucide-react"; // Import Loader2
 
 interface AuthContextType {
   user: User | null;
@@ -22,6 +22,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) {
+      // Firebase auth failed to initialize — stop loading so the app doesn't hang
+      console.error(
+        "Firebase Auth is not initialized. Check your environment variables.",
+      );
+      setLoading(false);
+      return;
+    }
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
@@ -33,15 +41,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Avoid rendering children until auth state is determined
   if (loading) {
-      // Updated full-page loading state
-      return (
-          <div className="flex h-screen flex-col items-center justify-center bg-background text-foreground">
-              <Loader2 className="h-10 w-10 animate-spin text-primary" />
-              <span className="mt-3 text-lg">Loading application...</span>
-          </div>
-      );
+    // Updated full-page loading state
+    return (
+      <div className="flex h-screen flex-col items-center justify-center bg-background text-foreground">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <span className="mt-3 text-lg">Loading application...</span>
+      </div>
+    );
   }
-
 
   return (
     <AuthContext.Provider value={{ user, loading }}>
@@ -53,7 +60,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

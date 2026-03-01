@@ -1,7 +1,12 @@
-
 // src/lib/gtag.ts
 
-export const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || '';
+declare global {
+  interface Window {
+    gtag: (...args: any[]) => void;
+  }
+}
+
+export const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "";
 
 /**
  * Sends a pageview event to Google Analytics.
@@ -12,11 +17,11 @@ export const pageview = (path: string): void => {
     // console.warn("GA_TRACKING_ID not set. Pageview not sent.");
     return;
   }
-  if (typeof window.gtag !== 'function') {
+  if (typeof window.gtag !== "function") {
     // console.warn("window.gtag is not a function. Pageview not sent.");
     return;
   }
-  window.gtag('config', GA_TRACKING_ID, {
+  window.gtag("config", GA_TRACKING_ID, {
     page_path: path,
   });
 };
@@ -36,11 +41,11 @@ export const event = ({ action, category, label, value }: GTagEvent): void => {
     // console.warn("GA_TRACKING_ID not set. Event not sent.");
     return;
   }
-  if (typeof window.gtag !== 'function') {
+  if (typeof window.gtag !== "function") {
     // console.warn("window.gtag is not a function. Event not sent.");
     return;
   }
-  window.gtag('event', action, {
+  window.gtag("event", action, {
     event_category: category,
     event_label: label,
     value: value,

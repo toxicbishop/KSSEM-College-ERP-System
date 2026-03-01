@@ -1,15 +1,23 @@
-
 // src/middleware.ts
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 // Import from the new Edge-safe settings service
-import { getMinimalSettingsForMiddleware } from '@/services/middleware-settings';
-import type { MinimalSystemSettings } from '@/services/middleware-settings';
+import { getMinimalSettingsForMiddleware } from "@/services/middleware-settings";
+import type { MinimalSystemSettings } from "@/services/middleware-settings";
 
-const publicRoutes = ['/', '/signin', '/signup', '/about', '/contact', '/faq']; // Add '/faq' to public routes
-const maintenanceRoute = '/maintenance';
-const adminRoutePrefix = '/admin';
-const dashboardRoute = '/dashboard';
+const publicRoutes = [
+  "/",
+  "/signin",
+  "/signup",
+  "/about",
+  "/contact",
+  "/faq",
+  "/privacy-policy",
+  "/terms-of-service",
+];
+const maintenanceRoute = "/maintenance";
+const adminRoutePrefix = "/admin";
+const dashboardRoute = "/dashboard";
 
 // Default settings structure, ensure it matches MinimalSystemSettings interface
 const defaultMinimalMiddlewareSettings: MinimalSystemSettings = {
@@ -25,13 +33,16 @@ export async function middleware(request: NextRequest) {
     settings = await getMinimalSettingsForMiddleware(); // Use the new Edge-safe function
     // console.log(`Middleware: Fetched minimal settings for ${pathname}. Maintenance Mode: ${settings.maintenanceMode}`);
   } catch (error) {
-    console.error(`Middleware: CRITICAL Error fetching minimal settings for ${pathname}:`, error);
+    console.error(
+      `Middleware: CRITICAL Error fetching minimal settings for ${pathname}:`,
+      error,
+    );
     // Fallback to default minimal settings if fetching fails
     settings = { ...defaultMinimalMiddlewareSettings };
     // console.log(`Middleware: Using fallback default minimal settings due to error for ${pathname}. Maintenance Mode: ${settings.maintenanceMode}`);
   }
 
-  const hasAuthCookie = request.cookies.has('firebaseAuthToken');
+  const hasAuthCookie = request.cookies.has("firebaseAuthToken");
   // console.log(`Middleware Diagnostics for ${pathname}: AuthCookie: ${hasAuthCookie}, Maintenance Setting: ${settings.maintenanceMode}`);
 
   // --- Maintenance Mode Logic ---
@@ -45,13 +56,13 @@ export async function middleware(request: NextRequest) {
     }
 
     // Allow access to sign-in page (so admins can log in to turn off maintenance mode)
-    if (pathname === '/signin') {
+    if (pathname === "/signin") {
       // console.log(`Middleware: Path ${pathname} is /signin. Allowing.`);
       return NextResponse.next();
     }
 
     // Allow API routes (e.g., for Genkit, Firebase, etc.)
-    if (pathname.startsWith('/api/')) {
+    if (pathname.startsWith("/api/")) {
       // console.log(`Middleware: Path ${pathname} is API route. Allowing.`);
       return NextResponse.next();
     }
@@ -66,7 +77,7 @@ export async function middleware(request: NextRequest) {
       } else {
         // Trying to access admin route without auth. Redirect to sign-in so admin can log in.
         // console.log(`Middleware: Path ${pathname} is admin route, no auth cookie. Redirecting to /signin.`);
-        url.pathname = '/signin';
+        url.pathname = "/signin";
         return NextResponse.redirect(url);
       }
     }
@@ -79,27 +90,28 @@ export async function middleware(request: NextRequest) {
   // console.log(`Middleware: Maintenance mode IS OFF for ${pathname}. Proceeding with normal auth logic.`);
 
   // --- Standard Auth Logic (if not in maintenance mode) ---
-  const isProtectedRoute = !publicRoutes.includes(pathname) &&
-                           pathname !== maintenanceRoute &&
-                           !pathname.startsWith('/_next/') && // Next.js internals
-                           !pathname.startsWith('/api/') &&    // API routes (already handled if maintenance was on)
-                           pathname !== '/favicon.ico' &&
-                           pathname !== '/collage-logo.png'; // Static assets
+  const isProtectedRoute =
+    !publicRoutes.includes(pathname) &&
+    pathname !== maintenanceRoute &&
+    !pathname.startsWith("/_next/") && // Next.js internals
+    !pathname.startsWith("/api/") && // API routes (already handled if maintenance was on)
+    pathname !== "/favicon.ico" &&
+    pathname !== "/collage-logo.png"; // Static assets
 
   // 1. User is NOT authenticated and tries to access a PROTECTED route
   if (!hasAuthCookie && isProtectedRoute) {
     // console.log(`Middleware: No auth cookie, accessing protected route ${pathname}. Redirecting to /signin.`);
-    url.pathname = '/signin';
+    url.pathname = "/signin";
     return NextResponse.redirect(url);
   }
 
   // 2. User IS authenticated and tries to access signin/signup pages
-  if (hasAuthCookie && (pathname === '/signin' || pathname === '/signup')) {
+  if (hasAuthCookie && (pathname === "/signin" || pathname === "/signup")) {
     // console.log(`Middleware: Auth cookie present, accessing auth route ${pathname}. Redirecting to ${dashboardRoute}.`)
     url.pathname = dashboardRoute; // Redirect to the main dashboard
     return NextResponse.redirect(url);
   }
-  
+
   return NextResponse.next();
 }
 
@@ -114,6 +126,6 @@ export const config = {
      * It's important that this matcher DOES include /api routes, /signin, /maintenance, etc.,
      * as the middleware logic needs to run for them.
      */
-    '/((?!_next/static|_next/image|favicon.ico|collage-logo.png).*)',
+    "/((?!_next/static|_next/image|favicon.ico|collage-logo.png).*)",
   ],
 };
