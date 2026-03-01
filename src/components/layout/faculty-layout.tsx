@@ -217,7 +217,7 @@ export function FacultyLayout({ children }: { children: React.ReactNode }) {
                 isSidebarCollapsed ? "justify-center pt-2" : "space-x-3",
               )}>
               <Image
-                src="/college-logo.png"
+                src="/placeholder-logo.svg"
                 alt={`${collegeName} Faculty Logo`}
                 width={isSidebarCollapsed ? 32 : 40}
                 height={isSidebarCollapsed ? 32 : 40}

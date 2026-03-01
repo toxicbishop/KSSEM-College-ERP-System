@@ -15,7 +15,7 @@ export default function AboutPage() {
         <div className="container flex h-14 items-center">
           <div className="mr-4 flex items-center">
             <Image
-              src="/college-logo.png"
+              src="/placeholder-logo.svg"
               alt="College Logo"
               width={32}
               height={32}

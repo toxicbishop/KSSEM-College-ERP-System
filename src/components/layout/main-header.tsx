@@ -76,7 +76,7 @@ export function MainHeader() {
           </Sheet>
         ) : (
           <Image
-            src="/college-logo.png"
+            src="/placeholder-logo.svg"
             alt="College Logo"
             width={40}
             height={40}
