@@ -1,0 +1,11 @@
+{
+  "projects": {
+    "testing": "college-hub-43ssh",
+    "development": "erp-dev-ef0f0",
+    "default": "erp-dev-ef0f0",
+    "test": "erp-test-6eba5",
+    "College ERP": "college-erp-system-f57d3"
+  },
+  "targets": {},
+  "etags": {}
+}
