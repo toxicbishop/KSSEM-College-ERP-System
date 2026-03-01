@@ -32,6 +32,18 @@ import {
 } from "@/components/ui/tooltip";
 import { getSystemSettings } from "@/services/system-settings";
 import { useIsMobile } from "@/hooks/use-is-mobile";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+// Helper function to get initials from a name
+const getInitials = (name: string) => {
+  if (!name) return "U";
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .substring(0, 2)
+    .toUpperCase();
+};
 
 const navigationItems = [
   { href: "/dashboard", label: "Home", icon: Home },
@@ -258,7 +270,15 @@ export function Sidebar({
                     "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium justify-start text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
                     isCollapsed ? "justify-center" : "",
                   )}>
-                  <LogOut className="w-5 h-5 text-sidebar-primary shrink-0" />
+                  <Avatar className="h-6 w-6">
+                    <AvatarImage
+                      src={user?.photoURL || ""}
+                      alt={user?.displayName || "Student"}
+                    />
+                    <AvatarFallback className="text-[10px] bg-sidebar-primary text-sidebar-primary-foreground">
+                      {getInitials(user?.displayName || user?.email || "ST")}
+                    </AvatarFallback>
+                  </Avatar>
                   {!isCollapsed && <span>Logout</span>}
                 </Button>
               </TooltipTrigger>

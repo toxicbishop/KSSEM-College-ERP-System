@@ -1,30 +1,62 @@
+"use client";
 
-'use client';
+import { useEffect, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from "@/context/auth-context";
+import { useToast } from "@/hooks/use-toast";
+import { MainHeader } from "@/components/layout/main-header";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import {
+  ArrowLeft,
+  UserSquare,
+  BarChart,
+  CheckSquare,
+  GraduationCap,
+  AlertTriangle,
+  Lightbulb,
+} from "lucide-react";
+import { auth as clientAuth } from "@/lib/firebase/client";
+import { getStudentProfile } from "@/services/profile";
+import { getAttendanceRecords } from "@/services/attendance";
+import { getGradesForStudent } from "@/services/grades"; // Changed from getGrades
+import { analyzeGrades } from "@/ai/flows/analyze-grades-flow";
+import type { StudentProfile } from "@/services/profile";
+import type { AttendanceRecord } from "@/services/attendance";
+import type { Grade } from "@/types/grades";
+import type { GradeAnalysisOutput } from "@/types/grade-analysis";
+import Image from "next/image";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { format, parseISO } from "date-fns";
+import { cn } from "@/lib/utils";
+import { GradesChartCard } from "@/components/dashboard/grades-chart-card";
+import { AttendanceCalendarCard } from "@/components/profile/attendance-calendar-card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-import { useEffect, useState } from 'react';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '@/context/auth-context';
-import { useToast } from '@/hooks/use-toast';
-import { MainHeader } from '@/components/layout/main-header';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, UserSquare, BarChart, CheckSquare, GraduationCap, AlertTriangle, Lightbulb } from 'lucide-react';
-import { auth as clientAuth } from '@/lib/firebase/client';
-import { getStudentProfile } from '@/services/profile';
-import { getAttendanceRecords } from '@/services/attendance';
-import { getGradesForStudent } from '@/services/grades'; // Changed from getGrades
-import { analyzeGrades } from '@/ai/flows/analyze-grades-flow';
-import type { StudentProfile } from '@/services/profile';
-import type { AttendanceRecord } from '@/services/attendance';
-import type { Grade } from '@/services/grades';
-import type { GradeAnalysisOutput } from '@/types/grade-analysis';
-import Image from 'next/image';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { format, parseISO } from 'date-fns';
-import { cn } from '@/lib/utils';
-import { GradesChartCard } from '@/components/dashboard/grades-chart-card';
-import { AttendanceCalendarCard } from '@/components/profile/attendance-calendar-card';
+// Helper function to get initials from a name
+const getInitials = (name: string) => {
+  if (!name) return "U";
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .substring(0, 2)
+    .toUpperCase();
+};
 
 interface StudentData {
   profile: StudentProfile;
@@ -34,11 +66,11 @@ interface StudentData {
 }
 
 const defaultGradeAnalysis: GradeAnalysisOutput = {
-    overallSummary: "AI analysis is currently unavailable. Please check the API key or try again later.",
-    strengths: [],
-    areasForImprovement: []
+  overallSummary:
+    "AI analysis is currently unavailable. Please check the API key or try again later.",
+  strengths: [],
+  areasForImprovement: [],
 };
-
 
 export default function FacultyStudentDetailPage() {
   const { user, loading: authLoading } = useAuth();
@@ -47,7 +79,7 @@ export default function FacultyStudentDetailPage() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const studentId = params.studentId as string;
-  const classroomIdFromUrl = searchParams.get('classroomId');
+  const classroomIdFromUrl = searchParams.get("classroomId");
 
   const [studentData, setStudentData] = useState<StudentData | null>(null);
   const [loadingData, setLoadingData] = useState(true);
@@ -60,40 +92,50 @@ export default function FacultyStudentDetailPage() {
   }, [user, authLoading, studentId]);
 
   const fetchStudentData = async () => {
-    if (!user || !clientAuth.currentUser) return;
+    if (!user || !clientAuth || !clientAuth.currentUser) return;
     setLoadingData(true);
     setError(null);
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
-      
-      const attendancePromise = getAttendanceRecords(idToken, studentId); 
+      const idToken = await clientAuth!.currentUser!.getIdToken();
+
+      const attendancePromise = getAttendanceRecords(idToken, studentId);
       const profilePromise = getStudentProfile(idToken, studentId);
       const gradesPromise = getGradesForStudent(idToken, studentId); // Use the correct service function
 
-      const [profile, attendance, grades] = await Promise.all([profilePromise, attendancePromise, gradesPromise]);
+      const [profile, attendance, grades] = await Promise.all([
+        profilePromise,
+        attendancePromise,
+        gradesPromise,
+      ]);
 
       if (!profile) {
         throw new Error("Student profile not found.");
       }
-      
+
       let analysis: GradeAnalysisOutput;
       try {
         analysis = await analyzeGrades(grades);
       } catch (aiError) {
-        console.error("Faculty Student Detail Page: AI grade analysis failed.", aiError);
+        console.error(
+          "Faculty Student Detail Page: AI grade analysis failed.",
+          aiError,
+        );
         toast({
           title: "AI Analysis Unavailable",
           description: "Could not generate AI grade analysis for this student.",
-          variant: "default"
+          variant: "default",
         });
         analysis = defaultGradeAnalysis;
       }
 
       setStudentData({ profile, attendance, grades, analysis });
-
     } catch (err) {
       setError((err as Error).message || "Failed to load student data.");
-      toast({ title: "Error", description: (err as Error).message, variant: "destructive" });
+      toast({
+        title: "Error",
+        description: (err as Error).message,
+        variant: "destructive",
+      });
     } finally {
       setLoadingData(false);
     }
@@ -102,7 +144,7 @@ export default function FacultyStudentDetailPage() {
   const handleGoBack = () => {
     const backUrl = classroomIdFromUrl
       ? `/faculty/students?classroomId=${classroomIdFromUrl}`
-      : '/faculty/students';
+      : "/faculty/students";
     router.push(backUrl);
   };
 
@@ -131,29 +173,29 @@ export default function FacultyStudentDetailPage() {
       <>
         <MainHeader />
         <div className="p-6 text-center">
-            <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />
-            <h2 className="mt-4 text-xl font-semibold">Error Loading Data</h2>
-            <p className="text-muted-foreground">{error}</p>
-            <Button onClick={handleGoBack} className="mt-4">
-                <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
-            </Button>
+          <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />
+          <h2 className="mt-4 text-xl font-semibold">Error Loading Data</h2>
+          <p className="text-muted-foreground">{error}</p>
+          <Button onClick={handleGoBack} className="mt-4">
+            <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
+          </Button>
         </div>
       </>
     );
   }
-  
+
   if (!studentData) {
-      return (
-           <>
-            <MainHeader />
-            <div className="p-6 text-center">
-                <p>No data available for this student.</p>
-                 <Button onClick={handleGoBack} className="mt-4">
-                    <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
-                </Button>
-            </div>
-           </>
-      )
+    return (
+      <>
+        <MainHeader />
+        <div className="p-6 text-center">
+          <p>No data available for this student.</p>
+          <Button onClick={handleGoBack} className="mt-4">
+            <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
+          </Button>
+        </div>
+      </>
+    );
   }
 
   const { profile, attendance, grades, analysis } = studentData;
@@ -163,46 +205,61 @@ export default function FacultyStudentDetailPage() {
       <MainHeader />
       <div className="p-4 md:p-6 space-y-6">
         <div>
-            <Button variant="outline" onClick={handleGoBack}>
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back to Student List
-            </Button>
-            <h2 className="text-2xl font-bold tracking-tight md:text-3xl mt-4">
-              Student Profile: {profile.name}
-            </h2>
-            <p className="text-muted-foreground">Roll No: {profile.studentId}</p>
+          <Button variant="outline" onClick={handleGoBack}>
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Student List
+          </Button>
+          <h2 className="text-2xl font-bold tracking-tight md:text-3xl mt-4">
+            Student Profile: {profile.name}
+          </h2>
+          <p className="text-muted-foreground">Roll No: {profile.studentId}</p>
         </div>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-1 space-y-6">
-                 <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center text-xl">
-                            <UserSquare className="mr-3 h-6 w-6 text-primary" />
-                            Personal Details
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2 text-sm">
-                        <div className="flex justify-center mb-4">
-                            <Image
-                                src={profile.profilePhotoUrl || "https://placehold.co/150x150.png"}
-                                alt="Profile Photo"
-                                width={120}
-                                height={120}
-                                className="rounded-full object-cover shadow-md"
-                                data-ai-hint="student headshot"
-                            />
-                        </div>
-                        <div><strong className="text-muted-foreground">Email:</strong> {profile.email}</div>
-                        <div><strong className="text-muted-foreground">Contact:</strong> {profile.contactNumber}</div>
-                        <div><strong className="text-muted-foreground">Course:</strong> {profile.courseProgram}</div>
-                        <div><strong className="text-muted-foreground">Batch:</strong> {profile.sectionOrBatch}</div>
-                    </CardContent>
-                </Card>
-            </div>
-             <div className="lg:col-span-2 space-y-6">
-                <GradesChartCard grades={grades} analysis={analysis} />
-                <AttendanceCalendarCard attendanceRecords={attendance} />
-            </div>
+          <div className="lg:col-span-1 space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center text-xl">
+                  <UserSquare className="mr-3 h-6 w-6 text-primary" />
+                  Personal Details
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                <div className="flex justify-center mb-4">
+                  <Avatar className="h-[120px] w-[120px] shadow-md text-3xl">
+                    <AvatarImage
+                      src={profile.profilePhotoUrl || ""}
+                      alt={profile.name || "Profile Photo"}
+                      className="object-cover"
+                      data-ai-hint="student headshot"
+                    />
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      {getInitials(profile.name || profile.email || "Student")}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+                <div>
+                  <strong className="text-muted-foreground">Email:</strong>{" "}
+                  {profile.email}
+                </div>
+                <div>
+                  <strong className="text-muted-foreground">Contact:</strong>{" "}
+                  {profile.contactNumber}
+                </div>
+                <div>
+                  <strong className="text-muted-foreground">Course:</strong>{" "}
+                  {profile.courseProgram}
+                </div>
+                <div>
+                  <strong className="text-muted-foreground">Batch:</strong>{" "}
+                  {profile.sectionOrBatch}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="lg:col-span-2 space-y-6">
+            <GradesChartCard grades={grades} analysis={analysis} />
+            <AttendanceCalendarCard attendanceRecords={attendance} />
+          </div>
         </div>
       </div>
     </>
