@@ -11,12 +11,26 @@ import { useEffect, useState } from "react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Sidebar } from "./sidebar";
+import { useAuth } from "@/context/auth-context";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+// Helper function to get initials from a name
+const getInitials = (name: string) => {
+  if (!name) return "U";
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .substring(0, 2)
+    .toUpperCase();
+};
 
 export function MainHeader() {
   const [collegeName, setCollegeName] = useState("KSSEM");
   const [appNameLoading, setAppNameLoading] = useState(true);
   const isMobile = useIsMobile();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchAppName = async () => {
@@ -87,7 +101,20 @@ export function MainHeader() {
         <ThemeToggle />
         <Link href="/profile">
           <Button variant="ghost" size="icon" className="rounded-full">
-            <UserCircle className="h-6 w-6 text-muted-foreground hover:text-primary transition-colors" />
+            <Avatar className="h-8 w-8 hover:ring-2 hover:ring-primary transition-all">
+              <AvatarImage
+                src={user?.photoURL || ""}
+                alt={user?.displayName || "User profile"}
+                data-ai-hint="user avatar current profile"
+              />
+              <AvatarFallback className="bg-primary/10 text-primary">
+                {user ? (
+                  getInitials(user.displayName || user.email || "User")
+                ) : (
+                  <UserCircle className="h-6 w-6 text-muted-foreground" />
+                )}
+              </AvatarFallback>
+            </Avatar>
             <span className="sr-only">User profile</span>
           </Button>
         </Link>
