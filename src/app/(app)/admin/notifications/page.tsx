@@ -1,23 +1,36 @@
+"use client";
 
-'use client';
-
-import { useEffect, useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/auth-context';
-import { db, auth as clientAuth } from '@/lib/firebase/client';
-import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { sendBulkEmail } from '@/ai/flows/send-bulk-email-flow';
-import { ShieldAlert, Send, Users, Loader2 } from 'lucide-react';
-import type { StudentProfile } from '@/services/profile';
+import { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/auth-context";
+import { db, auth as clientAuth } from "@/lib/firebase/client";
+import { doc, getDoc, collection, getDocs } from "firebase/firestore";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { sendBulkEmail } from "@/ai/flows/send-bulk-email-flow";
+import { ShieldAlert, Send, Users, Loader2 } from "lucide-react";
+import type { StudentProfile } from "@/services/profile";
 
 const ADMIN_EMAIL = "admin@gmail.com";
 
@@ -37,26 +50,38 @@ export default function AdminNotificationsPage() {
   const [recipients, setRecipients] = useState<UserRecipient[]>([]);
   const [loadingRecipients, setLoadingRecipients] = useState(false);
 
-  const [emailSubject, setEmailSubject] = useState('');
-  const [emailBody, setEmailBody] = useState('');
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailBody, setEmailBody] = useState("");
   const [isSending, setIsSending] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
-      router.push('/signin');
+      router.push("/signin");
       return;
     }
     const checkAdminAccess = async () => {
       setCheckingRole(true);
-      const userDocRef = doc(db, 'users', user.uid);
+      if (user.email === ADMIN_EMAIL) {
+        setIsAdmin(true);
+        fetchRecipients();
+        setCheckingRole(false);
+        return;
+      }
+      if (!db) {
+        toast({ title: "Access Denied", variant: "destructive" });
+        router.push("/");
+        setCheckingRole(false);
+        return;
+      }
+      const userDocRef = doc(db, "users", user.uid);
       const userDocSnap = await getDoc(userDocRef);
-      if ((user.email === ADMIN_EMAIL) || (userDocSnap.exists() && userDocSnap.data().role === 'admin')) {
+      if (userDocSnap.exists() && userDocSnap.data().role === "admin") {
         setIsAdmin(true);
         fetchRecipients();
       } else {
         toast({ title: "Access Denied", variant: "destructive" });
-        router.push('/');
+        router.push("/");
       }
       setCheckingRole(false);
     };
@@ -64,16 +89,20 @@ export default function AdminNotificationsPage() {
   }, [user, authLoading, router, toast]);
 
   const fetchRecipients = async () => {
+    if (!db) return;
     setLoadingRecipients(true);
     try {
-      const usersCollection = collection(db, 'users');
+      const usersCollection = collection(db, "users");
       const usersSnapshot = await getDocs(usersCollection);
       const usersList = usersSnapshot.docs
-        .map(docSnap => ({
-          id: docSnap.id,
-          ...docSnap.data()
-        } as UserRecipient))
-        .filter(u => u.email); // Ensure user has an email
+        .map(
+          (docSnap) =>
+            ({
+              id: docSnap.id,
+              ...docSnap.data(),
+            }) as UserRecipient,
+        )
+        .filter((u) => u.email); // Ensure user has an email
       setRecipients(usersList);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -85,31 +114,43 @@ export default function AdminNotificationsPage() {
 
   const handleSendNotification = async () => {
     if (!emailSubject.trim() || !emailBody.trim()) {
-      toast({ title: "Missing Content", description: "Subject and body are required.", variant: "destructive" });
+      toast({
+        title: "Missing Content",
+        description: "Subject and body are required.",
+        variant: "destructive",
+      });
       return;
     }
     if (recipients.length === 0) {
-      toast({ title: "No Recipients", description: "There are no users to send notifications to.", variant: "destructive" });
+      toast({
+        title: "No Recipients",
+        description: "There are no users to send notifications to.",
+        variant: "destructive",
+      });
       return;
     }
 
     setIsSending(true);
     try {
-      const recipientEmails = recipients.map(r => r.email);
+      const recipientEmails = recipients.map((r) => r.email);
       await sendBulkEmail({
         subject: emailSubject,
         body: emailBody,
-        recipients: recipientEmails
+        recipients: recipientEmails,
       });
       toast({
         title: "Emails Sent",
         description: `Notifications are being sent to ${recipients.length} users.`,
       });
-      setEmailSubject('');
-      setEmailBody('');
+      setEmailSubject("");
+      setEmailBody("");
     } catch (error) {
       console.error("Error sending notification:", error);
-      toast({ title: "Sending Failed", description: (error as Error).message, variant: "destructive" });
+      toast({
+        title: "Sending Failed",
+        description: (error as Error).message,
+        variant: "destructive",
+      });
     } finally {
       setIsSending(false);
     }
@@ -137,52 +178,69 @@ export default function AdminNotificationsPage() {
   return (
     <div className="grid gap-6 md:grid-cols-3">
       <div className="md:col-span-2">
-        <Card>
+        <Card className="bg-[#222B36] border-[#2a3441] text-white">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Send className="h-6 w-6" /> Compose Notification
+            <CardTitle className="flex items-center gap-2 text-white">
+              <Send className="h-6 w-6 text-[#2dd4bf]" /> Compose Notification
             </CardTitle>
-            <CardDescription>Create and send an email notification to all registered users.</CardDescription>
+            <CardDescription className="text-[#8A99BB]">
+              Create and send an email notification to all registered users.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="email-subject">Subject</Label>
+              <Label htmlFor="email-subject" className="text-[#8A99BB]">
+                Subject
+              </Label>
               <Input
                 id="email-subject"
                 placeholder="Important Update: Exam Schedule"
                 value={emailSubject}
                 onChange={(e) => setEmailSubject(e.target.value)}
                 disabled={isSending}
+                className="bg-transparent border-[#475569] text-white placeholder:text-[#475569] focus-visible:ring-[#2dd4bf]"
               />
             </div>
             <div>
-              <Label htmlFor="email-body">Body</Label>
+              <Label htmlFor="email-body" className="text-[#8A99BB]">
+                Body
+              </Label>
               <Textarea
                 id="email-body"
                 placeholder="Dear all, please find the updated exam schedule attached..."
                 value={emailBody}
                 onChange={(e) => setEmailBody(e.target.value)}
-                className="min-h-[250px]"
+                className="min-h-[250px] bg-transparent border-[#475569] text-white placeholder:text-[#475569] focus-visible:ring-[#2dd4bf]"
                 disabled={isSending}
               />
             </div>
           </CardContent>
           <CardFooter>
-            <Button onClick={handleSendNotification} disabled={isSending || loadingRecipients}>
-              {isSending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
-              {isSending ? 'Sending...' : `Send to ${recipients.length} Users`}
+            <Button
+              onClick={handleSendNotification}
+              disabled={isSending || loadingRecipients}
+              className="bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-semibold">
+              {isSending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-2 h-4 w-4" />
+              )}
+              {isSending ? "Sending..." : `Send to ${recipients.length} Users`}
             </Button>
           </CardFooter>
         </Card>
       </div>
 
       <div className="md:col-span-1">
-        <Card>
+        <Card className="bg-[#222B36] border-[#2a3441] text-white">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-6 w-6" /> Recipients
+            <CardTitle className="flex items-center gap-2 text-white">
+              <Users className="h-6 w-6 text-[#2dd4bf]" /> Recipients
             </CardTitle>
-            <CardDescription>This notification will be sent to all users with a registered email.</CardDescription>
+            <CardDescription className="text-[#8A99BB]">
+              This notification will be sent to all users with a registered
+              email.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {loadingRecipients ? (
@@ -195,16 +253,22 @@ export default function AdminNotificationsPage() {
               <ScrollArea className="h-80">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
+                    <TableRow className="border-[#334155] hover:bg-white/5">
+                      <TableHead className="text-[#8A99BB]">Name</TableHead>
+                      <TableHead className="text-[#8A99BB]">Email</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {recipients.map(recipient => (
-                      <TableRow key={recipient.id}>
-                        <TableCell>{recipient.name}</TableCell>
-                        <TableCell>{recipient.email}</TableCell>
+                    {recipients.map((recipient) => (
+                      <TableRow
+                        key={recipient.id}
+                        className="border-[#334155] hover:bg-white/5">
+                        <TableCell className="text-white">
+                          {recipient.name}
+                        </TableCell>
+                        <TableCell className="text-[#8A99BB]">
+                          {recipient.email}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
