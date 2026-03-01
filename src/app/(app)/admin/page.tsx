@@ -1,4 +1,4 @@
-
+﻿
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -460,66 +460,78 @@ export default function AdminPage() {
 
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Admin Panel</CardTitle>
-          <CardDescription>Manage users and system settings.</CardDescription>
-        </CardHeader>
-      </Card>
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Page Header */}
+      <div className="flex flex-row justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-white tracking-wide">Admin Panel - User Management</h1>
+        <Button 
+          className="bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-semibold rounded-md flex items-center gap-2"
+          onClick={() => {
+            document.getElementById('add-user-section')?.scrollIntoView({ behavior: 'smooth' });
+          }}
+        >
+          <UserPlus className="h-4 w-4" /> Add User
+        </Button>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-6 w-6" /> User Management
-          </CardTitle>
-          <CardDescription>View, add, edit, or remove user profiles.</CardDescription>
-        </CardHeader>
-        <CardContent>
+      {/* Outer Content Card */}
+      <div className="bg-[#222B36] rounded-xl border border-[#2a3441] shadow-xl overflow-hidden">
+        <div className="p-6">
           {/* Filter Section */}
-          <div className="mb-6 space-y-4 rounded-lg border p-4 shadow-sm">
-            <div className="flex items-center gap-2 text-lg font-medium">
-              <FilterIcon className="h-5 w-5 text-primary" />
-              Filters
-            </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Input
-                placeholder="Search by Name, ID, Email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <Select 
-                value={filterRole} 
-                onValueChange={(value) => setFilterRole(value === ALL_ROLES_VALUE ? "" : value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Filter by Role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ALL_ROLES_VALUE}>All Roles</SelectItem>
-                  <SelectItem value="student">Student</SelectItem>
-                  <SelectItem value="faculty">Faculty</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select 
-                value={filterCourse} 
-                onValueChange={(value) => setFilterCourse(value === ALL_COURSES_VALUE ? "" : value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Filter by Course/Program" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ALL_COURSES_VALUE}>All Courses</SelectItem>
-                  {uniqueCourses.map(course => (
-                    <SelectItem key={course} value={course}>{course}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button variant="outline" onClick={clearFilters} className="flex items-center gap-2">
-                <XCircle className="h-4 w-4" /> Clear Filters
-              </Button>
-            </div>
+          <div className="flex flex-col md:flex-row gap-4 items-end mb-6">
+             <div className="flex items-center text-[#8A99BB] font-medium mr-2 mb-2 md:mb-0">
+               Filter By
+             </div>
+             <div>
+               <Label className="text-[#8A99BB] text-xs mb-1 block">Role</Label>
+               <Select 
+                  value={filterRole} 
+                  onValueChange={(value) => setFilterRole(value === ALL_ROLES_VALUE ? "" : value)}
+                >
+                  <SelectTrigger className="w-full md:w-[180px] bg-transparent border-[#475569] text-white focus:ring-[#2dd4bf] rounded-md">
+                    <SelectValue placeholder="All Roles" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1A222C] border-[#475569] text-white">
+                    <SelectItem value={ALL_ROLES_VALUE}>All Roles</SelectItem>
+                    <SelectItem value="student">Student</SelectItem>
+                    <SelectItem value="faculty">Faculty</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+             </div>
+             
+             <div>
+                <Label className="text-[#8A99BB] text-xs mb-1 block">Department/Course</Label>
+                <Select 
+                  value={filterCourse} 
+                  onValueChange={(value) => setFilterCourse(value === ALL_COURSES_VALUE ? "" : value)}
+                >
+                  <SelectTrigger className="w-full md:w-[220px] bg-transparent border-[#475569] text-white focus:ring-[#2dd4bf] rounded-md">
+                    <SelectValue placeholder="All Departments" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1A222C] border-[#475569] text-white">
+                    <SelectItem value={ALL_COURSES_VALUE}>All Departments</SelectItem>
+                    {uniqueCourses.map(course => (
+                      <SelectItem key={course} value={course}>{course}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+             </div>
+
+             <div className="flex-1 md:ml-auto">
+               <div className="relative">
+                  <FilterIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8A99BB] hidden" />
+                  <Input
+                    className="w-full bg-transparent border-[#475569] text-white placeholder:text-[#8A99BB] focus-visible:ring-[#2dd4bf] rounded-md pl-10"
+                    placeholder="Search by Name, ID, Email..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8A99BB]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+               </div>
+             </div>
           </div>
 
           {loadingUsers ? (
@@ -531,134 +543,209 @@ export default function AdminPage() {
           ) : (
             <>
               {filteredUsers.length > 0 ? (
-                <div className="overflow-x-auto max-h-[60vh] relative">
-                  <table className="min-w-full divide-y divide-border">
-                    <thead className="bg-muted sticky top-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm whitespace-nowrap">
+                    <thead className="text-xs text-white font-semibold border-b border-[#334155]">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Name</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Student ID</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Email</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Course/Program</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Role</th>
-                        <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">Actions</th>
+                        <th className="px-4 py-3 pb-4">Name</th>
+                        <th className="px-4 py-3 pb-4">Student/Staff ID</th>
+                        <th className="px-4 py-3 pb-4">Email</th>
+                        <th className="px-4 py-3 pb-4">Role</th>
+                        <th className="px-4 py-3 pb-4">Department</th>
+                        <th className="px-4 py-3 pb-4">Status</th>
+                        <th className="px-4 py-3 pb-4 text-center">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-border bg-background">
+                    <tbody className="divide-y divide-[#334155]">
                       {filteredUsers.map((u) => (
-                        <tr key={u.id}>
-                          <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-foreground">{u.name || 'N/A'}</td>
-                          <td className="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">{u.studentId || 'N/A'}</td>
-                          <td className="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">{u.email || 'N/A'}</td>
-                          <td className="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">{u.courseProgram || 'N/A'}</td>
-                          <td className="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">{u.role || 'N/A'}</td>
-                          <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                            <Button variant="ghost" size="sm" onClick={() => openEditModal(u)} className="mr-2 text-primary hover:text-primary/80">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive/80">
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>Confirm Deletion</DialogTitle>
-                                  <DialogDescription>
-                                    Are you sure you want to delete the profile for {u.name || u.email}? This action cannot be undone.
-                                    This only deletes the Firestore document, not the Firebase Auth user.
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <DialogFooter>
-                                  <DialogClose asChild>
-                                    <Button variant="outline">Cancel</Button>
-                                  </DialogClose>
-                                  <Button variant="destructive" onClick={() => handleDeleteUser(u.id)}>
-                                    Delete
+                        <tr key={u.id} className="text-[#8A99BB] hover:bg-white/[0.02] transition-colors">
+                          <td className="px-4 py-4 text-white font-medium">{u.name || 'N/A'}</td>
+                          <td className="px-4 py-4">{u.studentId || 'N/A'}</td>
+                          <td className="px-4 py-4">{u.email || 'N/A'}</td>
+                          <td className="px-4 py-4 capitalize">{u.role || 'N/A'}</td>
+                          <td className="px-4 py-4">{u.department || u.courseProgram || 'N/A'}</td>
+                          <td className="px-4 py-4">
+                            <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-semibold rounded-md bg-[#22c55e]/20 text-[#4ade80] border border-[#22c55e]/30">
+                              Active
+                            </span>
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex items-center justify-center gap-2">
+                              <Button variant="ghost" size="icon" onClick={() => openEditModal(u)} className="h-8 w-8 rounded-md bg-transparent border border-[#475569] text-[#8A99BB] hover:text-white hover:bg-[#475569]/50">
+                                <Edit className="h-3.5 w-3.5" />
+                              </Button>
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-md bg-transparent border border-[#9f1239]/50 text-[#f43f5e] hover:bg-[#9f1239]/20 hover:text-[#fb7185]">
+                                    <Trash2 className="h-3.5 w-3.5" />
                                   </Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
+                                </DialogTrigger>
+                                <DialogContent className="bg-[#1A222C] border-[#334155] text-white">
+                                  <DialogHeader>
+                                    <DialogTitle>Confirm Deletion</DialogTitle>
+                                    <DialogDescription className="text-[#8A99BB]">
+                                      Are you sure you want to delete the profile for {u.name || u.email}? This action cannot be undone.
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                  <DialogFooter>
+                                    <DialogClose asChild>
+                                      <Button variant="outline" className="border-[#475569] text-white hover:bg-[#334155]">Cancel</Button>
+                                    </DialogClose>
+                                    <Button variant="destructive" onClick={() => handleDeleteUser(u.id)} className="bg-red-600 hover:bg-red-700 text-white">
+                                      Delete
+                                    </Button>
+                                  </DialogFooter>
+                                </DialogContent>
+                              </Dialog>
+                            </div>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
+                  
+                  {/* Pseudo Pagination Footer */}
+                  <div className="flex justify-end items-center mt-6 text-sm text-[#8A99BB]">
+                     <span className="mr-4 hover:text-white cursor-pointer">Previous</span>
+                     <div className="flex gap-1">
+                       <span className="flex items-center justify-center w-6 h-6 rounded bg-[#475569] text-white cursor-pointer">1</span>
+                       <span className="flex items-center justify-center w-6 h-6 rounded hover:bg-[#334155] hover:text-white cursor-pointer">2</span>
+                       <span className="flex items-center justify-center w-6 h-6 rounded hover:bg-[#334155] hover:text-white cursor-pointer">3</span>
+                       <span className="flex items-center justify-center px-1">...</span>
+                     </div>
+                     <span className="ml-4 hover:text-white cursor-pointer">Next</span>
+                  </div>
                 </div>
               ) : searchTerm || filterRole || filterCourse ? (
-                 <p className="text-center text-muted-foreground">No users match the current filters.</p>
+                 <p className="text-center text-muted-foreground mt-4">No users match the current filters.</p>
               ) : (
-                <p className="text-center text-muted-foreground">No user profiles found. Ensure Firestore rules allow listing users for admins.</p>
+                <p className="text-center text-muted-foreground mt-4">No user profiles found. Ensure Firestore rules allow listing users for admins.</p>
               )}
-
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <UserPlus className="h-5 w-5" /> Add New User Profile
-                  </CardTitle>
-                  <CardDescription>Create a new user profile in Firestore. Note: This does not create a Firebase Auth user.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    {renderProfileFormFields(newUser, handleInputChange)}
-                </CardContent>
-                <CardFooter>
-                  <Button onClick={handleCreateUser} className="flex items-center gap-2">
-                    <CheckCircle className="h-5 w-5" /> Create User Profile
-                  </Button>
-                </CardFooter>
-              </Card>
             </>
           )}
-        </CardContent>
-      </Card>
+              <div id="add-user-section" className="bg-[#222B36] rounded-xl border border-[#2a3441] shadow-xl overflow-hidden mt-6">
+                <div className="p-6">
+                  <div className="flex justify-between items-center mb-6 border-b border-[#334155] pb-4">
+                    <h2 className="text-lg font-bold text-white">Add New User</h2>
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-[#8A99BB] hover:text-white w-8 h-8 hover:bg-white/5 disabled:opacity-50"
+                        onClick={() => document.getElementById('add-user-section-content')?.classList.toggle('hidden')}
+                    >
+                      <span className="text-xl">▲</span>
+                    </Button>
+                  </div>
+
+                  <div id="add-user-section-content" className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                      <div>
+                        <Label className="text-[#8A99BB] text-xs mb-1.5 block">Full Name<span className="text-red-500">*</span></Label>
+                        <Input className="bg-transparent border-[#475569] text-white rounded-md focus-visible:ring-[#2dd4bf]" name="name" value={newUser.name} onChange={handleInputChange} placeholder="John Doe" />
+                      </div>
+                      <div>
+                        <Label className="text-[#8A99BB] text-xs mb-1.5 block">Student/Staff ID<span className="text-red-500">*</span></Label>
+                        <Input className="bg-transparent border-[#475569] text-white rounded-md focus-visible:ring-[#2dd4bf]" name="studentId" value={newUser.studentId} onChange={handleInputChange} placeholder="S12345" />
+                      </div>
+                      <div>
+                        <Label className="text-[#8A99BB] text-xs mb-1.5 block">Email<span className="text-red-500">*</span></Label>
+                        <Input className="bg-transparent border-[#475569] text-white rounded-md focus-visible:ring-[#2dd4bf]" name="email" value={newUser.email} onChange={handleInputChange} placeholder="user@example.com" />
+                      </div>
+                      <div>
+                        <Label className="text-[#8A99BB] text-xs mb-1.5 block">Role<span className="text-red-500">*</span></Label>
+                        <Select name="role" value={newUser.role} onValueChange={(val) => handleInputChange({ target: { name: 'role', value: val } } as any)}>
+                          <SelectTrigger className="bg-transparent border-[#475569] text-white rounded-md focus:ring-[#2dd4bf]"><SelectValue placeholder="Select Role" /></SelectTrigger>
+                          <SelectContent className="bg-[#1A222C] border-[#475569] text-white">
+                            <SelectItem value="student">Student</SelectItem>
+                            <SelectItem value="faculty">Faculty</SelectItem>
+                            <SelectItem value="admin">Admin</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-[#8A99BB] text-xs mb-1.5 block">Gender<span className="text-red-500">*</span></Label>
+                        <Select name="gender" value={newUser.gender} onValueChange={(val) => handleInputChange({ target: { name: 'gender', value: val } } as any)}>
+                          <SelectTrigger className="bg-transparent border-[#475569] text-white rounded-md focus:ring-[#2dd4bf]"><SelectValue placeholder="Select Gender" /></SelectTrigger>
+                          <SelectContent className="bg-[#1A222C] border-[#475569] text-white">
+                            <SelectItem value="Male">Male</SelectItem>
+                            <SelectItem value="Female">Female</SelectItem>
+                            <SelectItem value="Other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-[#8A99BB] text-xs mb-1.5 block">Department<span className="text-red-500">*</span></Label>
+                        <Select name="department" value={newUser.department} onValueChange={(val) => handleInputChange({ target: { name: 'department', value: val } } as any)}>
+                          <SelectTrigger className="bg-transparent border-[#475569] text-white rounded-md focus:ring-[#2dd4bf]"><SelectValue placeholder="Select Dept" /></SelectTrigger>
+                          <SelectContent className="bg-[#1A222C] border-[#475569] text-white">
+                            <SelectItem value="CS">CS</SelectItem>
+                            <SelectItem value="EC">EC</SelectItem>
+                            <SelectItem value="ME">ME</SelectItem>
+                            <SelectItem value="CV">CV</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-[#8A99BB] text-xs mb-1.5 block">Date of Birth</Label>
+                        <Input type="date" className="bg-transparent border-[#475569] text-[#8A99BB] rounded-md focus-visible:ring-[#2dd4bf]" name="dateOfBirth" value={newUser.dateOfBirth} onChange={handleInputChange} />
+                      </div>
+                    </div>
+
+                    <details className="text-[#8A99BB] text-sm cursor-pointer group">
+                      <summary className="hover:text-white font-medium mb-4 list-none flex items-center gap-2">
+                        <span className="text-xs group-open:rotate-90 transition-transform">▶</span> Show Advanced/Required Fields
+                      </summary>
+                      <div className="bg-[#1A222C] p-4 rounded-lg border border-[#334155] text-white cursor-auto">
+                        {renderProfileFormFields(newUser, handleInputChange)}
+                      </div>
+                    </details>
+
+                    <div className="flex gap-3 pt-4 border-t border-[#334155]">
+                      <Button onClick={handleCreateUser} className="bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-semibold rounded-md flex items-center gap-2 px-6">
+                        Create User
+                      </Button>
+                      <Button variant="outline" onClick={() => setNewUser(initialNewUserState)} className="bg-[#475569] hover:bg-[#334155] text-white border-0 font-medium rounded-md px-6">
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+        </div>
+      </div>
+      {/* End main container */}
 
       {editingUser && (
         <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-          <DialogContent className="max-w-3xl"> 
+          <DialogContent className="bg-[#1A222C] border-[#334155] text-white max-w-3xl">
             <DialogHeader>
               <DialogTitle>Edit User: {editingUser.name}</DialogTitle>
-              <DialogDescription>Modify the details for this user.</DialogDescription>
+              <DialogDescription className="text-[#8A99BB]">Modify the details for this user.</DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-2"> 
+            <div className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
                 {renderProfileFormFields(editingUser, handleEditInputChange)}
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => { setIsEditModalOpen(false); setEditingUser(null); }}>Cancel</Button>
-              <Button onClick={handleUpdateUser}>Save Changes</Button>
+              <Button variant="outline" className="border-[#475569] text-white hover:bg-[#334155]" onClick={() => { setIsEditModalOpen(false); setEditingUser(null); }}>Cancel</Button>
+              <Button onClick={handleUpdateUser} className="bg-[#2dd4bf] text-black hover:bg-[#14b8a6]">Save Changes</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Settings className="h-6 w-6" /> System Settings
-          </CardTitle>
-          <CardDescription>Configure application-wide settings and parameters.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">System settings configuration will be available here.</p>
-          <Button onClick={() => router.push('/admin/settings')} className="mt-2">
-            Configure Settings
-          </Button>
-        </CardContent>
-      </Card>
+      <div className="hidden">
+        <Card className="bg-[#222B36] border-[#334155] text-white">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Settings className="h-5 w-5" /> System Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => router.push('/admin/settings')} className="mt-2 bg-[#475569] hover:bg-[#334155] text-white border-0">Configure Settings</Button>
+          </CardContent>
+        </Card>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Content Management</CardTitle>
-          <CardDescription>Manage announcements, calendar events, etc.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">Content management tools will be available here.</p>
-        </CardContent>
-      </Card>
     </div>
   );
 }
-
-
-    
-
-    

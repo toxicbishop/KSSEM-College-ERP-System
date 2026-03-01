@@ -201,7 +201,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       <div className="flex h-screen">
         <aside
           className={cn(
-            "bg-sidebar-background h-screen p-4 flex flex-col justify-between shadow-lg border-r border-sidebar-border transition-all duration-300 ease-in-out",
+            "bg-[#1A222C] text-[#8A99BB] h-screen p-4 flex flex-col justify-between shadow-lg border-r border-[#1e293b] transition-all duration-300 ease-in-out",
             isSidebarCollapsed ? "w-20 items-center" : "w-64",
           )}>
           <div>
@@ -220,12 +220,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               />
               {!isSidebarCollapsed && (
                 <div>
-                  <h1 className="text-sm font-semibold text-sidebar-foreground">
+                  <h1 className="text-sm font-semibold text-white">
                     {appNameLoading ? "Loading..." : collegeName}
                   </h1>
-                  <p className="text-xs text-sidebar-foreground/80">
-                    Admin Panel
-                  </p>
+                  <p className="text-xs text-[#8A99BB]">Admin Panel</p>
                 </div>
               )}
             </div>
@@ -254,15 +252,13 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                           "flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                           isSidebarCollapsed ? "justify-center" : "",
                           finalIsActive
-                            ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                            : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+                            ? "bg-[#0d9488]/20 text-[#2dd4bf] border-l-4 border-[#2dd4bf]"
+                            : "text-[#8A99BB] hover:bg-white/5 hover:text-white",
                         )}>
                         <item.icon
                           className={cn(
                             "w-5 h-5 shrink-0",
-                            finalIsActive
-                              ? "text-sidebar-accent-foreground"
-                              : "text-sidebar-primary",
+                            finalIsActive ? "text-[#2dd4bf]" : "text-[#8A99BB]",
                           )}
                         />
                         {!isSidebarCollapsed && <span>{item.label}</span>}
@@ -289,7 +285,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                     variant="ghost"
                     onClick={handleLogout}
                     className={cn(
-                      "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium justify-start text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+                      "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium justify-start text-[#8A99BB] hover:bg-white/5 hover:text-white",
                       isSidebarCollapsed ? "justify-center" : "",
                     )}>
                     <Avatar className="h-6 w-6">
@@ -297,7 +293,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                         src={user?.photoURL || ""}
                         alt={user?.displayName || "Admin"}
                       />
-                      <AvatarFallback className="text-[10px] bg-sidebar-primary text-sidebar-primary-foreground">
+                      <AvatarFallback className="text-[10px] bg-[#334155] text-white">
                         {getInitials(user?.displayName || user?.email || "AD")}
                       </AvatarFallback>
                     </Avatar>
@@ -319,7 +315,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                     variant="ghost"
                     onClick={() => router.push("/signin")}
                     className={cn(
-                      "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium justify-start text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+                      "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium justify-start text-[#8A99BB] hover:bg-white/5 hover:text-white",
                       isSidebarCollapsed ? "justify-center" : "",
                     )}>
                     <Home className="w-5 h-5 text-sidebar-primary shrink-0" />
@@ -340,7 +336,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 variant="ghost"
                 onClick={toggleSidebarCollapse}
                 className={cn(
-                  "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium justify-start text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+                  "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium justify-start text-[#8A99BB] hover:bg-white/5 hover:text-white",
                   isSidebarCollapsed ? "justify-center" : "",
                 )}
                 aria-label={
@@ -357,7 +353,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </div>
         </aside>
 
-        <main className="flex-1 overflow-auto bg-background p-6">
+        <main className="flex-1 overflow-auto bg-[#0F172A] p-6 text-slate-200">
           {children}
         </main>
       </div>
