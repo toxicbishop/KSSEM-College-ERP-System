@@ -94,13 +94,25 @@ export default function DashboardPage() {
           if (userDocSnap.exists()) {
             profileData = { ...userDocSnap.data() } as StudentProfile;
             if (!profileData.studentId) profileData.studentId = user.uid;
+            // Determine fallback name based on role
+            const userRole =
+              profileData.role ||
+              (user.email === "admin@gmail.com" ? "admin" : "student");
+            const fallbackName =
+              userRole === "admin"
+                ? "Admin"
+                : userRole === "faculty"
+                  ? "Faculty"
+                  : "Student";
             if (!profileData.name)
-              profileData.name = user.displayName || "Student";
+              profileData.name = user.displayName || fallbackName;
             if (!profileData.email) profileData.email = user.email || "N/A";
           } else {
             console.warn(`User document not found for UID: ${user.uid}`);
+            const fallbackName =
+              user.email === "admin@gmail.com" ? "Admin" : "Student";
             profileData = {
-              name: user.displayName || "Student",
+              name: user.displayName || fallbackName,
               studentId: user.uid,
               courseProgram: "Unknown",
               email: user.email || "N/A",

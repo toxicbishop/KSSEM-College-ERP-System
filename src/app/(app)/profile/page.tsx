@@ -223,6 +223,10 @@ function ProfileDetailsLoader() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Admin users can directly edit all fields without requesting changes
+  const isAdmin =
+    user?.email === "admin@gmail.com" || profile?.role === "admin";
+
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [requestFieldInfo, setRequestFieldInfo] = useState<{
     key: keyof StudentProfile;
@@ -518,7 +522,8 @@ function ProfileDetailsLoader() {
               label="Full Name"
               value={profile.name}
               fieldName="name"
-              onEditRequest={openRequestModal}
+              isEditable={isAdmin}
+              onEditRequest={isAdmin ? undefined : openRequestModal}
               isEditMode={isEditMode}
               handleInputChange={handleInputChange}
               editableProfileValue={editableProfile.name}
@@ -592,7 +597,8 @@ function ProfileDetailsLoader() {
               label="Email Address"
               value={profile.email}
               fieldName="email"
-              onEditRequest={openRequestModal}
+              isEditable={isAdmin}
+              onEditRequest={isAdmin ? undefined : openRequestModal}
               isEditMode={isEditMode}
               handleInputChange={handleInputChange}
               editableProfileValue={editableProfile.email}
@@ -774,7 +780,8 @@ function ProfileDetailsLoader() {
             label="Enrollment Number / Roll Number"
             value={profile.enrollmentNumber}
             fieldName="enrollmentNumber"
-            onEditRequest={openRequestModal}
+            isEditable={isAdmin}
+            onEditRequest={isAdmin ? undefined : openRequestModal}
             isEditMode={isEditMode}
             handleInputChange={handleInputChange}
             editableProfileValue={editableProfile.enrollmentNumber}
@@ -784,7 +791,8 @@ function ProfileDetailsLoader() {
             label="Course / Program"
             value={profile.courseProgram}
             fieldName="courseProgram"
-            onEditRequest={openRequestModal}
+            isEditable={isAdmin}
+            onEditRequest={isAdmin ? undefined : openRequestModal}
             isEditMode={isEditMode}
             handleInputChange={handleInputChange}
             editableProfileValue={editableProfile.courseProgram}
@@ -794,7 +802,8 @@ function ProfileDetailsLoader() {
             label="Department"
             value={profile.department}
             fieldName="department"
-            onEditRequest={openRequestModal}
+            isEditable={isAdmin}
+            onEditRequest={isAdmin ? undefined : openRequestModal}
             isEditMode={isEditMode}
             handleInputChange={handleInputChange}
             editableProfileValue={editableProfile.department}
@@ -804,7 +813,8 @@ function ProfileDetailsLoader() {
             label="Current Year"
             value={profile.currentYear ? `Year ${profile.currentYear}` : "N/A"}
             fieldName="currentYear"
-            onEditRequest={openRequestModal}
+            isEditable={isAdmin}
+            onEditRequest={isAdmin ? undefined : openRequestModal}
             isEditMode={isEditMode}
             handleInputChange={handleInputChange}
             editableProfileValue={editableProfile.currentYear}
@@ -818,7 +828,8 @@ function ProfileDetailsLoader() {
                 : "N/A"
             }
             fieldName="currentSemester"
-            onEditRequest={openRequestModal}
+            isEditable={isAdmin}
+            onEditRequest={isAdmin ? undefined : openRequestModal}
             isEditMode={isEditMode}
             handleInputChange={handleInputChange}
             editableProfileValue={editableProfile.currentSemester}
@@ -1011,7 +1022,8 @@ function ProfileDetailsLoader() {
             label="Exam Registration"
             value={profile.examRegistrationStatus}
             fieldName="examRegistrationStatus"
-            onEditRequest={openRequestModal}
+            isEditable={isAdmin}
+            onEditRequest={isAdmin ? undefined : openRequestModal}
             isEditMode={isEditMode}
             handleInputChange={handleInputChange}
             editableProfileValue={editableProfile.examRegistrationStatus}
