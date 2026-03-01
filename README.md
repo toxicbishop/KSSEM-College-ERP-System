@@ -1,10 +1,10 @@
-# Advanced Student ERP Dashboard (Next.js & Firebase)
+# KSSEM College ERP System (Next.js & Firebase)
 
-This guide will walk you through setting up the Advanced Student ERP Dashboard application on your computer. This application helps manage student information and provides a dashboard for students, faculty, and administrators.
+This guide will walk you through setting up the KSSEM College ERP System on your computer. This application helps manage student information and provides a dashboard for students, faculty, and administrators.
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=ChinmayIngle26/College-ERP.git&type=date&legend=top-left)](https://www.star-history.com/#ChinmayIngle26/College-ERP.git&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/svg?repos=toxicbishop/KSSEM-College-ERP-System.git&type=date&legend=top-left)](https://www.star-history.com/#toxicbishop/KSSEM-College-ERP-System.git&type=date&legend=top-left)
 
 ## What You'll Need (Prerequisites)
 
