@@ -1,6 +1,6 @@
 "use client"; // Required for Recharts
 
-import type { Grade } from "@/services/grades";
+import type { Grade } from "@/types/grades";
 import {
   Card,
   CardHeader,
@@ -44,11 +44,12 @@ export function GradesChartCard({ grades, analysis }: GradesChartCardProps) {
   // Check if the analysis is the default fallback or a real one
   const hasRealAnalysis =
     analysis.strengths.length > 0 || analysis.areasForImprovement.length > 0;
+  const getTime = (d: any) =>
+    d instanceof Date
+      ? d.getTime()
+      : (d?.toMillis?.() ?? new Date(d).getTime());
   const recentGrades = [...grades]
-    .sort(
-      (a, b) =>
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-    )
+    .sort((a, b) => getTime(b.updatedAt) - getTime(a.updatedAt))
     .slice(0, 5);
 
   return (
