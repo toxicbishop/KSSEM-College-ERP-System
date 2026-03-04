@@ -15,6 +15,7 @@ import {
   LayoutDashboard,
   Send,
 } from "lucide-react";
+import { MobileNav } from "./mobile-nav";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
@@ -49,6 +50,14 @@ const adminNavigationItems = [
   { href: "/admin/settings", label: "System Settings", icon: Settings },
   { href: "/admin/requests", label: "Change Requests", icon: Edit },
   { href: "/admin/notifications", label: "Notifications", icon: Send },
+];
+
+const adminMobileNavItems = [
+  { href: "/admin", label: "Users", icon: Users },
+  { href: "/admin/requests", label: "Requests", icon: Edit },
+  { href: "/admin/notifications", label: "Notifs", icon: Send },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/dashboard", label: "Student V", icon: LayoutDashboard },
 ];
 
 function deleteCookie(name: string) {
@@ -353,9 +362,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </div>
         </aside>
 
-        <main className="flex-1 overflow-auto bg-[#0F172A] p-6 text-slate-200">
-          {children}
+        <main className="flex-1 overflow-auto bg-[#0F172A] pb-16 md:pb-0 text-slate-200">
+          <div className="p-4 md:p-6">{children}</div>
         </main>
+        {isMobile && <MobileNav items={adminMobileNavItems} />}
       </div>
     </TooltipProvider>
   );

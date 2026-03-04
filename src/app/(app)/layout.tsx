@@ -10,10 +10,26 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
-import { Loader2 } from "lucide-react";
+import {
+  Loader2,
+  Home,
+  User,
+  Network,
+  CheckSquare,
+  GraduationCap,
+} from "lucide-react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
+import { MobileNav } from "@/components/layout/mobile-nav";
 
 type UserRole = "admin" | "faculty" | "student" | null;
+
+const studentMobileNavItems = [
+  { href: "/dashboard", label: "Home", icon: Home },
+  { href: "/attendance", label: "Attendance", icon: CheckSquare },
+  { href: "/grades", label: "Grades", icon: GraduationCap },
+  { href: "/classrooms", label: "Classrooms", icon: Network },
+  { href: "/profile", label: "Profile", icon: User },
+];
 
 export default function AppLayout({
   children,
@@ -192,16 +208,17 @@ export default function AppLayout({
     }
 
     return (
-      <div className="flex h-screen bg-[#0F172A]">
+      <div className="flex h-screen bg-[#0F172A] overflow-hidden">
         {!isMobile && (
           <Sidebar
             isCollapsed={isStudentSidebarCollapsed}
             toggleCollapse={toggleStudentSidebarCollapse}
           />
         )}
-        <main className="flex-1 overflow-auto">
-          <div className="p-6">{children}</div>
+        <main className="flex-1 overflow-auto pb-16 md:pb-0">
+          <div className="p-4 md:p-6">{children}</div>
         </main>
+        {isMobile && <MobileNav items={studentMobileNavItems} />}
       </div>
     );
   }
