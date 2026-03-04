@@ -14,7 +14,7 @@ import {
   AttendanceAnalysisOutputSchema,
   type AttendanceAnalysisInput,
   type AttendanceAnalysisOutput
-} from '@/types/attendance-analysis';
+} from '@/services/attendance';
 import type { LectureAttendanceRecord } from '@/services/attendance';
 
 /**

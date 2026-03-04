@@ -15,7 +15,7 @@ import {
   GradeAnalysisOutputSchema,
   type GradeAnalysisInput,
   type GradeAnalysisOutput
-} from '@/types/grade-analysis';
+} from '@/services/grades';
 
 
 /**
