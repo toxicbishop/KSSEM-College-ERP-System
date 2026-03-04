@@ -8,14 +8,7 @@ import {
   CardContent,
   CardDescription,
 } from "@/components/ui/card";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
+
 import {
   CheckCircle,
   ArrowUp,

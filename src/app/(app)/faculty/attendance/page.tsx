@@ -87,14 +87,15 @@ import { exportDataToCsv } from "@/lib/csv-exporter";
 import { Slider } from "@/components/ui/slider";
 import { analyzeAttendance } from "@/ai/flows/analyze-attendance-flow";
 import type { AttendanceAnalysisOutput } from "@/services/attendance";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
+import dynamic from "next/dynamic";
+
+const AttendancePieChart = dynamic(
+  () => import("@/components/charts/attendance-pie-chart"),
+  {
+    ssr: false,
+    loading: () => <div className="h-60 w-full animate-pulse bg-muted/20" />,
+  },
+);
 import { useIsMobile } from "@/hooks/use-is-mobile";
 
 type StudentAttendanceStatus = {
@@ -1430,38 +1431,11 @@ export default function FacultyAttendancePage() {
                           </CardHeader>
                           <CardContent>
                             <div className="h-60 w-full">
-                              <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                  <Pie
-                                    data={pieChartData}
-                                    dataKey="value"
-                                    nameKey="name"
-                                    cx="50%"
-                                    cy="50%"
-                                    outerRadius={isMobile ? 60 : 80}
-                                    label={(props) =>
-                                      `${props.payload.name}: ${props.payload.percentage}%`
-                                    }>
-                                    {pieChartData.map((entry, index) => (
-                                      <Cell
-                                        key={`cell-${index}`}
-                                        fill={
-                                          entry.name === "Present"
-                                            ? PIE_CHART_COLORS.present
-                                            : PIE_CHART_COLORS.absent
-                                        }
-                                      />
-                                    ))}
-                                  </Pie>
-                                  <Tooltip
-                                    formatter={(value, name, props) => [
-                                      `${value} lectures (${props.payload.percentage}%)`,
-                                      name,
-                                    ]}
-                                  />
-                                  <Legend />
-                                </PieChart>
-                              </ResponsiveContainer>
+                              <AttendancePieChart
+                                data={pieChartData}
+                                colors={PIE_CHART_COLORS}
+                                isMobile={isMobile ?? false}
+                              />
                             </div>
                           </CardContent>
                         </Card>
