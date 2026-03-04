@@ -17,8 +17,8 @@ import { PlusCircle, Users, Edit, UserPlus, LinkIcon, Trash2, Loader2, MessageSq
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { useToast } from '@/hooks/use-toast';
-import { createClassroom, getClassroomsByFaculty, addInvitedFacultyToClassroom, getAllFacultyUsers, deleteClassroom } from '@/services/classroomService';
-import type { Classroom, FacultyUser } from '@/types/classroom';
+import { createClassroom, getClassroomsByFaculty, addInvitedFacultyToClassroom, getAllFacultyUsers, deleteClassroom } from '@/services/classroom';
+import type { Classroom, FacultyUser } from '@/services/classroom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { auth as clientAuth } from '@/lib/firebase/client';
 import Link from 'next/link';

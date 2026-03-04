@@ -1,9 +1,21 @@
+"use server";
 
-'use server';
+import {
+  adminDb,
+  adminAuth,
+  adminInitializationError,
+} from "@/lib/firebase/admin.server";
+import { FieldValue as AdminFieldValue } from "firebase-admin/firestore";
+import type { Timestamp } from "firebase/firestore";
 
-import { adminDb, adminAuth, adminInitializationError } from '@/lib/firebase/admin.server';
-import { FieldValue as AdminFieldValue } from 'firebase-admin/firestore';
-import type { ChatMessage } from '@/types/chat';
+export interface ChatMessage {
+  id?: string; // Firestore document ID
+  classroomId: string;
+  senderId: string; // Firebase UID of the sender
+  senderName: string; // Display name of the sender
+  text: string;
+  timestamp: Timestamp | Date | any; // Firestore Server Timestamp on send, Date on retrieval
+}
 
 /**
  * Sends a chat message to a specific classroom.
@@ -15,10 +27,13 @@ import type { ChatMessage } from '@/types/chat';
 export async function sendMessage(
   idToken: string,
   classroomId: string,
-  text: string
+  text: string,
 ): Promise<void> {
   if (adminInitializationError) {
-    console.error("sendMessage SA Error: Admin SDK init failed:", adminInitializationError.message);
+    console.error(
+      "sendMessage SA Error: Admin SDK init failed:",
+      adminInitializationError.message,
+    );
     throw new Error("Server error: Admin SDK initialization failed.");
   }
   if (!adminDb || !adminAuth) {
@@ -26,7 +41,7 @@ export async function sendMessage(
     throw new Error("Server error: Admin services not initialized.");
   }
 
-  if (!text || text.trim() === '') {
+  if (!text || text.trim() === "") {
     throw new Error("Message text cannot be empty.");
   }
 
@@ -39,18 +54,21 @@ export async function sendMessage(
   }
 
   const senderId = decodedToken.uid;
-  let senderName = decodedToken.name || decodedToken.email || 'Anonymous';
+  let senderName = decodedToken.name || decodedToken.email || "Anonymous";
   try {
-    const userDoc = await adminDb.collection('users').doc(senderId).get();
+    const userDoc = await adminDb.collection("users").doc(senderId).get();
     if (userDoc.exists && userDoc.data()?.name) {
       senderName = userDoc.data()!.name;
     }
   } catch (e) {
-    console.warn(`sendMessage SA: Could not fetch sender's name for UID ${senderId}. Error: ${(e as Error).message}`);
+    console.warn(
+      `sendMessage SA: Could not fetch sender's name for UID ${senderId}. Error: ${(e as Error).message}`,
+    );
   }
 
-
-  const messageData: Omit<ChatMessage, 'id' | 'timestamp'> & { timestamp: any } = {
+  const messageData: Omit<ChatMessage, "id" | "timestamp"> & {
+    timestamp: any;
+  } = {
     classroomId,
     senderId,
     senderName,
@@ -59,11 +77,19 @@ export async function sendMessage(
   };
 
   try {
-    const messagesCollectionRef = adminDb.collection('classrooms').doc(classroomId).collection('messages');
+    const messagesCollectionRef = adminDb
+      .collection("classrooms")
+      .doc(classroomId)
+      .collection("messages");
     await messagesCollectionRef.add(messageData);
-    console.log(`sendMessage SA: Message sent successfully to classroom ${classroomId} by ${senderId}`);
+    console.log(
+      `sendMessage SA: Message sent successfully to classroom ${classroomId} by ${senderId}`,
+    );
   } catch (error) {
-    console.error(`sendMessage SA Error: Error sending message to classroom ${classroomId}:`, error);
+    console.error(
+      `sendMessage SA Error: Error sending message to classroom ${classroomId}:`,
+      error,
+    );
     throw new Error("Could not send message. Please try again.");
   }
 }

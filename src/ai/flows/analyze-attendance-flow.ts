@@ -15,7 +15,7 @@ import {
   type AttendanceAnalysisInput,
   type AttendanceAnalysisOutput
 } from '@/types/attendance-analysis';
-import type { LectureAttendanceRecord } from '@/types/lectureAttendance';
+import type { LectureAttendanceRecord } from '@/services/attendance';
 
 /**
  * Analyzes a list of student attendance records and provides an AI-generated analysis.

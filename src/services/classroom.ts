@@ -1,47 +1,151 @@
+"use server";
 
-'use server';
+import {
+  adminDb,
+  adminAuth,
+  adminInitializationError,
+} from "@/lib/firebase/admin.server";
+import {
+  FieldValue as AdminFieldValue,
+  Timestamp as AdminTimestamp,
+} from "firebase-admin/firestore";
 
-import { adminDb, adminAuth, adminInitializationError } from '@/lib/firebase/admin.server';
-import { FieldValue as AdminFieldValue, Timestamp as AdminTimestamp } from 'firebase-admin/firestore';
-import type { Classroom, ClassroomStudentInfo, FacultyUser, StudentSearchResultItem, StudentClassroomEnrollmentInfo, ClassmateInfo } from '@/types/classroom';
-import type { StudentProfile } from './profile';
-
-
-async function checkFacultyPermissionForClassroom(
-    classroomId: string, 
-    facultyId: string
-): Promise<{ permitted: boolean; classroomData?: Omit<Classroom, 'id'> }> {
-    if (adminInitializationError) {
-        console.error("[classroomService:checkFacultyPermissionForClassroom] Admin SDK init error:", adminInitializationError.message);
-        throw new Error("Server error: Admin SDK initialization failed.");
-    }
-    if (!adminDb) {
-        throw new Error("Admin DB not initialized in checkFacultyPermissionForClassroom.");
-    }
-    const classroomDocRef = adminDb.collection('classrooms').doc(classroomId);
-    const classroomSnap = await classroomDocRef.get();
-
-    if (!classroomSnap.exists) {
-        throw new Error(`Classroom with ID ${classroomId} not found.`);
-    }
-    const classroomData = classroomSnap.data() as Omit<Classroom, 'id'>;
-    const isOwner = classroomData.ownerFacultyId === facultyId;
-    const isInvited = classroomData.invitedFacultyIds?.includes(facultyId);
-
-    if (!isOwner && !isInvited) {
-        return { permitted: false };
-    }
-    return { permitted: true, classroomData };
+/**
+ * Represents a student enrolled in a classroom, including their assigned batch.
+ */
+export interface ClassroomStudentInfo {
+  userId: string; // Firebase UID of the student
+  studentIdNumber: string; // Official student ID (e.g., "A-001", "B-102")
+  name: string; // Full name of the student
+  email?: string; // Optional: student email
+  batch?: string; // Assigned batch (e.g., "A", "B", or manually assigned name)
 }
 
-export async function createClassroom(idToken: string, name: string, subject: string): Promise<string> {
+/**
+ * Represents a classroom created by a faculty member.
+ */
+export interface Classroom {
+  id: string; // Firestore document ID (set manually after fetching the doc)
+
+  name: string; // Name of the classroom (e.g., "AIML Year 1")
+
+  subject: string; // Subject or short description of the classroom (e.g., "Data Structures")
+
+  ownerFacultyId: string; // UID of the faculty member who created the classroom
+
+  invitedFacultyIds: string[]; // UIDs of other faculty members allowed to access and manage this classroom
+
+  students: ClassroomStudentInfo[]; // Array of student objects with their details and batch
+
+  studentUids: string[]; // Array of student UIDs for efficient security rule checks
+
+  createdAt?: AdminTimestamp | Date; // Optional timestamp, set on creation
+}
+
+/**
+ * Represents a student in a classroom, for UI display purposes when listing students.
+ * This is often derived from ClassroomStudentInfo.
+ */
+export interface ClassroomStudent extends ClassroomStudentInfo {
+  // Inherits all fields from ClassroomStudentInfo
+  // id is equivalent to userId from ClassroomStudentInfo
+  // This type might be more for UI components if they expect an 'id' field specifically.
+  // For service layer, ClassroomStudentInfo might be sufficient.
+}
+
+/**
+ * Simplified representation of a faculty member, used in selection components.
+ */
+export interface FacultyUser {
+  uid: string; // Firebase UID of the faculty user
+  name: string; // Name of the faculty member
+  email: string; // Email of the faculty member (used for display or contact)
+}
+
+/**
+ * Represents a student found via search, for adding to a classroom.
+ */
+export interface StudentSearchResultItem {
+  uid: string; // Firebase UID of the student
+  name: string;
+  studentId: string; // User-facing student ID (from users collection, e.g. "A-001")
+  email: string;
+}
+
+/**
+ * Information about a classroom a student is enrolled in, including their specific batch.
+ */
+export interface StudentClassroomEnrollmentInfo {
+  classroomId: string;
+  classroomName: string;
+  classroomSubject: string;
+  studentBatchInClassroom?: string; // The student's batch within this specific classroom
+}
+
+/**
+ * Basic information about a classmate for display.
+ */
+export interface ClassmateInfo {
+  userId: string;
+  name: string;
+  studentIdNumber: string;
+  batch?: string; // Their batch within the common classroom
+}
+import type { StudentProfile } from "./profile";
+
+async function checkFacultyPermissionForClassroom(
+  classroomId: string,
+  facultyId: string,
+): Promise<{ permitted: boolean; classroomData?: Omit<Classroom, "id"> }> {
   if (adminInitializationError) {
-    console.error("[classroomService:createClassroom SA] Firebase Admin SDK had a prior initialization error:", adminInitializationError.message);
-    throw new Error(`Server error: Firebase Admin SDK failed to initialize: ${adminInitializationError.message}`);
+    console.error(
+      "[classroomService:checkFacultyPermissionForClassroom] Admin SDK init error:",
+      adminInitializationError.message,
+    );
+    throw new Error("Server error: Admin SDK initialization failed.");
+  }
+  if (!adminDb) {
+    throw new Error(
+      "Admin DB not initialized in checkFacultyPermissionForClassroom.",
+    );
+  }
+  const classroomDocRef = adminDb.collection("classrooms").doc(classroomId);
+  const classroomSnap = await classroomDocRef.get();
+
+  if (!classroomSnap.exists) {
+    throw new Error(`Classroom with ID ${classroomId} not found.`);
+  }
+  const classroomData = classroomSnap.data() as Omit<Classroom, "id">;
+  const isOwner = classroomData.ownerFacultyId === facultyId;
+  const isInvited = classroomData.invitedFacultyIds?.includes(facultyId);
+
+  if (!isOwner && !isInvited) {
+    return { permitted: false };
+  }
+  return { permitted: true, classroomData };
+}
+
+export async function createClassroom(
+  idToken: string,
+  name: string,
+  subject: string,
+): Promise<string> {
+  if (adminInitializationError) {
+    console.error(
+      "[classroomService:createClassroom SA] Firebase Admin SDK had a prior initialization error:",
+      adminInitializationError.message,
+    );
+    throw new Error(
+      `Server error: Firebase Admin SDK failed to initialize: ${adminInitializationError.message}`,
+    );
   }
   if (!adminDb || !adminAuth) {
-    console.error("[classroomService:createClassroom SA] CRITICAL: Admin DB or Admin Auth instance is NOT available.");
-    throw new Error("Server error: Firebase Admin services are not configured or available.");
+    console.error(
+      "[classroomService:createClassroom SA] CRITICAL: Admin DB or Admin Auth instance is NOT available.",
+    );
+    throw new Error(
+      "Server error: Firebase Admin services are not configured or available.",
+    );
   }
 
   let ownerFacultyId: string;
@@ -49,12 +153,15 @@ export async function createClassroom(idToken: string, name: string, subject: st
     const decodedToken = await adminAuth.verifyIdToken(idToken);
     ownerFacultyId = decodedToken.uid;
   } catch (error) {
-    console.error("[classroomService:createClassroom SA] Error verifying ID token:", error);
+    console.error(
+      "[classroomService:createClassroom SA] Error verifying ID token:",
+      error,
+    );
     throw new Error("Authentication failed. Invalid ID token.");
   }
-  
+
   try {
-    const classroomsCollectionRef = adminDb.collection('classrooms');
+    const classroomsCollectionRef = adminDb.collection("classrooms");
     const serverTimestampForCreate = AdminFieldValue.serverTimestamp();
 
     const docRef = await classroomsCollectionRef.add({
@@ -64,23 +171,35 @@ export async function createClassroom(idToken: string, name: string, subject: st
       invitedFacultyIds: [],
       students: [], // Initialize with an empty array of student objects
       studentUids: [], // Initialize with an empty array of student UIDs for rules
-      createdAt: serverTimestampForCreate, 
+      createdAt: serverTimestampForCreate,
     });
-    console.log(`[classroomService:createClassroom SA] Classroom created successfully with ID: ${docRef.id} using Admin SDK.`);
+    console.log(
+      `[classroomService:createClassroom SA] Classroom created successfully with ID: ${docRef.id} using Admin SDK.`,
+    );
     return docRef.id;
   } catch (error) {
-    console.error("[classroomService:createClassroom SA] Error creating classroom (Admin SDK):", error);
-    throw error; 
+    console.error(
+      "[classroomService:createClassroom SA] Error creating classroom (Admin SDK):",
+      error,
+    );
+    throw error;
   }
 }
 
-export async function getClassroomsByFaculty(idToken: string): Promise<Classroom[]> {
+export async function getClassroomsByFaculty(
+  idToken: string,
+): Promise<Classroom[]> {
   if (adminInitializationError) {
-    console.error("[classroomService:getClassroomsByFaculty SA] Admin SDK init failed:", adminInitializationError.message);
+    console.error(
+      "[classroomService:getClassroomsByFaculty SA] Admin SDK init failed:",
+      adminInitializationError.message,
+    );
     throw new Error("Server error: Admin SDK initialization failed.");
   }
   if (!adminDb || !adminAuth) {
-    console.error("[classroomService:getClassroomsByFaculty SA] Admin DB or Auth not initialized.");
+    console.error(
+      "[classroomService:getClassroomsByFaculty SA] Admin DB or Auth not initialized.",
+    );
     throw new Error("Server error: Admin services not initialized.");
   }
 
@@ -89,107 +208,145 @@ export async function getClassroomsByFaculty(idToken: string): Promise<Classroom
     const decodedToken = await adminAuth.verifyIdToken(idToken);
     facultyId = decodedToken.uid;
   } catch (error) {
-    console.error("[classroomService:getClassroomsByFaculty] Error verifying ID token:", error);
+    console.error(
+      "[classroomService:getClassroomsByFaculty] Error verifying ID token:",
+      error,
+    );
     throw new Error("Authentication failed. Invalid ID token.");
   }
 
   try {
-    const classroomsCollectionRef = adminDb.collection('classrooms');
-    const ownedQuery = classroomsCollectionRef.where('ownerFacultyId', '==', facultyId);
-    const invitedQuery = classroomsCollectionRef.where('invitedFacultyIds', 'array-contains', facultyId);
+    const classroomsCollectionRef = adminDb.collection("classrooms");
+    const ownedQuery = classroomsCollectionRef.where(
+      "ownerFacultyId",
+      "==",
+      facultyId,
+    );
+    const invitedQuery = classroomsCollectionRef.where(
+      "invitedFacultyIds",
+      "array-contains",
+      facultyId,
+    );
 
-    const [ownedSnapshot, invitedSnapshot] = await Promise.all([ownedQuery.get(), invitedQuery.get()]);
-    
+    const [ownedSnapshot, invitedSnapshot] = await Promise.all([
+      ownedQuery.get(),
+      invitedQuery.get(),
+    ]);
+
     const classroomsMap = new Map<string, Classroom>();
 
     const processSnapshot = (snapshot: FirebaseFirestore.QuerySnapshot) => {
-        snapshot.docs.forEach(docSnap => {
-            if (!classroomsMap.has(docSnap.id)) {
-                const data = docSnap.data();
-                const createdAtAdmin = data.createdAt as AdminTimestamp | undefined;
-                classroomsMap.set(docSnap.id, {
-                    id: docSnap.id,
-                    name: data.name,
-                    subject: data.subject,
-                    ownerFacultyId: data.ownerFacultyId,
-                    invitedFacultyIds: data.invitedFacultyIds || [],
-                    students: (data.students || []).map((s: any) => ({ // Ensure students array is mapped correctly
-                        userId: s.userId,
-                        studentIdNumber: s.studentIdNumber,
-                        name: s.name,
-                        email: s.email,
-                        batch: s.batch,
-                    })),
-                    studentUids: data.studentUids || [], // Include studentUids
-                    createdAt: createdAtAdmin?.toDate() 
-                } as Classroom);
-            }
-        });
+      snapshot.docs.forEach((docSnap) => {
+        if (!classroomsMap.has(docSnap.id)) {
+          const data = docSnap.data();
+          const createdAtAdmin = data.createdAt as AdminTimestamp | undefined;
+          classroomsMap.set(docSnap.id, {
+            id: docSnap.id,
+            name: data.name,
+            subject: data.subject,
+            ownerFacultyId: data.ownerFacultyId,
+            invitedFacultyIds: data.invitedFacultyIds || [],
+            students: (data.students || []).map((s: any) => ({
+              // Ensure students array is mapped correctly
+              userId: s.userId,
+              studentIdNumber: s.studentIdNumber,
+              name: s.name,
+              email: s.email,
+              batch: s.batch,
+            })),
+            studentUids: data.studentUids || [], // Include studentUids
+            createdAt: createdAtAdmin?.toDate(),
+          } as Classroom);
+        }
+      });
     };
 
     processSnapshot(ownedSnapshot);
     processSnapshot(invitedSnapshot);
 
     const sortedClassrooms = Array.from(classroomsMap.values()).sort((a, b) => {
-        const dateA = a.createdAt instanceof Date ? a.createdAt.getTime() : 0;
-        const dateB = b.createdAt instanceof Date ? b.createdAt.getTime() : 0;
-        return dateB - dateA; // Sort by creation date, newest first
+      const dateA = a.createdAt instanceof Date ? a.createdAt.getTime() : 0;
+      const dateB = b.createdAt instanceof Date ? b.createdAt.getTime() : 0;
+      return dateB - dateA; // Sort by creation date, newest first
     });
     return sortedClassrooms;
-
   } catch (error) {
-    console.error(`[classroomService:getClassroomsByFaculty] Error during Firestore query for faculty ${facultyId} (Admin SDK):`, error);
+    console.error(
+      `[classroomService:getClassroomsByFaculty] Error during Firestore query for faculty ${facultyId} (Admin SDK):`,
+      error,
+    );
     throw error;
   }
 }
 
-export async function getAllFacultyUsers(idToken: string): Promise<FacultyUser[]> {
-    if (adminInitializationError) {
-      console.error("[classroomService:getAllFacultyUsers SA] Admin SDK init failed:", adminInitializationError.message);
-      throw new Error("Server error: Admin SDK initialization failed.");
-    }
-    if (!adminDb || !adminAuth) {
-      console.error("[classroomService:getAllFacultyUsers SA] Admin DB or Auth not initialized.");
-      throw new Error("Server error: Admin services not initialized.");
-    }
-
-    try {
-      await adminAuth.verifyIdToken(idToken);
-    } catch (error) {
-      console.error("[classroomService:getAllFacultyUsers] Error verifying ID token:", error);
-      throw new Error("Authentication failed.");
-    }
-
-    try {
-        const usersCollectionRef = adminDb.collection('users');
-        const q = usersCollectionRef.where('role', '==', 'faculty');
-        const snapshot = await q.get();
-
-        return snapshot.docs.map(docSnap => {
-            const data = docSnap.data();
-            return {
-                uid: docSnap.id,
-                name: data.name || 'Unknown Faculty',
-                email: data.email || 'No email'
-            } as FacultyUser;
-        });
-    } catch (error) {
-        console.error("[classroomService:getAllFacultyUsers] Error fetching all faculty users (Admin SDK):", error);
-        throw error;
-    }
-}
-
-// Updated to return ClassroomStudentInfo[] which includes batch
-export async function getStudentsInClassroom(idToken: string, classroomId: string): Promise<ClassroomStudentInfo[]> {
+export async function getAllFacultyUsers(
+  idToken: string,
+): Promise<FacultyUser[]> {
   if (adminInitializationError) {
-    console.error("[classroomService:getStudentsInClassroom SA] Admin SDK init failed:", adminInitializationError.message);
+    console.error(
+      "[classroomService:getAllFacultyUsers SA] Admin SDK init failed:",
+      adminInitializationError.message,
+    );
     throw new Error("Server error: Admin SDK initialization failed.");
   }
   if (!adminDb || !adminAuth) {
-    console.error("[classroomService:getStudentsInClassroom SA] Admin DB or Auth not initialized.");
+    console.error(
+      "[classroomService:getAllFacultyUsers SA] Admin DB or Auth not initialized.",
+    );
     throw new Error("Server error: Admin services not initialized.");
   }
-  
+
+  try {
+    await adminAuth.verifyIdToken(idToken);
+  } catch (error) {
+    console.error(
+      "[classroomService:getAllFacultyUsers] Error verifying ID token:",
+      error,
+    );
+    throw new Error("Authentication failed.");
+  }
+
+  try {
+    const usersCollectionRef = adminDb.collection("users");
+    const q = usersCollectionRef.where("role", "==", "faculty");
+    const snapshot = await q.get();
+
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data();
+      return {
+        uid: docSnap.id,
+        name: data.name || "Unknown Faculty",
+        email: data.email || "No email",
+      } as FacultyUser;
+    });
+  } catch (error) {
+    console.error(
+      "[classroomService:getAllFacultyUsers] Error fetching all faculty users (Admin SDK):",
+      error,
+    );
+    throw error;
+  }
+}
+
+// Updated to return ClassroomStudentInfo[] which includes batch
+export async function getStudentsInClassroom(
+  idToken: string,
+  classroomId: string,
+): Promise<ClassroomStudentInfo[]> {
+  if (adminInitializationError) {
+    console.error(
+      "[classroomService:getStudentsInClassroom SA] Admin SDK init failed:",
+      adminInitializationError.message,
+    );
+    throw new Error("Server error: Admin SDK initialization failed.");
+  }
+  if (!adminDb || !adminAuth) {
+    console.error(
+      "[classroomService:getStudentsInClassroom SA] Admin DB or Auth not initialized.",
+    );
+    throw new Error("Server error: Admin services not initialized.");
+  }
+
   let facultyId: string;
   try {
     const decodedToken = await adminAuth.verifyIdToken(idToken);
@@ -199,312 +356,405 @@ export async function getStudentsInClassroom(idToken: string, classroomId: strin
   }
 
   try {
-    const permCheck = await checkFacultyPermissionForClassroom(classroomId, facultyId);
+    const permCheck = await checkFacultyPermissionForClassroom(
+      classroomId,
+      facultyId,
+    );
     if (!permCheck.permitted || !permCheck.classroomData) {
-        throw new Error("Permission denied or classroom data not found.");
+      throw new Error("Permission denied or classroom data not found.");
     }
     // The students array in classroomData already contains all necessary info including batch.
     return permCheck.classroomData.students || [];
   } catch (error) {
-    console.error(`Error fetching students for classroom ${classroomId} (Admin SDK):`, error);
+    console.error(
+      `Error fetching students for classroom ${classroomId} (Admin SDK):`,
+      error,
+    );
     throw error;
   }
 }
 
-export async function addStudentsToClassroom(idToken: string, classroomId: string, studentsToAdd: StudentSearchResultItem[]): Promise<void> {
-    if (adminInitializationError) {
-      throw new Error("Server error: Admin SDK initialization failed.");
-    }
-    if (!adminDb || !adminAuth) {
-      throw new Error("Server error: Admin services not initialized.");
-    }
-    let facultyId: string;
-    try {
-        facultyId = (await adminAuth.verifyIdToken(idToken)).uid;
-    } catch (error) {
-        throw new Error("Authentication failed. Invalid ID token.");
-    }
+export async function addStudentsToClassroom(
+  idToken: string,
+  classroomId: string,
+  studentsToAdd: StudentSearchResultItem[],
+): Promise<void> {
+  if (adminInitializationError) {
+    throw new Error("Server error: Admin SDK initialization failed.");
+  }
+  if (!adminDb || !adminAuth) {
+    throw new Error("Server error: Admin services not initialized.");
+  }
+  let facultyId: string;
+  try {
+    facultyId = (await adminAuth.verifyIdToken(idToken)).uid;
+  } catch (error) {
+    throw new Error("Authentication failed. Invalid ID token.");
+  }
 
-    const permCheck = await checkFacultyPermissionForClassroom(classroomId, facultyId);
-    if (!permCheck.permitted) {
-        throw new Error("Permission denied to modify this classroom.");
-    }
+  const permCheck = await checkFacultyPermissionForClassroom(
+    classroomId,
+    facultyId,
+  );
+  if (!permCheck.permitted) {
+    throw new Error("Permission denied to modify this classroom.");
+  }
 
-    const classroomDocRef = adminDb.collection('classrooms').doc(classroomId);
-    
-    // Create an array of ClassroomStudentInfo from the search results
-    const studentsToStore: ClassroomStudentInfo[] = studentsToAdd.map(student => {
-        let assignedBatch: string | undefined = undefined;
-        if (student.studentId) {
-            const parts = student.studentId.split('-');
-            if (parts.length === 3) {
-                assignedBatch = parts[1].toUpperCase();
-            }
+  const classroomDocRef = adminDb.collection("classrooms").doc(classroomId);
+
+  // Create an array of ClassroomStudentInfo from the search results
+  const studentsToStore: ClassroomStudentInfo[] = studentsToAdd.map(
+    (student) => {
+      let assignedBatch: string | undefined = undefined;
+      if (student.studentId) {
+        const parts = student.studentId.split("-");
+        if (parts.length === 3) {
+          assignedBatch = parts[1].toUpperCase();
         }
-        return {
-            userId: student.uid,
-            studentIdNumber: student.studentId || 'N/A',
-            name: student.name || 'N/A',
-            email: student.email || 'N/A',
-            batch: assignedBatch,
-        };
+      }
+      return {
+        userId: student.uid,
+        studentIdNumber: student.studentId || "N/A",
+        name: student.name || "N/A",
+        email: student.email || "N/A",
+        batch: assignedBatch,
+      };
+    },
+  );
+
+  // Get all student UIDs to add
+  const studentUidsToAdd = studentsToAdd.map((s) => s.uid);
+
+  try {
+    await classroomDocRef.update({
+      students: AdminFieldValue.arrayUnion(...studentsToStore),
+      studentUids: AdminFieldValue.arrayUnion(...studentUidsToAdd),
     });
-    
-    // Get all student UIDs to add
-    const studentUidsToAdd = studentsToAdd.map(s => s.uid);
-
-    try {
-        await classroomDocRef.update({
-            students: AdminFieldValue.arrayUnion(...studentsToStore),
-            studentUids: AdminFieldValue.arrayUnion(...studentUidsToAdd)
-        });
-    } catch (error) {
-        console.error("Error adding students to classroom:", error);
-        throw error;
-    }
+  } catch (error) {
+    console.error("Error adding students to classroom:", error);
+    throw error;
+  }
 }
-
 
 // Updated to remove student object from array
-export async function removeStudentFromClassroom(idToken: string, classroomId: string, studentUserId: string): Promise<void> {
-    if (adminInitializationError) {
-      console.error("[classroomService:removeStudentFromClassroom SA] Admin SDK init failed:", adminInitializationError.message);
-      throw new Error("Server error: Admin SDK initialization failed.");
-    }
-    if (!adminDb || !adminAuth) {
-      console.error("[classroomService:removeStudentFromClassroom SA] Admin DB or Auth not initialized.");
-      throw new Error("Server error: Admin services not initialized.");
-    }
-    let facultyId: string;
-    try {
-        facultyId = (await adminAuth.verifyIdToken(idToken)).uid;
-    } catch (error) {
-        throw new Error("Authentication failed. Invalid ID token.");
-    }
+export async function removeStudentFromClassroom(
+  idToken: string,
+  classroomId: string,
+  studentUserId: string,
+): Promise<void> {
+  if (adminInitializationError) {
+    console.error(
+      "[classroomService:removeStudentFromClassroom SA] Admin SDK init failed:",
+      adminInitializationError.message,
+    );
+    throw new Error("Server error: Admin SDK initialization failed.");
+  }
+  if (!adminDb || !adminAuth) {
+    console.error(
+      "[classroomService:removeStudentFromClassroom SA] Admin DB or Auth not initialized.",
+    );
+    throw new Error("Server error: Admin services not initialized.");
+  }
+  let facultyId: string;
+  try {
+    facultyId = (await adminAuth.verifyIdToken(idToken)).uid;
+  } catch (error) {
+    throw new Error("Authentication failed. Invalid ID token.");
+  }
 
-    const permCheck = await checkFacultyPermissionForClassroom(classroomId, facultyId);
+  const permCheck = await checkFacultyPermissionForClassroom(
+    classroomId,
+    facultyId,
+  );
+  if (!permCheck.permitted || !permCheck.classroomData) {
+    throw new Error("Permission denied or classroom data not found.");
+  }
+
+  const classroomDocRef = adminDb.collection("classrooms").doc(classroomId);
+  try {
+    const currentClassroomSnap = await classroomDocRef.get();
+    if (!currentClassroomSnap.exists) throw new Error("Classroom disappeared.");
+
+    const currentClassroomData = currentClassroomSnap.data() as Classroom;
+    const updatedStudents = (currentClassroomData.students || []).filter(
+      (s) => s.userId !== studentUserId,
+    );
+
+    await classroomDocRef.update({
+      students: updatedStudents,
+      studentUids: AdminFieldValue.arrayRemove(studentUserId), // Also remove from studentUids
+    });
+  } catch (error) {
+    console.error("Error removing student from classroom:", error);
+    throw error;
+  }
+}
+
+export async function searchStudents(
+  idToken: string,
+  classroomId: string,
+  searchTerm: string,
+): Promise<StudentSearchResultItem[]> {
+  if (adminInitializationError) {
+    console.error(
+      "[classroomService:searchStudents SA] Admin SDK init failed:",
+      adminInitializationError.message,
+    );
+    throw new Error("Server error: Admin SDK initialization failed.");
+  }
+  if (!adminDb || !adminAuth) {
+    console.error(
+      "[classroomService:searchStudents SA] Admin DB or Auth not initialized.",
+    );
+    throw new Error("Server error: Admin services not initialized.");
+  }
+  let facultyId: string;
+  try {
+    facultyId = (await adminAuth.verifyIdToken(idToken)).uid;
+  } catch (error) {
+    throw new Error("Authentication failed. Invalid ID token.");
+  }
+
+  // Global search for grades page does not need classroom permission check
+  let studentsCurrentlyInClassroom: string[] = [];
+  if (classroomId !== "__GLOBAL_SEARCH__") {
+    const permCheck = await checkFacultyPermissionForClassroom(
+      classroomId,
+      facultyId,
+    );
     if (!permCheck.permitted || !permCheck.classroomData) {
-        throw new Error("Permission denied or classroom data not found.");
+      throw new Error("Permission denied or classroom data not found.");
     }
+    studentsCurrentlyInClassroom = permCheck.classroomData.studentUids || [];
+  }
 
-    const classroomDocRef = adminDb.collection('classrooms').doc(classroomId);
-    try {
-        const currentClassroomSnap = await classroomDocRef.get();
-        if (!currentClassroomSnap.exists) throw new Error("Classroom disappeared.");
-        
-        const currentClassroomData = currentClassroomSnap.data() as Classroom;
-        const updatedStudents = (currentClassroomData.students || []).filter(s => s.userId !== studentUserId);
-        
-        await classroomDocRef.update({ 
-            students: updatedStudents,
-            studentUids: AdminFieldValue.arrayRemove(studentUserId) // Also remove from studentUids
-        });
-    } catch (error) {
-        console.error("Error removing student from classroom:", error);
-        throw error;
-    }
-}
+  try {
+    const usersCollectionRef = adminDb.collection("users");
+    const q = usersCollectionRef.where("role", "==", "student");
+    const snapshot = await q.get();
 
-export async function searchStudents(idToken: string, classroomId: string, searchTerm: string): Promise<StudentSearchResultItem[]> {
-    if (adminInitializationError) {
-      console.error("[classroomService:searchStudents SA] Admin SDK init failed:", adminInitializationError.message);
-      throw new Error("Server error: Admin SDK initialization failed.");
-    }
-    if (!adminDb || !adminAuth) {
-      console.error("[classroomService:searchStudents SA] Admin DB or Auth not initialized.");
-      throw new Error("Server error: Admin services not initialized.");
-    }
-    let facultyId: string;
-    try {
-        facultyId = (await adminAuth.verifyIdToken(idToken)).uid;
-    } catch (error) {
-        throw new Error("Authentication failed. Invalid ID token.");
-    }
-    
-    // Global search for grades page does not need classroom permission check
-    let studentsCurrentlyInClassroom: string[] = [];
-    if (classroomId !== '__GLOBAL_SEARCH__') {
-        const permCheck = await checkFacultyPermissionForClassroom(classroomId, facultyId);
-        if (!permCheck.permitted || !permCheck.classroomData) {
-            throw new Error("Permission denied or classroom data not found.");
-        }
-        studentsCurrentlyInClassroom = (permCheck.classroomData.studentUids || []);
-    }
+    if (snapshot.empty) return [];
 
-    try {
-        const usersCollectionRef = adminDb.collection('users');
-        const q = usersCollectionRef.where('role', '==', 'student');
-        const snapshot = await q.get();
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    const results: StudentSearchResultItem[] = [];
 
-        if (snapshot.empty) return [];
-        
-        const lowerSearchTerm = searchTerm.toLowerCase();
-        const results: StudentSearchResultItem[] = [];
+    snapshot.docs.forEach((docSnap) => {
+      const data = docSnap.data() as StudentProfile;
+      const studentUid = docSnap.id;
 
-        snapshot.docs.forEach(docSnap => {
-            const data = docSnap.data() as StudentProfile; 
-            const studentUid = docSnap.id;
-            
-            // For classroom-specific searches, filter out students already in the class
-            if (classroomId !== '__GLOBAL_SEARCH__' && studentsCurrentlyInClassroom.includes(studentUid)) {
-                return;
-            }
-            
-            if (
-                (data.name && data.name.toLowerCase().includes(lowerSearchTerm)) ||
-                (data.email && data.email.toLowerCase().includes(lowerSearchTerm)) ||
-                (data.studentId && data.studentId.toLowerCase().includes(lowerSearchTerm)) 
-            ) {
-                results.push({
-                    uid: studentUid,
-                    name: data.name || 'N/A',
-                    studentId: data.studentId || 'N/A', 
-                    email: data.email || 'N/A',
-                });
-            }
-        });
-        return results;
-    } catch (error) {
-        console.error("Error searching students:", error);
-        throw error;
-    }
-}
-
-export async function addInvitedFacultyToClassroom(idToken: string, classroomId: string, facultyToInviteId: string): Promise<void> {
-    if (adminInitializationError) {
-      console.error("[classroomService:addInvitedFacultyToClassroom SA] Admin SDK init failed:", adminInitializationError.message);
-      throw new Error("Server error: Admin SDK initialization failed.");
-    }
-    if (!adminDb || !adminAuth) {
-      console.error("[classroomService:addInvitedFacultyToClassroom SA] Admin DB or Auth not initialized.");
-      throw new Error("Server error: Admin services not initialized.");
-    }
-
-    let currentFacultyId: string;
-    try {
-        currentFacultyId = (await adminAuth.verifyIdToken(idToken)).uid;
-    } catch (error) {
-        throw new Error("Authentication failed. Invalid ID token.");
-    }
-
-    const classroomDocRef = adminDb.collection('classrooms').doc(classroomId);
-    const classroomSnap = await classroomDocRef.get();
-
-    if (!classroomSnap.exists) throw new Error(`Classroom with ID ${classroomId} not found.`);
-    const classroomData = classroomSnap.data() as Omit<Classroom, 'id'>;
-
-    if (classroomData.ownerFacultyId !== currentFacultyId) {
-        throw new Error("Only the classroom owner can invite other faculty.");
-    }
-    if (currentFacultyId === facultyToInviteId) {
-        throw new Error("Owner cannot invite themselves.");
-    }
-    if (classroomData.invitedFacultyIds?.includes(facultyToInviteId)) {
-        return; // Already invited
-    }
-
-    const facultyToInviteDocRef = adminDb.collection('users').doc(facultyToInviteId);
-    const facultyToInviteSnap = await facultyToInviteDocRef.get();
-    if (!facultyToInviteSnap.exists || facultyToInviteSnap.data()?.role !== 'faculty') { 
-        throw new Error("Faculty member to invite not found or is not a faculty.");
-    }
-
-    try {
-        await classroomDocRef.update({
-            invitedFacultyIds: AdminFieldValue.arrayUnion(facultyToInviteId)
-        });
-    } catch (error) {
-        console.error("Error inviting faculty:", error);
-        throw error;
-    }
-}
-
-export async function deleteClassroom(idToken: string, classroomId: string): Promise<void> {
-    if (adminInitializationError) {
-      console.error("[classroomService:deleteClassroom SA] Admin SDK init failed:", adminInitializationError.message);
-      throw new Error("Server error: Admin SDK initialization failed.");
-    }
-    if (!adminDb || !adminAuth) {
-      console.error("[classroomService:deleteClassroom SA] Admin DB or Auth not initialized.");
-      throw new Error("Server error: Admin services not initialized.");
-    }
-  
-    let facultyId: string;
-    try {
-      facultyId = (await adminAuth.verifyIdToken(idToken)).uid;
-    } catch (error) {
-      throw new Error("Authentication failed. Invalid ID token.");
-    }
-  
-    const classroomDocRef = adminDb.collection('classrooms').doc(classroomId);
-    try {
-      const classroomSnap = await classroomDocRef.get();
-      if (!classroomSnap.exists) throw new Error(`Classroom with ID ${classroomId} not found.`);
-      
-      const classroomData = classroomSnap.data() as Omit<Classroom, 'id'>;
-      if (classroomData.ownerFacultyId !== facultyId) {
-        throw new Error("Permission denied: Only the classroom owner can delete the classroom.");
+      // For classroom-specific searches, filter out students already in the class
+      if (
+        classroomId !== "__GLOBAL_SEARCH__" &&
+        studentsCurrentlyInClassroom.includes(studentUid)
+      ) {
+        return;
       }
-  
-      await classroomDocRef.delete();
-    } catch (error) {
-      console.error(`Error deleting classroom ${classroomId}:`, error);
-      throw error;
+
+      if (
+        (data.name && data.name.toLowerCase().includes(lowerSearchTerm)) ||
+        (data.email && data.email.toLowerCase().includes(lowerSearchTerm)) ||
+        (data.studentId &&
+          data.studentId.toLowerCase().includes(lowerSearchTerm))
+      ) {
+        results.push({
+          uid: studentUid,
+          name: data.name || "N/A",
+          studentId: data.studentId || "N/A",
+          email: data.email || "N/A",
+        });
+      }
+    });
+    return results;
+  } catch (error) {
+    console.error("Error searching students:", error);
+    throw error;
+  }
+}
+
+export async function addInvitedFacultyToClassroom(
+  idToken: string,
+  classroomId: string,
+  facultyToInviteId: string,
+): Promise<void> {
+  if (adminInitializationError) {
+    console.error(
+      "[classroomService:addInvitedFacultyToClassroom SA] Admin SDK init failed:",
+      adminInitializationError.message,
+    );
+    throw new Error("Server error: Admin SDK initialization failed.");
+  }
+  if (!adminDb || !adminAuth) {
+    console.error(
+      "[classroomService:addInvitedFacultyToClassroom SA] Admin DB or Auth not initialized.",
+    );
+    throw new Error("Server error: Admin services not initialized.");
+  }
+
+  let currentFacultyId: string;
+  try {
+    currentFacultyId = (await adminAuth.verifyIdToken(idToken)).uid;
+  } catch (error) {
+    throw new Error("Authentication failed. Invalid ID token.");
+  }
+
+  const classroomDocRef = adminDb.collection("classrooms").doc(classroomId);
+  const classroomSnap = await classroomDocRef.get();
+
+  if (!classroomSnap.exists)
+    throw new Error(`Classroom with ID ${classroomId} not found.`);
+  const classroomData = classroomSnap.data() as Omit<Classroom, "id">;
+
+  if (classroomData.ownerFacultyId !== currentFacultyId) {
+    throw new Error("Only the classroom owner can invite other faculty.");
+  }
+  if (currentFacultyId === facultyToInviteId) {
+    throw new Error("Owner cannot invite themselves.");
+  }
+  if (classroomData.invitedFacultyIds?.includes(facultyToInviteId)) {
+    return; // Already invited
+  }
+
+  const facultyToInviteDocRef = adminDb
+    .collection("users")
+    .doc(facultyToInviteId);
+  const facultyToInviteSnap = await facultyToInviteDocRef.get();
+  if (
+    !facultyToInviteSnap.exists ||
+    facultyToInviteSnap.data()?.role !== "faculty"
+  ) {
+    throw new Error("Faculty member to invite not found or is not a faculty.");
+  }
+
+  try {
+    await classroomDocRef.update({
+      invitedFacultyIds: AdminFieldValue.arrayUnion(facultyToInviteId),
+    });
+  } catch (error) {
+    console.error("Error inviting faculty:", error);
+    throw error;
+  }
+}
+
+export async function deleteClassroom(
+  idToken: string,
+  classroomId: string,
+): Promise<void> {
+  if (adminInitializationError) {
+    console.error(
+      "[classroomService:deleteClassroom SA] Admin SDK init failed:",
+      adminInitializationError.message,
+    );
+    throw new Error("Server error: Admin SDK initialization failed.");
+  }
+  if (!adminDb || !adminAuth) {
+    console.error(
+      "[classroomService:deleteClassroom SA] Admin DB or Auth not initialized.",
+    );
+    throw new Error("Server error: Admin services not initialized.");
+  }
+
+  let facultyId: string;
+  try {
+    facultyId = (await adminAuth.verifyIdToken(idToken)).uid;
+  } catch (error) {
+    throw new Error("Authentication failed. Invalid ID token.");
+  }
+
+  const classroomDocRef = adminDb.collection("classrooms").doc(classroomId);
+  try {
+    const classroomSnap = await classroomDocRef.get();
+    if (!classroomSnap.exists)
+      throw new Error(`Classroom with ID ${classroomId} not found.`);
+
+    const classroomData = classroomSnap.data() as Omit<Classroom, "id">;
+    if (classroomData.ownerFacultyId !== facultyId) {
+      throw new Error(
+        "Permission denied: Only the classroom owner can delete the classroom.",
+      );
     }
+
+    await classroomDocRef.delete();
+  } catch (error) {
+    console.error(`Error deleting classroom ${classroomId}:`, error);
+    throw error;
+  }
 }
 
 /**
  * Server Action: Updates a student's batch within a specific classroom.
  */
-export async function updateStudentBatchInClassroom(idToken: string, classroomId: string, studentUserId: string, newBatch: string): Promise<void> {
-    if (adminInitializationError) {
-      console.error("[classroomService:updateStudentBatchInClassroom SA] Admin SDK init failed:", adminInitializationError.message);
-      throw new Error("Server error: Admin SDK initialization failed.");
+export async function updateStudentBatchInClassroom(
+  idToken: string,
+  classroomId: string,
+  studentUserId: string,
+  newBatch: string,
+): Promise<void> {
+  if (adminInitializationError) {
+    console.error(
+      "[classroomService:updateStudentBatchInClassroom SA] Admin SDK init failed:",
+      adminInitializationError.message,
+    );
+    throw new Error("Server error: Admin SDK initialization failed.");
+  }
+  if (!adminDb || !adminAuth) {
+    console.error(
+      "[classroomService:updateStudentBatchInClassroom SA] Admin DB or Auth not initialized.",
+    );
+    throw new Error("Server error: Admin services not initialized.");
+  }
+
+  let facultyId: string;
+  try {
+    facultyId = (await adminAuth.verifyIdToken(idToken)).uid;
+  } catch (error) {
+    console.error(
+      "[classroomService:updateStudentBatchInClassroom SA] Error verifying ID token:",
+      error,
+    );
+    throw new Error("Authentication failed. Invalid ID token.");
+  }
+
+  const permCheck = await checkFacultyPermissionForClassroom(
+    classroomId,
+    facultyId,
+  );
+  if (!permCheck.permitted) {
+    throw new Error("Permission denied to modify this classroom.");
+  }
+
+  const classroomDocRef = adminDb.collection("classrooms").doc(classroomId);
+  try {
+    const classroomSnap = await classroomDocRef.get();
+    if (!classroomSnap.exists) {
+      throw new Error("Classroom not found.");
     }
-    if (!adminDb || !adminAuth) {
-      console.error("[classroomService:updateStudentBatchInClassroom SA] Admin DB or Auth not initialized.");
-      throw new Error("Server error: Admin services not initialized.");
+    const classroomData = classroomSnap.data() as Classroom;
+    const studentIndex = (classroomData.students || []).findIndex(
+      (s) => s.userId === studentUserId,
+    );
+
+    if (studentIndex === -1) {
+      throw new Error("Student not found in this classroom roster.");
     }
 
-    let facultyId: string;
-    try {
-        facultyId = (await adminAuth.verifyIdToken(idToken)).uid;
-    } catch (error) {
-        console.error("[classroomService:updateStudentBatchInClassroom SA] Error verifying ID token:", error);
-        throw new Error("Authentication failed. Invalid ID token.");
-    }
+    const updatedStudentsArray = [...(classroomData.students || [])];
+    const trimmedBatch = newBatch.trim();
+    updatedStudentsArray[studentIndex] = {
+      ...updatedStudentsArray[studentIndex],
+      batch: trimmedBatch === "" ? undefined : trimmedBatch,
+    };
 
-    const permCheck = await checkFacultyPermissionForClassroom(classroomId, facultyId);
-    if (!permCheck.permitted) {
-        throw new Error("Permission denied to modify this classroom.");
-    }
-
-    const classroomDocRef = adminDb.collection('classrooms').doc(classroomId);
-    try {
-        const classroomSnap = await classroomDocRef.get();
-        if (!classroomSnap.exists) {
-            throw new Error("Classroom not found.");
-        }
-        const classroomData = classroomSnap.data() as Classroom; 
-        const studentIndex = (classroomData.students || []).findIndex(s => s.userId === studentUserId);
-
-        if (studentIndex === -1) {
-            throw new Error("Student not found in this classroom roster.");
-        }
-
-        const updatedStudentsArray = [...(classroomData.students || [])];
-        const trimmedBatch = newBatch.trim();
-        updatedStudentsArray[studentIndex] = {
-            ...updatedStudentsArray[studentIndex],
-            batch: trimmedBatch === "" ? undefined : trimmedBatch, 
-        };
-
-        await classroomDocRef.update({ students: updatedStudentsArray });
-        console.log(`[classroomService SA] Batch for student ${studentUserId} in classroom ${classroomId} updated to "${newBatch}".`);
-    } catch (error) {
-        console.error(`[classroomService:updateStudentBatchInClassroom SA] Error updating student batch:`, error);
-        throw error;
-    }
+    await classroomDocRef.update({ students: updatedStudentsArray });
+    console.log(
+      `[classroomService SA] Batch for student ${studentUserId} in classroom ${classroomId} updated to "${newBatch}".`,
+    );
+  } catch (error) {
+    console.error(
+      `[classroomService:updateStudentBatchInClassroom SA] Error updating student batch:`,
+      error,
+    );
+    throw error;
+  }
 }
 
 /**
@@ -512,54 +762,73 @@ export async function updateStudentBatchInClassroom(idToken: string, classroomId
  * This is for the student to view their own classroom enrollments.
  * @param idToken - Student's Firebase ID token.
  */
-export async function getStudentClassroomsWithBatchInfo(idToken: string): Promise<StudentClassroomEnrollmentInfo[]> {
-    if (adminInitializationError) {
-      console.error("[classroomService:getStudentClassroomsWithBatchInfo SA] Admin SDK init failed:", adminInitializationError.message);
-      throw new Error("Server error: Admin SDK initialization failed.");
+export async function getStudentClassroomsWithBatchInfo(
+  idToken: string,
+): Promise<StudentClassroomEnrollmentInfo[]> {
+  if (adminInitializationError) {
+    console.error(
+      "[classroomService:getStudentClassroomsWithBatchInfo SA] Admin SDK init failed:",
+      adminInitializationError.message,
+    );
+    throw new Error("Server error: Admin SDK initialization failed.");
+  }
+  if (!adminDb || !adminAuth) {
+    console.error(
+      "[classroomService:getStudentClassroomsWithBatchInfo SA] Admin DB or Auth not initialized.",
+    );
+    throw new Error("Server error: Admin services not initialized.");
+  }
+
+  let studentUid: string;
+  try {
+    const decodedToken = await adminAuth.verifyIdToken(idToken);
+    studentUid = decodedToken.uid;
+  } catch (error) {
+    console.error(
+      "[classroomService:getStudentClassroomsWithBatchInfo SA] Error verifying ID token:",
+      error,
+    );
+    throw new Error("Authentication failed. Invalid ID token.");
+  }
+
+  const enrolledClassrooms: StudentClassroomEnrollmentInfo[] = [];
+  try {
+    // More efficient query using the studentUids array
+    const classroomsSnapshot = await adminDb
+      .collection("classrooms")
+      .where("studentUids", "array-contains", studentUid)
+      .get();
+    if (classroomsSnapshot.empty) {
+      return [];
     }
-    if (!adminDb || !adminAuth) {
-      console.error("[classroomService:getStudentClassroomsWithBatchInfo SA] Admin DB or Auth not initialized.");
-      throw new Error("Server error: Admin services not initialized.");
-    }
 
-    let studentUid: string;
-    try {
-        const decodedToken = await adminAuth.verifyIdToken(idToken);
-        studentUid = decodedToken.uid;
-    } catch (error) {
-        console.error("[classroomService:getStudentClassroomsWithBatchInfo SA] Error verifying ID token:", error);
-        throw new Error("Authentication failed. Invalid ID token.");
-    }
+    classroomsSnapshot.forEach((docSnap) => {
+      const classroomData = docSnap.data() as Omit<Classroom, "id">; // Type assertion
+      const studentEntry = (classroomData.students || []).find(
+        (s) => s.userId === studentUid,
+      );
 
-    const enrolledClassrooms: StudentClassroomEnrollmentInfo[] = [];
-    try {
-        // More efficient query using the studentUids array
-        const classroomsSnapshot = await adminDb.collection('classrooms').where('studentUids', 'array-contains', studentUid).get();
-        if (classroomsSnapshot.empty) {
-            return [];
-        }
-
-        classroomsSnapshot.forEach(docSnap => {
-            const classroomData = docSnap.data() as Omit<Classroom, 'id'>; // Type assertion
-            const studentEntry = (classroomData.students || []).find(s => s.userId === studentUid);
-
-            if (studentEntry) {
-                enrolledClassrooms.push({
-                    classroomId: docSnap.id,
-                    classroomName: classroomData.name,
-                    classroomSubject: classroomData.subject,
-                    studentBatchInClassroom: studentEntry.batch,
-                });
-            }
+      if (studentEntry) {
+        enrolledClassrooms.push({
+          classroomId: docSnap.id,
+          classroomName: classroomData.name,
+          classroomSubject: classroomData.subject,
+          studentBatchInClassroom: studentEntry.batch,
         });
-        
-        console.log(`[classroomService:getStudentClassroomsWithBatchInfo SA] Found ${enrolledClassrooms.length} classrooms for student ${studentUid}.`);
-        return enrolledClassrooms;
+      }
+    });
 
-    } catch (error) {
-        console.error(`[classroomService:getStudentClassroomsWithBatchInfo SA] Error fetching classrooms for student ${studentUid} (Admin SDK):`, error);
-        throw error;
-    }
+    console.log(
+      `[classroomService:getStudentClassroomsWithBatchInfo SA] Found ${enrolledClassrooms.length} classrooms for student ${studentUid}.`,
+    );
+    return enrolledClassrooms;
+  } catch (error) {
+    console.error(
+      `[classroomService:getStudentClassroomsWithBatchInfo SA] Error fetching classrooms for student ${studentUid} (Admin SDK):`,
+      error,
+    );
+    throw error;
+  }
 }
 
 /**
@@ -568,58 +837,77 @@ export async function getStudentClassroomsWithBatchInfo(idToken: string): Promis
  * @param idToken - Student's Firebase ID token.
  * @param classroomId - The ID of the classroom.
  */
-export async function getClassmatesInfo(idToken: string, classroomId: string): Promise<ClassmateInfo[]> {
-    if (adminInitializationError) {
-      console.error("[classroomService:getClassmatesInfo SA] Admin SDK init failed:", adminInitializationError.message);
-      throw new Error("Server error: Admin SDK initialization failed.");
+export async function getClassmatesInfo(
+  idToken: string,
+  classroomId: string,
+): Promise<ClassmateInfo[]> {
+  if (adminInitializationError) {
+    console.error(
+      "[classroomService:getClassmatesInfo SA] Admin SDK init failed:",
+      adminInitializationError.message,
+    );
+    throw new Error("Server error: Admin SDK initialization failed.");
+  }
+  if (!adminDb || !adminAuth) {
+    console.error(
+      "[classroomService:getClassmatesInfo SA] Admin DB or Auth not initialized.",
+    );
+    throw new Error("Server error: Admin services not initialized.");
+  }
+
+  let studentUid: string;
+  try {
+    const decodedToken = await adminAuth.verifyIdToken(idToken);
+    studentUid = decodedToken.uid;
+  } catch (error) {
+    console.error(
+      "[classroomService:getClassmatesInfo SA] Error verifying ID token:",
+      error,
+    );
+    throw new Error("Authentication failed. Invalid ID token.");
+  }
+
+  try {
+    const classroomDocRef = adminDb.collection("classrooms").doc(classroomId);
+    const classroomSnap = await classroomDocRef.get();
+
+    if (!classroomSnap.exists) {
+      throw new Error(`Classroom with ID ${classroomId} not found.`);
     }
-    if (!adminDb || !adminAuth) {
-      console.error("[classroomService:getClassmatesInfo SA] Admin DB or Auth not initialized.");
-      throw new Error("Server error: Admin services not initialized.");
+
+    const classroomData = classroomSnap.data() as Omit<Classroom, "id">;
+    const studentsInClassroom = classroomData.students || [];
+
+    // Verify the requesting student is part of this classroom
+    const requestingStudentEntry = (classroomData.studentUids || []).includes(
+      studentUid,
+    );
+    if (!requestingStudentEntry) {
+      console.warn(
+        `[classroomService:getClassmatesInfo SA] Student ${studentUid} not found in classroom ${classroomId}. Denying access to classmates list.`,
+      );
+      throw new Error("Access denied: You are not enrolled in this classroom.");
     }
 
-    let studentUid: string;
-    try {
-        const decodedToken = await adminAuth.verifyIdToken(idToken);
-        studentUid = decodedToken.uid;
-    } catch (error) {
-        console.error("[classroomService:getClassmatesInfo SA] Error verifying ID token:", error);
-        throw new Error("Authentication failed. Invalid ID token.");
-    }
+    // Map to ClassmateInfo, excluding the requesting student
+    const classmates = studentsInClassroom
+      .filter((student) => student.userId !== studentUid) // Exclude the requesting student
+      .map((student) => ({
+        userId: student.userId,
+        name: student.name,
+        studentIdNumber: student.studentIdNumber,
+        batch: student.batch,
+      }));
 
-    try {
-        const classroomDocRef = adminDb.collection('classrooms').doc(classroomId);
-        const classroomSnap = await classroomDocRef.get();
-
-        if (!classroomSnap.exists) {
-            throw new Error(`Classroom with ID ${classroomId} not found.`);
-        }
-
-        const classroomData = classroomSnap.data() as Omit<Classroom, 'id'>;
-        const studentsInClassroom = classroomData.students || [];
-
-        // Verify the requesting student is part of this classroom
-        const requestingStudentEntry = (classroomData.studentUids || []).includes(studentUid);
-        if (!requestingStudentEntry) {
-            console.warn(`[classroomService:getClassmatesInfo SA] Student ${studentUid} not found in classroom ${classroomId}. Denying access to classmates list.`);
-            throw new Error("Access denied: You are not enrolled in this classroom.");
-        }
-
-        // Map to ClassmateInfo, excluding the requesting student
-        const classmates = studentsInClassroom
-            .filter(student => student.userId !== studentUid) // Exclude the requesting student
-            .map(student => ({
-                userId: student.userId,
-                name: student.name,
-                studentIdNumber: student.studentIdNumber,
-                batch: student.batch,
-            }));
-        
-        console.log(`[classroomService:getClassmatesInfo SA] Found ${classmates.length} classmates for student ${studentUid} in classroom ${classroomId}.`);
-        return classmates;
-
-    } catch (error) {
-        console.error(`[classroomService:getClassmatesInfo SA] Error fetching classmates for classroom ${classroomId} (Admin SDK):`, error);
-        throw error;
-    }
+    console.log(
+      `[classroomService:getClassmatesInfo SA] Found ${classmates.length} classmates for student ${studentUid} in classroom ${classroomId}.`,
+    );
+    return classmates;
+  } catch (error) {
+    console.error(
+      `[classroomService:getClassmatesInfo SA] Error fetching classmates for classroom ${classroomId} (Admin SDK):`,
+      error,
+    );
+    throw error;
+  }
 }

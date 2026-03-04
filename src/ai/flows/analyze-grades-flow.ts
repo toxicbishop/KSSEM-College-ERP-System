@@ -9,7 +9,7 @@
 
 import { ai } from '@/ai/ai-instance';
 import { z } from 'zod';
-import type { Grade } from '@/types/grades';
+import type { Grade } from '@/services/grades';
 import { 
   GradeAnalysisInputSchema, 
   GradeAnalysisOutputSchema,

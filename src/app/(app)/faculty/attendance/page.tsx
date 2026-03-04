@@ -67,15 +67,15 @@ import { auth as clientAuth } from "@/lib/firebase/client";
 import {
   getClassroomsByFaculty,
   getStudentsInClassroom,
-} from "@/services/classroomService";
+} from "@/services/classroom";
 import {
   submitLectureAttendance,
   getLectureAttendanceForDate,
   getLectureAttendanceForDateRange,
   deleteLectureAttendance,
 } from "@/services/attendance";
-import type { Classroom, ClassroomStudentInfo } from "@/types/classroom";
-import type { LectureAttendanceRecord } from "@/types/lectureAttendance";
+import type { Classroom, ClassroomStudentInfo } from "@/services/classroom";
+import type { LectureAttendanceRecord } from "@/services/attendance";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Accordion,

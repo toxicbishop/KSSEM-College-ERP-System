@@ -7,8 +7,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState, Suspense } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { auth as clientAuth } from '@/lib/firebase/client';
-import { getStudentClassroomsWithBatchInfo, getClassmatesInfo } from '@/services/classroomService';
-import type { StudentClassroomEnrollmentInfo, ClassmateInfo } from '@/types/classroom';
+import { getStudentClassroomsWithBatchInfo, getClassmatesInfo } from '@/services/classroom';
+import type { StudentClassroomEnrollmentInfo, ClassmateInfo } from '@/services/classroom';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Users, Loader2, Network, MessageSquare } from 'lucide-react'; // Added MessageSquare
