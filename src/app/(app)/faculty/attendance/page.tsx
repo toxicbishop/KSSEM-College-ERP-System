@@ -58,6 +58,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { DateRange } from "react-day-picker";
 import { format, isValid, startOfMonth, endOfMonth } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -1377,54 +1378,58 @@ export default function FacultyAttendancePage() {
                   reportRecords.length > 0 && (
                     <div className="space-y-6">
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <Card className="lg:col-span-3 xl:col-span-2">
-                          <CardHeader>
-                            <CardTitle>AI Attendance Analysis</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            {analysisResult ? (
-                              <div className="space-y-4 text-sm">
-                                <div>
-                                  <h4 className="font-semibold flex items-center gap-2">
-                                    <Lightbulb className="h-4 w-4 text-yellow-500" />{" "}
-                                    Overall Summary
-                                  </h4>
-                                  <p className="text-muted-foreground mt-1">
-                                    {analysisResult.overallSummary}
-                                  </p>
+                        <ErrorBoundary
+                          title="Attendance AI Analysis Error"
+                          className="lg:col-span-3 xl:col-span-2">
+                          <Card>
+                            <CardHeader>
+                              <CardTitle>AI Attendance Analysis</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              {analysisResult ? (
+                                <div className="space-y-4 text-sm">
+                                  <div>
+                                    <h4 className="font-semibold flex items-center gap-2">
+                                      <Lightbulb className="h-4 w-4 text-yellow-500" />{" "}
+                                      Overall Summary
+                                    </h4>
+                                    <p className="text-muted-foreground mt-1">
+                                      {analysisResult.overallSummary}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <h4 className="font-semibold">
+                                      Key Observations
+                                    </h4>
+                                    <ul className="list-disc list-inside text-muted-foreground mt-1 space-y-1">
+                                      {analysisResult.keyObservations.map(
+                                        (obs, i) => (
+                                          <li key={`obs-${i}`}>{obs}</li>
+                                        ),
+                                      )}
+                                    </ul>
+                                  </div>
+                                  <div>
+                                    <h4 className="font-semibold">
+                                      Actionable Suggestions
+                                    </h4>
+                                    <ul className="list-disc list-inside text-muted-foreground mt-1 space-y-1">
+                                      {analysisResult.actionableSuggestions.map(
+                                        (sug, i) => (
+                                          <li key={`sug-${i}`}>{sug}</li>
+                                        ),
+                                      )}
+                                    </ul>
+                                  </div>
                                 </div>
-                                <div>
-                                  <h4 className="font-semibold">
-                                    Key Observations
-                                  </h4>
-                                  <ul className="list-disc list-inside text-muted-foreground mt-1 space-y-1">
-                                    {analysisResult.keyObservations.map(
-                                      (obs, i) => (
-                                        <li key={`obs-${i}`}>{obs}</li>
-                                      ),
-                                    )}
-                                  </ul>
-                                </div>
-                                <div>
-                                  <h4 className="font-semibold">
-                                    Actionable Suggestions
-                                  </h4>
-                                  <ul className="list-disc list-inside text-muted-foreground mt-1 space-y-1">
-                                    {analysisResult.actionableSuggestions.map(
-                                      (sug, i) => (
-                                        <li key={`sug-${i}`}>{sug}</li>
-                                      ),
-                                    )}
-                                  </ul>
-                                </div>
-                              </div>
-                            ) : (
-                              <p className="text-muted-foreground text-center py-4">
-                                AI analysis is unavailable for this data.
-                              </p>
-                            )}
-                          </CardContent>
-                        </Card>
+                              ) : (
+                                <p className="text-muted-foreground text-center py-4">
+                                  AI analysis is unavailable for this data.
+                                </p>
+                              )}
+                            </CardContent>
+                          </Card>
+                        </ErrorBoundary>
                         <Card className="lg:col-span-3 xl:col-span-1">
                           <CardHeader>
                             <CardTitle>Overall Attendance</CardTitle>

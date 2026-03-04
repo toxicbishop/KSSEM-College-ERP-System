@@ -9,6 +9,7 @@ import { GradesChartCard } from "@/components/dashboard/grades-chart-card";
 import { AnnouncementsCard } from "@/components/dashboard/announcements-card";
 import { SummaryCard } from "@/components/dashboard/summary-card";
 import { Suspense, useEffect, useState } from "react";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MainHeader } from "@/components/layout/main-header";
 import {
@@ -310,10 +311,12 @@ export default function DashboardPage() {
             <AttendanceOverviewCard
               attendanceRecords={data.attendanceRecords}
             />
-            <GradesChartCard
-              grades={data.grades}
-              analysis={data.gradeAnalysis}
-            />
+            <ErrorBoundary title="Grades Analysis Error">
+              <GradesChartCard
+                grades={data.grades}
+                analysis={data.gradeAnalysis}
+              />
+            </ErrorBoundary>
           </div>
           <div className="lg:col-span-3 xl:col-span-1">
             <AnnouncementsCard announcements={data.announcements} />
