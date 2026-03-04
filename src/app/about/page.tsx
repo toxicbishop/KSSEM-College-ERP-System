@@ -70,7 +70,7 @@ export default function AboutPage() {
             {/* Profile Header */}
             <div className="flex flex-col items-center gap-4 text-center">
               <Image
-                src="https://picsum.photos/200/200"
+                src="/profile-avatar.png"
                 alt="Pranav Arun"
                 width={160}
                 height={160}
