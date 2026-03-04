@@ -25,12 +25,12 @@ import { Badge } from "@/components/ui/badge";
 import { ShieldAlert, CheckCircle, XCircle, Edit, Info } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import type { ProfileChangeRequest } from "@/types/profile-change-request";
+import type { ProfileChangeRequest } from "@/services/profile-change-request";
 import {
   getProfileChangeRequests,
   approveProfileChangeRequest,
   denyProfileChangeRequest,
-} from "@/services/profile-change-requests";
+} from "@/services/profile-change-request";
 import { format } from "date-fns";
 import {
   Dialog,

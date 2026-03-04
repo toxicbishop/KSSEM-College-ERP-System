@@ -1,4 +1,4 @@
-﻿
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -633,7 +633,7 @@ export default function AdminPage() {
                         className="text-[#8A99BB] hover:text-white w-8 h-8 hover:bg-white/5 disabled:opacity-50"
                         onClick={() => document.getElementById('add-user-section-content')?.classList.toggle('hidden')}
                     >
-                      <span className="text-xl">▲</span>
+                      <span className="text-xl">?</span>
                     </Button>
                   </div>
 
@@ -693,7 +693,7 @@ export default function AdminPage() {
 
                     <details className="text-[#8A99BB] text-sm cursor-pointer group">
                       <summary className="hover:text-white font-medium mb-4 list-none flex items-center gap-2">
-                        <span className="text-xs group-open:rotate-90 transition-transform">▶</span> Show Advanced/Required Fields
+                        <span className="text-xs group-open:rotate-90 transition-transform">?</span> Show Advanced/Required Fields
                       </summary>
                       <div className="bg-[#1A222C] p-4 rounded-lg border border-[#334155] text-white cursor-auto">
                         {renderProfileFormFields(newUser, handleInputChange)}

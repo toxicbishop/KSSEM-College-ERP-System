@@ -22,7 +22,7 @@ import { useAuth } from "@/context/auth-context";
 import { auth as clientAuth, db } from "@/lib/firebase/client"; // Import clientAuth
 import type { StudentProfile } from "@/services/profile";
 import type { AttendanceRecord } from "@/services/attendance";
-import type { Grade } from "@/types/grades";
+import type { Grade } from "@/services/grades";
 import type { Announcement } from "@/services/announcements";
 import { doc, getDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";

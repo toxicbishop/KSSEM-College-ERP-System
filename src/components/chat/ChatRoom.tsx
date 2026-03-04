@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Send, Loader2, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { sendMessage } from "@/services/chatService";
+import { sendMessage } from "@/services/chat";
 import { auth as clientAuth, db as clientDb } from "@/lib/firebase/client"; // For client-side Firestore access
 import {
   collection,
@@ -14,7 +14,7 @@ import {
   onSnapshot,
   Timestamp as ClientTimestamp,
 } from "firebase/firestore";
-import type { ChatMessage } from "@/types/chat";
+import type { ChatMessage } from "@/services/chat";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDistanceToNowStrict } from "date-fns";

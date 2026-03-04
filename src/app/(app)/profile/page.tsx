@@ -14,15 +14,15 @@ import { useAuth } from "@/context/auth-context";
 import { db, auth as clientAuth } from "@/lib/firebase/client";
 import type { StudentProfile } from "@/services/profile";
 import { getStudentProfile, updateStudentProfile } from "@/services/profile";
-import { createProfileChangeRequest } from "@/services/profile-change-requests";
+import { createProfileChangeRequest } from "@/services/profile-change-request";
 import {
   getStudentClassroomsWithBatchInfo,
   getClassmatesInfo,
-} from "@/services/classroomService"; // Import new service
+} from "@/services/classroom"; // Import new service
 import type {
   StudentClassroomEnrollmentInfo,
   ClassmateInfo,
-} from "@/types/classroom"; // Import new type
+} from "@/services/classroom"; // Import new type
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

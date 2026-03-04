@@ -1,6 +1,6 @@
 "use client"; // Required for Recharts
 
-import type { Grade } from "@/types/grades";
+import type { Grade } from "@/services/grades";
 import {
   Card,
   CardHeader,

@@ -1,20 +1,42 @@
+"use server";
 
-'use server';
+import nodemailer from "nodemailer";
+import { z } from "zod";
 
-import nodemailer from 'nodemailer';
+// Define the input schema for the sendBulkEmail flow
+export const SendBulkEmailInputSchema = z.object({
+  subject: z.string().describe("The subject line of the email."),
+  body: z.string().describe("The HTML or plain text body of the email."),
+  recipients: z
+    .array(z.string().email())
+    .describe("A list of recipient email addresses."),
+});
+export type SendBulkEmailInput = z.infer<typeof SendBulkEmailInputSchema>;
+
+// Define the output schema for the sendBulkEmail flow
+export const SendBulkEmailOutputSchema = z.object({
+  success: z
+    .boolean()
+    .describe("Whether the email dispatch process was initiated successfully."),
+  message: z.string().describe("A summary message of the operation."),
+  sentCount: z
+    .number()
+    .describe("The number of recipients the email was sent to."),
+});
+export type SendBulkEmailOutput = z.infer<typeof SendBulkEmailOutputSchema>;
 
 // Define the interface for mail options for better type-checking
 interface MailOptions {
   to: string | string[]; // Recipient(s)
-  subject: string;       // Subject line
-  text?: string;         // Plain text body
-  html: string;          // HTML body
+  subject: string; // Subject line
+  text?: string; // Plain text body
+  html: string; // HTML body
 }
 
 /**
  * Sends an email using Nodemailer.
  * This is a server-side function and requires SMTP environment variables to be set.
- * 
+ *
  * Required .env.local variables:
  * SMTP_HOST="your_smtp_host"
  * SMTP_PORT=your_smtp_port (e.g., 587 or 465)
@@ -23,10 +45,18 @@ interface MailOptions {
  * SMTP_FROM_ADDRESS="Your Name <no-reply@yourdomain.com>"
  */
 export async function sendEmail(mailOptions: MailOptions): Promise<void> {
-  const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM_ADDRESS } = process.env;
+  const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM_ADDRESS } =
+    process.env;
 
-  if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS || !SMTP_FROM_ADDRESS) {
-    const errorMessage = "SMTP configuration is missing. Please set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and SMTP_FROM_ADDRESS in your environment variables.";
+  if (
+    !SMTP_HOST ||
+    !SMTP_PORT ||
+    !SMTP_USER ||
+    !SMTP_PASS ||
+    !SMTP_FROM_ADDRESS
+  ) {
+    const errorMessage =
+      "SMTP configuration is missing. Please set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and SMTP_FROM_ADDRESS in your environment variables.";
     console.error(`[EmailService] ${errorMessage}`);
     throw new Error(errorMessage);
   }
@@ -48,13 +78,19 @@ export async function sendEmail(mailOptions: MailOptions): Promise<void> {
   };
 
   try {
-    console.log(`[EmailService] Attempting to send email to: ${Array.isArray(mailOptions.to) ? mailOptions.to.join(', ') : mailOptions.to}`);
+    console.log(
+      `[EmailService] Attempting to send email to: ${Array.isArray(mailOptions.to) ? mailOptions.to.join(", ") : mailOptions.to}`,
+    );
     const info = await transporter.sendMail(finalMailOptions);
     console.log(`[EmailService] Message sent: ${info.messageId}`);
-    console.log(`[EmailService] Preview URL: ${nodemailer.getTestMessageUrl(info)}`); // Useful for development with ethereal.email
+    console.log(
+      `[EmailService] Preview URL: ${nodemailer.getTestMessageUrl(info)}`,
+    ); // Useful for development with ethereal.email
   } catch (error) {
     console.error("[EmailService] Error sending email:", error);
     // Throw a more user-friendly error to be caught by the calling flow
-    throw new Error('Failed to send the email. Please check server logs for details.');
+    throw new Error(
+      "Failed to send the email. Please check server logs for details.",
+    );
   }
 }
