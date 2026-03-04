@@ -69,13 +69,13 @@ export default function AboutPage() {
             className="mx-auto flex max-w-4xl flex-col items-center gap-8">
             {/* Profile Header */}
             <div className="flex flex-col items-center gap-4 text-center">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src="/profile-avatar.png"
                 alt="Pranav Arun"
                 width={160}
                 height={160}
-                className="rounded-full object-cover shadow-lg"
-                data-ai-hint="professional headshot"
+                className="rounded-full object-cover shadow-lg w-40 h-40"
               />
               <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
                 Pranav Arun
