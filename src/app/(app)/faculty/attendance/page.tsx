@@ -86,7 +86,7 @@ import {
 import { exportDataToCsv } from "@/lib/csv-exporter";
 import { Slider } from "@/components/ui/slider";
 import { analyzeAttendance } from "@/ai/flows/analyze-attendance-flow";
-import type { AttendanceAnalysisOutput } from "@/types/attendance-analysis";
+import type { AttendanceAnalysisOutput } from "@/services/attendance";
 import {
   PieChart,
   Pie,

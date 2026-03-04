@@ -9,14 +9,14 @@
  */
 
 import { ai } from '@/ai/ai-instance';
-import { sendEmail } from '@/services/email-service';
+import { sendEmail } from '@/services/email';
 // Import schemas and types from the new dedicated types file
 import { 
   SendBulkEmailInputSchema, 
   SendBulkEmailOutputSchema, 
   type SendBulkEmailInput, 
   type SendBulkEmailOutput 
-} from '@/types/notifications';
+} from '@/services/email';
 
 
 // Exported wrapper function that clients will call

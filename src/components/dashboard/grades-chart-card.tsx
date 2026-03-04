@@ -23,7 +23,7 @@ import {
   Lightbulb,
   GraduationCap,
 } from "lucide-react";
-import type { GradeAnalysisOutput } from "@/types/grade-analysis";
+import type { GradeAnalysisOutput } from "@/services/grades";
 import {
   Table,
   TableBody,
