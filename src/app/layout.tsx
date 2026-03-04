@@ -28,6 +28,13 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${appName}`,
     },
     description: appDescription,
+    manifest: "/manifest.json",
+    themeColor: "#2dd4bf",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: appName,
+    },
     icons: {
       icon: "/collage-logo.png",
       apple: "/collage-logo.png",
