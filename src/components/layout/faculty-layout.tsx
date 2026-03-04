@@ -16,6 +16,7 @@ import {
   GraduationCap,
   UserSearch,
 } from "lucide-react";
+import { MobileNav } from "./mobile-nav";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
@@ -55,6 +56,14 @@ const facultyNavigationItems = [
   },
   { href: "/faculty/grades", label: "Manage Grades", icon: GraduationCap },
   { href: "/", label: "Student View", icon: Eye },
+];
+
+const facultyMobileNavItems = [
+  { href: "/faculty", label: "Home", icon: Home },
+  { href: "/faculty/attendance", label: "Attendance", icon: CheckSquare },
+  { href: "/faculty/grades", label: "Grades", icon: GraduationCap },
+  { href: "/faculty/classrooms", label: "Classrooms", icon: Users },
+  { href: "/faculty/students", label: "Students", icon: UserSearch },
 ];
 
 function deleteCookie(name: string) {
@@ -375,9 +384,10 @@ export function FacultyLayout({ children }: { children: React.ReactNode }) {
           </div>
         </aside>
 
-        <main className="flex-1 overflow-auto bg-background p-6">
-          {children}
+        <main className="flex-1 overflow-auto bg-background pb-16 md:pb-0">
+          <div className="p-4 md:p-6">{children}</div>
         </main>
+        {isMobile && <MobileNav items={facultyMobileNavItems} />}
       </div>
     </TooltipProvider>
   );

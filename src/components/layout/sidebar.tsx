@@ -214,7 +214,7 @@ export function Sidebar({
                       href={item.href}
                       onClick={onLinkClick}
                       className={cn(
-                        "flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                        "flex items-center space-x-3 px-3 py-3 md:py-2.5 rounded-lg text-sm font-medium transition-colors",
                         isCollapsed ? "justify-center" : "",
                         isActive
                           ? "bg-sidebar-accent text-sidebar-accent-foreground"

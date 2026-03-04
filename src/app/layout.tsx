@@ -1,6 +1,6 @@
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -18,6 +18,15 @@ const inter = Inter({
   variable: "--font-sans",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#09090b",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+};
+
 export async function generateMetadata(): Promise<Metadata> {
   const appName = await getApplicationName();
   const appDescription = `Access your student information and services at ${appName}.`;
@@ -29,7 +38,6 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: appDescription,
     manifest: "/manifest.json",
-    themeColor: "#2dd4bf",
     appleWebApp: {
       capable: true,
       statusBarStyle: "default",
