@@ -1,5 +1,12 @@
 import type { NextConfig } from "next";
 import withBundleAnalyzer from "@next/bundle-analyzer";
+import withPWAInit from "@ducanh2912/next-pwa";
+
+const withPWA = withPWAInit({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development",
+  register: true,
+});
 
 const nextConfig: NextConfig = {
   devIndicators: false,
@@ -57,6 +64,8 @@ const nextConfig: NextConfig = {
   ],
 };
 
-export default withBundleAnalyzer({
-  enabled: process.env.ANALYZE === "true",
-})(nextConfig);
+export default withPWA(
+  withBundleAnalyzer({
+    enabled: process.env.ANALYZE === "true",
+  })(nextConfig),
+);
