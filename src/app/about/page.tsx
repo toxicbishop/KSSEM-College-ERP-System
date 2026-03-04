@@ -104,7 +104,7 @@ export default function AboutPage() {
                 </Button>
                 <Button asChild variant="outline" size="icon">
                   <a
-                    href="mailto:pranav.arun@example.com"
+                    href="https://mail.google.com/mail/?view=cm&fs=1&to=pranavarun19@gmail.com"
                     aria-label="Send Email">
                     <Mail className="h-5 w-5" />
                   </a>
