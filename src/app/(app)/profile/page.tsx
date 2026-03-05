@@ -749,10 +749,10 @@ function ProfileDetailsLoader() {
         </CardContent>
       </Card>
 
-      <Card className="shadow-lg bg-[#222B36] border-[#2a3441] text-white">
-        <CardHeader>
-          <CardTitle className="flex items-center text-xl">
-            <Users className="mr-3 h-6 w-6 text-[#2dd4bf]" />
+      <Card className="shadow-prestige bg-white border border-kssem-border text-kssem-text rounded-sm">
+        <CardHeader className="border-b border-kssem-border">
+          <CardTitle className="flex items-center text-xl font-serif text-kssem-navy">
+            <Users className="mr-3 h-6 w-6 text-kssem-gold" />
             My Classrooms & Batches
           </CardTitle>
         </CardHeader>
