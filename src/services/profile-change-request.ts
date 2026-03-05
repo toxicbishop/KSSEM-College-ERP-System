@@ -299,7 +299,8 @@ export async function denyProfileChangeRequest(
     });
   } catch (error) {
     console.error(
-      `Error denying profile change request ${requestId} (Admin SDK):`,
+      "Error denying profile change request (Admin SDK):",
+      requestId,
       error,
     );
     throw error;
