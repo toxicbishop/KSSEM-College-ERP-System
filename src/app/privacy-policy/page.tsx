@@ -2,114 +2,107 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Footer } from "@/components/layout/footer";
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center">
-          <div className="mr-4 flex items-center">
+    <div className="flex min-h-screen flex-col bg-kssem-bg">
+      <header className="sticky top-0 z-50 w-full bg-kssem-navy shadow-lg">
+        <div className="container flex h-16 items-center">
+          <Link href="/" className="mr-6 flex items-center gap-2">
             <Image
               src="/collage-logo.png"
-              alt="College Logo"
-              width={32}
-              height={32}
-              className="mr-2"
+              alt="Logo"
+              width={36}
+              height={36}
               data-ai-hint="college crest logo"
             />
-            <span className="font-bold">KSSEM</span>
-          </div>
-          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+            <span className="font-serif font-bold text-white text-lg">
+              KSSEM
+            </span>
+          </Link>
+          <nav className="hidden md:flex items-center space-x-6 text-sm font-semibold">
             <Link
               href="/"
-              className="transition-colors text-muted-foreground hover:text-primary">
+              className="text-gray-300 hover:text-kssem-gold transition-colors">
               Home
             </Link>
             <Link
               href="/about"
-              className="transition-colors text-muted-foreground hover:text-primary">
+              className="text-gray-300 hover:text-kssem-gold transition-colors">
               About
             </Link>
             <Link
               href="/contact"
-              className="transition-colors text-muted-foreground hover:text-primary">
+              className="text-gray-300 hover:text-kssem-gold transition-colors">
               Contact
             </Link>
             <Link
               href="/faq"
-              className="transition-colors text-muted-foreground hover:text-primary">
+              className="text-gray-300 hover:text-kssem-gold transition-colors">
               FAQ
             </Link>
           </nav>
-          <nav className="ml-auto flex items-center space-x-2">
-            <ThemeToggle />
-            <Button asChild variant="ghost">
-              <Link href="/signin">Sign In</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/signup">Sign Up</Link>
-            </Button>
+          <nav className="ml-auto flex items-center space-x-3">
+            <Link
+              href="/signin"
+              className="text-gray-300 text-sm font-semibold hover:text-white transition-colors">
+              Sign In
+            </Link>
+            <Link
+              href="/signup"
+              className="bg-kssem-gold text-kssem-navy px-4 py-2 rounded-sm text-sm font-bold uppercase tracking-wider hover:bg-[#c4a030] transition-colors">
+              Sign Up
+            </Link>
           </nav>
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-1">
         <section className="container py-16 md:py-24">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="mx-auto flex max-w-3xl flex-col gap-6">
-            <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-4">
-              Privacy Policy
-            </h1>
-            <div className="prose dark:prose-invert max-w-none text-muted-foreground">
-              <p>Last updated: {new Date().toLocaleDateString()}</p>
-              <h2 className="text-2xl font-bold mt-8 mb-4 text-foreground">
+            className="mx-auto max-w-3xl">
+            <div className="card-prestige">
+              <h1 className="text-4xl font-serif font-bold tracking-tight text-kssem-navy mb-6">
+                Privacy Policy
+              </h1>
+              <p className="text-kssem-text-muted text-sm mb-8">
+                Last updated: {new Date().toLocaleDateString()}
+              </p>
+
+              <h2 className="text-xl font-serif font-bold text-kssem-navy mt-8 mb-3">
                 1. Introduction
               </h2>
-              <p>
+              <p className="text-kssem-text-muted leading-relaxed">
                 Welcome to KSSEM Student ERP. We respect your privacy and are
-                committed to protecting your personal data. This privacy policy
-                will inform you about how we look after your personal data when
-                you visit our website.
+                committed to protecting your personal data.
               </p>
 
-              <h2 className="text-2xl font-bold mt-8 mb-4 text-foreground">
+              <h2 className="text-xl font-serif font-bold text-kssem-navy mt-8 mb-3">
                 2. Data We Collect
               </h2>
-              <p>
-                We may collect, use, store and transfer different kinds of
-                personal data about you which we have grouped together as
-                follows: Identity Data, Contact Data, Technical Data, Usage
-                Data, and Profile Data.
+              <p className="text-kssem-text-muted leading-relaxed">
+                We may collect Identity Data, Contact Data, Technical Data,
+                Usage Data, and Profile Data.
               </p>
 
-              <h2 className="text-2xl font-bold mt-8 mb-4 text-foreground">
+              <h2 className="text-xl font-serif font-bold text-kssem-navy mt-8 mb-3">
                 3. How We Use Your Data
               </h2>
-              <p>
-                We will only use your personal data when the law allows us to.
-                Most commonly, we will use your personal data in the following
-                circumstances: Where we need to perform the contract we are
-                about to enter into or have entered into with you; where it is
-                necessary for our legitimate interests (or those of a third
-                party) and your interests and fundamental rights do not override
-                those interests; and where we need to comply with a legal
-                obligation.
+              <p className="text-kssem-text-muted leading-relaxed">
+                We will only use your personal data when the law allows us to,
+                where we need to perform the contract or where it is necessary
+                for our legitimate interests.
               </p>
             </div>
           </motion.div>
         </section>
       </main>
 
-      {/* Footer */}
       <Footer />
     </div>
   );
