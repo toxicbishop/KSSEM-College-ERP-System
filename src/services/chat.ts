@@ -87,7 +87,8 @@ export async function sendMessage(
     );
   } catch (error) {
     console.error(
-      `sendMessage SA Error: Error sending message to classroom ${classroomId}:`,
+      "sendMessage SA Error: Error sending message to classroom %s:",
+      classroomId,
       error,
     );
     throw new Error("Could not send message. Please try again.");
