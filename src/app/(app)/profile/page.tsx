@@ -65,6 +65,19 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
+// Helper function to safely validate URLs before using them in href/src attributes
+const isSafeUrl = (url?: string | null): boolean => {
+  if (!url) return false;
+
+  try {
+    const parsed = new URL(url, typeof window !== "undefined" ? window.location.origin : "http://localhost");
+    // Allow only http and https protocols to avoid javascript:, data:, etc.
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+};
+
 // Helper function to get initials from a name
 const getInitials = (name: string) => {
   if (!name) return "U";
@@ -167,6 +180,7 @@ const DocumentOrActionItem = ({
   revalRef?: React.RefObject<HTMLInputElement>;
 }) => {
   const IconComponent = icon;
+  const safeUrl = url && isSafeUrl(url) ? url : undefined;
 
   return (
     <div className="mb-3 flex flex-col items-start gap-2 rounded-md border-[#334155] p-3 text-white sm:flex-row sm:items-center sm:justify-between">
@@ -177,14 +191,14 @@ const DocumentOrActionItem = ({
         <span className="text-sm font-medium text-white">{label}</span>
       </div>
       <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-        {url && url !== "#" ? (
+        {safeUrl ? (
           <Button
             variant="outline"
             size="sm"
             asChild
             className="w-full sm:w-auto">
             <a
-              href={url}
+              href={safeUrl}
               download={isDownloadable}
               target="_blank"
               rel="noopener noreferrer">
