@@ -10,22 +10,13 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import { auth } from "@/lib/firebase/client"; // Correct import path
+import { auth } from "@/lib/firebase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
@@ -41,8 +32,20 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  ArrowRight,
+  GraduationCap,
+  LayoutDashboard,
+  BookOpen,
+  Wallet,
+  Clock,
+  Bell,
+  Library,
+} from "lucide-react";
 
 const signInSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -60,7 +63,6 @@ const resetPasswordSchema = z.object({
 });
 type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 
-// Helper function to set a cookie
 function setCookie(name: string, value: string, days: number) {
   let expires = "";
   if (days) {
@@ -69,10 +71,18 @@ function setCookie(name: string, value: string, days: number) {
     expires = "; expires=" + date.toUTCString();
   }
   if (typeof document !== "undefined") {
-    // Ensure document is available (client-side)
     document.cookie = name + "=" + (value || "") + expires + "; path=/";
   }
 }
+
+const featureGrid = [
+  { icon: LayoutDashboard, title: "Dashboard", subtitle: "Overview & Metrics" },
+  { icon: GraduationCap, title: "Academics", subtitle: "Grades & Records" },
+  { icon: Wallet, title: "Finance", subtitle: "Fee Management" },
+  { icon: Library, title: "Library", subtitle: "Digital Access" },
+  { icon: Clock, title: "Schedule", subtitle: "Timetables" },
+  { icon: Bell, title: "Alerts", subtitle: "Real-time Notices" },
+];
 
 export default function SignInPage() {
   const router = useRouter();
@@ -122,7 +132,7 @@ export default function SignInPage() {
       const idToken = await user.getIdToken();
       setCookie("firebaseAuthToken", idToken, 1);
 
-      let userRole = "student"; // Default role
+      let userRole = "student";
       const ADMIN_EMAIL = "admin@gmail.com";
 
       if (user.email === ADMIN_EMAIL) {
@@ -133,18 +143,8 @@ export default function SignInPage() {
 
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
-          if (userData.role === "admin") {
-            userRole = "admin";
-          } else if (userData.role === "faculty") {
-            userRole = "faculty";
-          }
-          // If role is 'student' or undefined, it remains 'student'
-        } else {
-          // If no user document, they might be a new user who hasn't completed profile setup
-          // or an issue with data sync. Default to student role.
-          console.warn(
-            `User document not found for UID: ${user.uid} during sign-in. Defaulting to student role for redirection.`,
-          );
+          if (userData.role === "admin") userRole = "admin";
+          else if (userData.role === "faculty") userRole = "faculty";
         }
       }
 
@@ -153,13 +153,9 @@ export default function SignInPage() {
         description: "Welcome back!",
       });
 
-      if (userRole === "admin") {
-        router.push("/admin");
-      } else if (userRole === "faculty") {
-        router.push("/faculty");
-      } else {
-        router.push("/dashboard");
-      }
+      if (userRole === "admin") router.push("/admin");
+      else if (userRole === "faculty") router.push("/faculty");
+      else router.push("/dashboard");
     } catch (error: any) {
       console.error("Sign in error:", error);
       let description = "An unexpected error occurred. Please try again.";
@@ -172,8 +168,7 @@ export default function SignInPage() {
       } else if (error.code === "auth/invalid-email") {
         description = "Please enter a valid email address.";
       } else if (error.code === "auth/api-key-not-valid") {
-        description =
-          "Firebase API Key is invalid. Please check your environment configuration.";
+        description = "Firebase API Key is invalid. Check your environment.";
       } else if (error.code === "auth/network-request-failed") {
         description = "Network error. Please check your internet connection.";
       }
@@ -201,7 +196,7 @@ export default function SignInPage() {
       await sendPasswordResetEmail(auth, data.resetEmail);
       toast({
         title: "Password Reset Email Sent",
-        description: `If an account exists for ${data.resetEmail}, a password reset link has been sent. Please check your inbox (and spam folder).`,
+        description: `If an account exists for ${data.resetEmail}, a password reset link has been sent.`,
       });
       setIsResetPasswordDialogOpen(false);
       resetPasswordForm.reset();
@@ -216,7 +211,7 @@ export default function SignInPage() {
       }
       toast({
         title: "Password Reset Failed",
-        description: description,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -224,150 +219,257 @@ export default function SignInPage() {
     }
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">
-            Sign In
-          </CardTitle>
-          <CardDescription className="text-center">
-            Enter your credentials to access your account.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="you@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center justify-between">
-                      <FormLabel>Password</FormLabel>
-                      <Dialog
-                        open={isResetPasswordDialogOpen}
-                        onOpenChange={setIsResetPasswordDialogOpen}>
-                        <DialogTrigger asChild>
-                          <Button
-                            type="button"
-                            variant="link"
-                            size="sm"
-                            className="p-0 h-auto text-xs">
-                            Forgot Password?
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Reset Password</DialogTitle>
-                            <DialogDescription>
-                              Enter your email address below to receive a
-                              password reset link.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <Form {...resetPasswordForm}>
-                            <form
-                              onSubmit={resetPasswordForm.handleSubmit(
-                                handlePasswordResetRequest,
-                              )}
-                              className="space-y-4 py-4">
-                              <FormField
-                                control={resetPasswordForm.control}
-                                name="resetEmail"
-                                render={({ field: resetField }) => (
-                                  <FormItem>
-                                    <FormLabel htmlFor="resetEmailDialog">
-                                      Email Address
-                                    </FormLabel>
-                                    <FormControl>
-                                      <Input
-                                        id="resetEmailDialog"
-                                        placeholder="you@example.com"
-                                        {...resetField}
-                                      />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-                              <DialogFooter>
-                                <DialogClose asChild>
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    disabled={loading}>
-                                    Cancel
-                                  </Button>
-                                </DialogClose>
-                                <Button type="submit" disabled={loading}>
-                                  {loading ? "Sending..." : "Send Reset Link"}
-                                </Button>
-                              </DialogFooter>
-                            </form>
-                          </Form>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          type={showPassword ? "text" : "password"}
-                          placeholder="••••••••"
+    <div className="min-h-screen flex flex-col md:flex-row antialiased overflow-hidden">
+      {/* ──────────────── Left Panel: Login (40%) ──────────────── */}
+      <div className="w-full md:w-[40%] bg-white flex flex-col justify-between relative z-10 shadow-prestige h-screen overflow-y-auto">
+        {/* Top Branding */}
+        <div className="px-8 pt-8 md:px-12 md:pt-12">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-kssem-navy flex items-center justify-center text-white rounded-sm">
+              <GraduationCap className="h-7 w-7" />
+            </div>
+            <div>
+              <h2 className="text-kssem-navy font-bold tracking-wide text-lg leading-tight">
+                KSSEM
+              </h2>
+              <p className="text-kssem-text-muted text-xs uppercase tracking-wider font-semibold">
+                School of Engineering &amp; Management
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Center Form */}
+        <div className="px-8 md:px-12 flex flex-col justify-center flex-grow py-10">
+          <div className="max-w-md w-full mx-auto">
+            <div className="mb-10">
+              <h1 className="font-serif text-4xl md:text-5xl font-bold text-kssem-navy mb-3">
+                Portal Access
+              </h1>
+              <p className="text-kssem-text-muted text-lg">
+                Secure login for students and faculty.
+              </p>
+            </div>
+
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8">
+                {/* Email Input */}
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem className="relative group">
+                      <label className="block text-xs font-bold text-kssem-text-muted uppercase tracking-widest mb-1 transition-colors group-focus-within:text-kssem-navy">
+                        Institutional ID or Email
+                      </label>
+                      <FormControl>
+                        <input
+                          className="block w-full border-0 border-b border-gray-300 bg-transparent px-0 py-3 text-kssem-navy text-lg placeholder-gray-300 focus:border-kssem-gold focus:ring-0 transition-colors rounded-none focus:outline-none"
+                          placeholder="e.g. 1MS18CS001"
                           {...field}
                         />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                          onClick={togglePasswordVisibility}
-                          aria-label={
-                            showPassword ? "Hide password" : "Show password"
-                          }>
-                          {showPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
+                      </FormControl>
+                      <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-kssem-gold transition-all duration-300 group-focus-within:w-full" />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Password Input */}
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem className="relative group">
+                      <label className="block text-xs font-bold text-kssem-text-muted uppercase tracking-widest mb-1 transition-colors group-focus-within:text-kssem-navy">
+                        Password
+                      </label>
+                      <FormControl>
+                        <div className="relative">
+                          <input
+                            type={showPassword ? "text" : "password"}
+                            className="block w-full border-0 border-b border-gray-300 bg-transparent px-0 py-3 text-kssem-navy text-lg placeholder-gray-300 focus:border-kssem-gold focus:ring-0 transition-colors rounded-none focus:outline-none"
+                            placeholder="••••••••"
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-0 top-1/2 -translate-y-1/2 text-kssem-text-muted hover:text-kssem-navy transition-colors"
+                            aria-label={
+                              showPassword ? "Hide password" : "Show password"
+                            }>
+                            {showPassword ? (
+                              <EyeOff className="h-5 w-5" />
+                            ) : (
+                              <Eye className="h-5 w-5" />
+                            )}
+                          </button>
+                        </div>
+                      </FormControl>
+                      <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-kssem-gold transition-all duration-300 group-focus-within:w-full" />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex items-center justify-between pt-2">
+                  <label className="flex items-center gap-2 cursor-pointer group/check">
+                    <input
+                      type="checkbox"
+                      className="rounded-sm border-gray-300 text-kssem-navy focus:ring-kssem-gold w-4 h-4"
+                    />
+                    <span className="text-sm text-kssem-text-muted group-hover/check:text-kssem-navy transition-colors">
+                      Remember device
+                    </span>
+                  </label>
+
+                  <Dialog
+                    open={isResetPasswordDialogOpen}
+                    onOpenChange={setIsResetPasswordDialogOpen}>
+                    <DialogTrigger asChild>
+                      <button
+                        type="button"
+                        className="text-sm font-semibold text-kssem-navy hover:text-kssem-gold transition-colors">
+                        Forgot Password?
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle className="font-serif">
+                          Reset Password
+                        </DialogTitle>
+                        <DialogDescription>
+                          Enter your email address below to receive a password
+                          reset link.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <Form {...resetPasswordForm}>
+                        <form
+                          onSubmit={resetPasswordForm.handleSubmit(
+                            handlePasswordResetRequest,
                           )}
-                        </Button>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Signing In..." : "Sign In"}
-              </Button>
-            </form>
-          </Form>
-          <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{" "}
-            <Link
-              href="/signup"
-              className="text-primary underline hover:text-primary/90">
-              Sign Up
-            </Link>
+                          className="space-y-4 py-4">
+                          <FormField
+                            control={resetPasswordForm.control}
+                            name="resetEmail"
+                            render={({ field: resetField }) => (
+                              <FormItem>
+                                <Label htmlFor="resetEmailDialog">
+                                  Email Address
+                                </Label>
+                                <FormControl>
+                                  <Input
+                                    id="resetEmailDialog"
+                                    placeholder="you@example.com"
+                                    {...resetField}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <DialogFooter>
+                            <DialogClose asChild>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                disabled={loading}>
+                                Cancel
+                              </Button>
+                            </DialogClose>
+                            <Button
+                              type="submit"
+                              disabled={loading}
+                              className="bg-kssem-navy hover:bg-kssem-navy-light">
+                              {loading ? "Sending..." : "Send Reset Link"}
+                            </Button>
+                          </DialogFooter>
+                        </form>
+                      </Form>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+
+                <div className="pt-4">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-kssem-navy hover:bg-kssem-navy-light text-white font-bold py-4 px-6 rounded-sm shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 group disabled:opacity-50">
+                    <span>{loading ? "Signing In..." : "Secure Login"}</span>
+                    {!loading && (
+                      <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    )}
+                  </button>
+                </div>
+              </form>
+            </Form>
+
+            <div className="mt-8 text-center">
+              <p className="text-kssem-text-muted text-sm">
+                First time user?{" "}
+                <Link
+                  href="/signup"
+                  className="text-kssem-navy font-bold hover:text-kssem-gold transition-colors border-b border-transparent hover:border-kssem-gold">
+                  Request Access
+                </Link>
+              </p>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+
+        {/* Footer */}
+        <div className="px-8 pb-6 md:px-12 md:pb-8 text-center md:text-left">
+          <p className="text-xs text-gray-400">
+            &copy; {new Date().getFullYear()} KSSEM. All rights reserved.{" "}
+            <br className="md:hidden" /> Powered by Institutional ERP.
+          </p>
+        </div>
+      </div>
+
+      {/* ──────────────── Right Panel: Hero (60%) ──────────────── */}
+      <div className="hidden md:flex md:w-[60%] bg-kssem-navy relative overflow-hidden items-center justify-center">
+        {/* Background overlay */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-kssem-navy/90"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-kssem-navy via-transparent to-transparent opacity-90"></div>
+        </div>
+
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-2xl px-12 text-white">
+          <div className="mb-12 border-l-4 border-kssem-gold pl-6">
+            <h1 className="font-serif text-5xl lg:text-6xl font-bold leading-tight mb-4">
+              Unified ERP for <br />
+              <span className="text-kssem-gold italic">Smarter</span> Campus
+              Management.
+            </h1>
+            <p className="text-gray-300 text-lg font-light tracking-wide max-w-lg">
+              Experience seamless academic administration, real-time analytics,
+              and a dignified digital campus environment.
+            </p>
+          </div>
+
+          {/* Feature Grid */}
+          <div className="grid grid-cols-3 gap-6 pt-8 border-t border-white/10">
+            {featureGrid.map((feature) => (
+              <div
+                key={feature.title}
+                className="group flex flex-col items-start gap-3 p-4 rounded-sm hover:bg-white/5 transition-colors cursor-default">
+                <feature.icon className="h-8 w-8 text-kssem-gold" />
+                <div>
+                  <p className="font-serif font-bold text-lg">
+                    {feature.title}
+                  </p>
+                  <p className="text-xs text-gray-400">{feature.subtitle}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
