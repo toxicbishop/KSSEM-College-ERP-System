@@ -308,7 +308,7 @@ export async function deleteStudentGrade(
   try {
     await adminDb.collection("grades").doc(gradeId).delete();
   } catch (error) {
-    console.error(`Error deleting grade ${gradeId}:`, error);
+    console.error("Error deleting grade %s:", gradeId, error);
     throw new Error("Failed to delete the grade.");
   }
 }
