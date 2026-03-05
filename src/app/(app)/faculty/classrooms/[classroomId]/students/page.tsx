@@ -22,9 +22,10 @@ import {
     addStudentsToClassroom,
     searchStudents,
     getClassroomsByFaculty,
-    updateStudentBatchInClassroom
-} from '@/services/classroomService';
-import type { ClassroomStudentInfo, StudentSearchResultItem } from '@/types/classroom';
+    updateStudentBatchInClassroom,
+    type ClassroomStudentInfo,
+    type StudentSearchResultItem
+} from '@/services/classroom';
 
 export default function ManageClassroomStudentsPage() {
   const { user, loading: authLoading } = useAuth();
