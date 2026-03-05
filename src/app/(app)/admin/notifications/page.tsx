@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
@@ -178,18 +178,18 @@ export default function AdminNotificationsPage() {
   return (
     <div className="grid gap-6 md:grid-cols-3">
       <div className="md:col-span-2">
-        <Card className="bg-[#222B36] border-[#2a3441] text-white">
+        <Card className="bg-[white] border-[kssem-border] text-kssem-text">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-white">
-              <Send className="h-6 w-6 text-[#2dd4bf]" /> Compose Notification
+            <CardTitle className="flex items-center gap-2 text-kssem-text">
+              <Send className="h-6 w-6 text-[kssem-gold]" /> Compose Notification
             </CardTitle>
-            <CardDescription className="text-[#8A99BB]">
+            <CardDescription className="text-[kssem-text-muted]">
               Create and send an email notification to all registered users.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="email-subject" className="text-[#8A99BB]">
+              <Label htmlFor="email-subject" className="text-[kssem-text-muted]">
                 Subject
               </Label>
               <Input
@@ -198,11 +198,11 @@ export default function AdminNotificationsPage() {
                 value={emailSubject}
                 onChange={(e) => setEmailSubject(e.target.value)}
                 disabled={isSending}
-                className="bg-transparent border-[#475569] text-white placeholder:text-[#475569] focus-visible:ring-[#2dd4bf]"
+                className="bg-transparent border-[kssem-border] text-kssem-text placeholder:text-[kssem-border] focus-visible:ring-[kssem-gold]"
               />
             </div>
             <div>
-              <Label htmlFor="email-body" className="text-[#8A99BB]">
+              <Label htmlFor="email-body" className="text-[kssem-text-muted]">
                 Body
               </Label>
               <Textarea
@@ -210,7 +210,7 @@ export default function AdminNotificationsPage() {
                 placeholder="Dear all, please find the updated exam schedule attached..."
                 value={emailBody}
                 onChange={(e) => setEmailBody(e.target.value)}
-                className="min-h-[250px] bg-transparent border-[#475569] text-white placeholder:text-[#475569] focus-visible:ring-[#2dd4bf]"
+                className="min-h-[250px] bg-transparent border-[kssem-border] text-kssem-text placeholder:text-[kssem-border] focus-visible:ring-[kssem-gold]"
                 disabled={isSending}
               />
             </div>
@@ -219,7 +219,7 @@ export default function AdminNotificationsPage() {
             <Button
               onClick={handleSendNotification}
               disabled={isSending || loadingRecipients}
-              className="bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-semibold">
+              className="bg-[kssem-gold] hover:bg-[[#c4a030]] text-kssem-navy font-semibold">
               {isSending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
@@ -232,12 +232,12 @@ export default function AdminNotificationsPage() {
       </div>
 
       <div className="md:col-span-1">
-        <Card className="bg-[#222B36] border-[#2a3441] text-white">
+        <Card className="bg-[white] border-[kssem-border] text-kssem-text">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-white">
-              <Users className="h-6 w-6 text-[#2dd4bf]" /> Recipients
+            <CardTitle className="flex items-center gap-2 text-kssem-text">
+              <Users className="h-6 w-6 text-[kssem-gold]" /> Recipients
             </CardTitle>
-            <CardDescription className="text-[#8A99BB]">
+            <CardDescription className="text-[kssem-text-muted]">
               This notification will be sent to all users with a registered
               email.
             </CardDescription>
@@ -253,20 +253,20 @@ export default function AdminNotificationsPage() {
               <ScrollArea className="h-80">
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-[#334155] hover:bg-white/5">
-                      <TableHead className="text-[#8A99BB]">Name</TableHead>
-                      <TableHead className="text-[#8A99BB]">Email</TableHead>
+                    <TableRow className="border-[kssem-border] hover:bg-white/5">
+                      <TableHead className="text-[kssem-text-muted]">Name</TableHead>
+                      <TableHead className="text-[kssem-text-muted]">Email</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {recipients.map((recipient) => (
                       <TableRow
                         key={recipient.id}
-                        className="border-[#334155] hover:bg-white/5">
-                        <TableCell className="text-white">
+                        className="border-[kssem-border] hover:bg-white/5">
+                        <TableCell className="text-kssem-text">
                           {recipient.name}
                         </TableCell>
-                        <TableCell className="text-[#8A99BB]">
+                        <TableCell className="text-[kssem-text-muted]">
                           {recipient.email}
                         </TableCell>
                       </TableRow>
@@ -281,3 +281,4 @@ export default function AdminNotificationsPage() {
     </div>
   );
 }
+

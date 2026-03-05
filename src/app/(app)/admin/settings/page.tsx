@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -387,32 +387,32 @@ export default function AdminSettingsPage() {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-[#222B36] border-[#2a3441] text-white">
+      <Card className="bg-[white] border-[kssem-border] text-kssem-text">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold flex items-center gap-2 text-white">
-            <LayoutDashboard className="h-6 w-6 text-[#2dd4bf]" /> System
+          <CardTitle className="text-2xl font-bold flex items-center gap-2 text-kssem-text">
+            <LayoutDashboard className="h-6 w-6 text-[kssem-gold]" /> System
             Settings
           </CardTitle>
-          <CardDescription className="text-[#8A99BB]">
+          <CardDescription className="text-[kssem-text-muted]">
             Configure system-wide settings for the application.
           </CardDescription>
         </CardHeader>
       </Card>
-      <Card className="bg-[#222B36] border-[#2a3441] text-white">
+      <Card className="bg-[white] border-[kssem-border] text-kssem-text">
         <CardHeader>
-          <CardTitle className="text-white">General Settings</CardTitle>
+          <CardTitle className="text-kssem-text">General Settings</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Maintenance Mode */}
-          <div className="flex items-center justify-between rounded-lg border border-[#334155] p-4">
+          <div className="flex items-center justify-between rounded-lg border border-[kssem-border] p-4">
             <div>
               <Label
                 htmlFor="maintenance-mode"
-                className="text-base font-medium flex items-center gap-2 text-white">
+                className="text-base font-medium flex items-center gap-2 text-kssem-text">
                 <AlertTriangle className="h-5 w-5 text-orange-400" />
                 Maintenance Mode
               </Label>
-              <p className="text-sm text-[#8A99BB] mt-1">
+              <p className="text-sm text-[kssem-text-muted] mt-1">
                 When enabled, users will see a maintenance page. Only admins can
                 access the site.
               </p>
@@ -428,15 +428,15 @@ export default function AdminSettingsPage() {
           </div>
 
           {/* Allow New User Registration */}
-          <div className="flex items-center justify-between rounded-lg border border-[#334155] p-4">
+          <div className="flex items-center justify-between rounded-lg border border-[kssem-border] p-4">
             <div>
               <Label
                 htmlFor="allow-registration"
-                className="text-base font-medium flex items-center gap-2 text-white">
+                className="text-base font-medium flex items-center gap-2 text-kssem-text">
                 <UserPlus className="h-5 w-5 text-blue-400" />
                 Allow New User Registration
               </Label>
-              <p className="text-sm text-[#8A99BB] mt-1">
+              <p className="text-sm text-[kssem-text-muted] mt-1">
                 Enable or disable the ability for new users to sign up.
               </p>
             </div>
@@ -451,14 +451,14 @@ export default function AdminSettingsPage() {
           </div>
 
           {/* Application Name */}
-          <div className="rounded-lg border border-[#334155] p-4 space-y-2">
+          <div className="rounded-lg border border-[kssem-border] p-4 space-y-2">
             <Label
               htmlFor="application-name"
-              className="text-base font-medium flex items-center gap-2 text-white">
+              className="text-base font-medium flex items-center gap-2 text-kssem-text">
               <Type className="h-5 w-5 text-green-400" />
               Application Name
             </Label>
-            <p className="text-sm text-[#8A99BB]">
+            <p className="text-sm text-[kssem-text-muted]">
               This name will be displayed in various parts of the application,
               like the page title.
             </p>
@@ -468,20 +468,20 @@ export default function AdminSettingsPage() {
                 value={tempAppName}
                 onChange={handleTempApplicationNameChange}
                 placeholder="e.g., My Awesome ERP"
-                className="bg-transparent border-[#475569] text-white placeholder:text-[#475569] focus-visible:ring-[#2dd4bf]"
+                className="bg-transparent border-[kssem-border] text-kssem-text placeholder:text-[kssem-border] focus-visible:ring-[kssem-gold]"
               />
             )}
           </div>
 
           {/* Default Items Per Page */}
-          <div className="rounded-lg border border-[#334155] p-4 space-y-2">
+          <div className="rounded-lg border border-[kssem-border] p-4 space-y-2">
             <Label
               htmlFor="items-per-page"
-              className="text-base font-medium flex items-center gap-2 text-white">
+              className="text-base font-medium flex items-center gap-2 text-kssem-text">
               <ListFilter className="h-5 w-5 text-purple-400" />
               Default Items Per Page
             </Label>
-            <p className="text-sm text-[#8A99BB]">
+            <p className="text-sm text-[kssem-text-muted]">
               Set the default number of items to display in paginated lists
               (e.g., user lists).
             </p>
@@ -493,26 +493,26 @@ export default function AdminSettingsPage() {
                 onChange={handleDefaultItemsPerPageChange}
                 placeholder="e.g., 10"
                 min="1"
-                className="bg-transparent border-[#475569] text-white placeholder:text-[#475569] focus-visible:ring-[#2dd4bf]"
+                className="bg-transparent border-[kssem-border] text-kssem-text placeholder:text-[kssem-border] focus-visible:ring-[kssem-gold]"
               />
             )}
           </div>
         </CardContent>
       </Card>
-      <Card className="bg-[#222B36] border-[#2a3441] text-white">
+      <Card className="bg-[white] border-[kssem-border] text-kssem-text">
         <CardHeader>
-          <CardTitle className="text-white">Announcement Settings</CardTitle>
+          <CardTitle className="text-kssem-text">Announcement Settings</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Announcement Title */}
-          <div className="rounded-lg border border-[#334155] p-4 space-y-2">
+          <div className="rounded-lg border border-[kssem-border] p-4 space-y-2">
             <Label
               htmlFor="announcement-title"
-              className="text-base font-medium flex items-center gap-2 text-white">
+              className="text-base font-medium flex items-center gap-2 text-kssem-text">
               <Type className="h-5 w-5 text-green-400" />
               Announcement Title
             </Label>
-            <p className="text-sm text-[#8A99BB]">
+            <p className="text-sm text-[kssem-text-muted]">
               The title of the announcement displayed on the dashboard.
             </p>
             {settings && (
@@ -521,20 +521,20 @@ export default function AdminSettingsPage() {
                 value={tempAnnouncementTitle}
                 onChange={handleTempAnnouncementTitleChange}
                 placeholder="e.g., Welcome to the Dashboard!"
-                className="bg-transparent border-[#475569] text-white placeholder:text-[#475569] focus-visible:ring-[#2dd4bf]"
+                className="bg-transparent border-[kssem-border] text-kssem-text placeholder:text-[kssem-border] focus-visible:ring-[kssem-gold]"
               />
             )}
           </div>
 
           {/* Announcement Content */}
-          <div className="rounded-lg border border-[#334155] p-4 space-y-2">
+          <div className="rounded-lg border border-[kssem-border] p-4 space-y-2">
             <Label
               htmlFor="announcement-content"
-              className="text-base font-medium flex items-center gap-2 text-white">
+              className="text-base font-medium flex items-center gap-2 text-kssem-text">
               <Type className="h-5 w-5 text-purple-400" />
               Announcement Content
             </Label>
-            <p className="text-sm text-[#8A99BB]">
+            <p className="text-sm text-[kssem-text-muted]">
               The main content of the announcement displayed on the dashboard.
             </p>
             {settings && (
@@ -543,7 +543,7 @@ export default function AdminSettingsPage() {
                 value={tempAnnouncementContent}
                 onChange={handleTempAnnouncementContentChange}
                 placeholder="e.g., Stay tuned for upcoming events and important updates."
-                className="bg-transparent border-[#475569] text-white placeholder:text-[#475569] focus-visible:ring-[#2dd4bf]"
+                className="bg-transparent border-[kssem-border] text-kssem-text placeholder:text-[kssem-border] focus-visible:ring-[kssem-gold]"
               />
             )}
           </div>
@@ -551,33 +551,33 @@ export default function AdminSettingsPage() {
       </Card>
 
       {/* Placeholder for more settings categories */}
-      <Card className="bg-[#222B36] border-[#2a3441] text-white">
+      <Card className="bg-[white] border-[kssem-border] text-kssem-text">
         <CardHeader>
-          <CardTitle className="text-white">
+          <CardTitle className="text-kssem-text">
             Notification Settings (Placeholder)
           </CardTitle>
-          <CardDescription className="text-[#8A99BB]">
+          <CardDescription className="text-[kssem-text-muted]">
             Configure email and SMS notification preferences.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-[#8A99BB]">
+          <p className="text-[kssem-text-muted]">
             Notification settings will be configurable here in a future update.
           </p>
         </CardContent>
       </Card>
 
-      <Card className="bg-[#222B36] border-[#2a3441] text-white">
+      <Card className="bg-[white] border-[kssem-border] text-kssem-text">
         <CardHeader>
-          <CardTitle className="text-white">
+          <CardTitle className="text-kssem-text">
             API Integration (Placeholder)
           </CardTitle>
-          <CardDescription className="text-[#8A99BB]">
+          <CardDescription className="text-[kssem-text-muted]">
             Manage API keys for third-party services.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-[#8A99BB]">
+          <p className="text-[kssem-text-muted]">
             API key management will be available here.
           </p>
         </CardContent>
@@ -585,3 +585,4 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
+
