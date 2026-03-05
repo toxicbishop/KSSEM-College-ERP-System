@@ -71,7 +71,9 @@ const isSafeUrl = (url?: string | null): boolean => {
 
   try {
     const baseOrigin =
-      typeof window !== "undefined" ? window.location.origin : "http://localhost";
+      typeof window !== "undefined"
+        ? window.location.origin
+        : "http://localhost";
     const parsed = new URL(url, baseOrigin);
     // Allow only http and https protocols to avoid javascript:, data:, etc.
     if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
@@ -136,7 +138,9 @@ const InfoItem = ({
   profileValue: any;
 }) => (
   <div className="mb-2">
-    <Label htmlFor={fieldName} className="font-semibold text-[#8A99BB]">
+    <Label
+      htmlFor={fieldName}
+      className="font-semibold text-kssem-text-muted text-xs uppercase tracking-wider">
       {label}:
     </Label>
     {isEditMode && isEditable ? (
@@ -154,7 +158,7 @@ const InfoItem = ({
       )
     ) : isEditMode && onEditRequest ? (
       <div className="flex items-center gap-2 mt-1">
-        <span className="text-white break-all">{value || "N/A"}</span>
+        <span className="text-kssem-text break-all">{value || "N/A"}</span>
         <Button
           variant="outline"
           size="sm"
@@ -164,7 +168,7 @@ const InfoItem = ({
         </Button>
       </div>
     ) : (
-      <span className="ml-2 text-white break-all">{value || "N/A"}</span>
+      <span className="ml-2 text-kssem-text break-all">{value || "N/A"}</span>
     )}
   </div>
 );
@@ -193,12 +197,12 @@ const DocumentOrActionItem = ({
   const safeUrl = url && isSafeUrl(url) ? url : undefined;
 
   return (
-    <div className="mb-3 flex flex-col items-start gap-2 rounded-md border-[#334155] p-3 text-white sm:flex-row sm:items-center sm:justify-between">
+    <div className="mb-3 flex flex-col items-start gap-2 rounded-sm border border-kssem-border p-3 text-kssem-text sm:flex-row sm:items-center sm:justify-between hover:bg-kssem-bg transition-colors">
       <div className="flex items-center">
         {IconComponent && (
-          <IconComponent className="mr-2 h-4 w-4 text-[#8A99BB]" />
+          <IconComponent className="mr-2 h-4 w-4 text-kssem-navy" />
         )}
-        <span className="text-sm font-medium text-white">{label}</span>
+        <span className="text-sm font-medium text-kssem-text">{label}</span>
       </div>
       <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
         {safeUrl ? (
@@ -226,7 +230,7 @@ const DocumentOrActionItem = ({
             {actionLabel}
           </Button>
         ) : (
-          <span className="text-sm text-[#8A99BB]">
+          <span className="text-sm text-kssem-text-muted">
             {actionLabel || "Not Available"}
           </span>
         )}
@@ -488,7 +492,11 @@ function ProfileDetailsLoader() {
   }
 
   if (!profile) {
-    return <p className="text-center text-[#8A99BB]">Profile not available.</p>;
+    return (
+      <p className="text-center text-kssem-text-muted">
+        Profile not available.
+      </p>
+    );
   }
 
   return (
@@ -498,7 +506,7 @@ function ProfileDetailsLoader() {
           <Button
             onClick={handleSaveProfile}
             disabled={isSubmitting}
-            className="bg-[#2dd4bf] text-black hover:bg-[#2dd4bf]/90">
+            className="bg-kssem-gold text-kssem-navy hover:bg-kssem-gold/90">
             {isSubmitting ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
@@ -513,10 +521,10 @@ function ProfileDetailsLoader() {
         )}
       </div>
 
-      <Card className="shadow-lg bg-[#222B36] border-[#2a3441] text-white">
-        <CardHeader>
-          <CardTitle className="flex items-center text-xl">
-            <UserSquare className="mr-3 h-6 w-6 text-[#2dd4bf]" />
+      <Card className="shadow-prestige bg-white border border-kssem-border text-kssem-text rounded-sm">
+        <CardHeader className="border-b border-kssem-border">
+          <CardTitle className="flex items-center text-xl font-serif text-kssem-navy">
+            <UserSquare className="mr-3 h-6 w-6 text-kssem-gold" />
             Personal Information
           </CardTitle>
         </CardHeader>
@@ -534,12 +542,16 @@ function ProfileDetailsLoader() {
                 className="object-cover"
                 data-ai-hint="profile photo"
               />
-              <AvatarFallback className="bg-[#2dd4bf]/10 text-[#2dd4bf]">
+              <AvatarFallback className="bg-kssem-gold/10 text-kssem-gold">
                 {getInitials(profile.name || profile.email || "User")}
               </AvatarFallback>
             </Avatar>
-            <h3 className="text-lg font-semibold text-white">{profile.name}</h3>
-            <p className="text-sm text-[#8A99BB] break-all">{profile.email}</p>
+            <h3 className="text-lg font-semibold text-kssem-text font-serif">
+              {profile.name}
+            </h3>
+            <p className="text-sm text-kssem-text-muted break-all">
+              {profile.email}
+            </p>
           </div>
           <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
             <InfoItem
@@ -588,7 +600,7 @@ function ProfileDetailsLoader() {
                   name={name as string}
                   value={currentValue || ""}
                   onChange={handleChange}
-                  className="input-class mt-1 block w-full rounded-md border-[#334155] bg-[#0F172A] p-2 text-sm shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 h-10">
+                  className="input-class mt-1 block w-full rounded-sm border-kssem-border bg-kssem-bg p-2 text-sm shadow-sm focus:border-kssem-navy focus:ring focus:ring-kssem-navy focus:ring-opacity-50 h-10">
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
@@ -748,7 +760,7 @@ function ProfileDetailsLoader() {
           {loadingClassrooms ? (
             <Skeleton className="h-20 w-full" />
           ) : classroomsError ? (
-            <div className="flex items-center gap-2 text-red-400">
+            <div className="flex items-center gap-2 text-destructive">
               <AlertTriangle className="h-5 w-5" />
               <p>{classroomsError}</p>
             </div>
@@ -757,18 +769,18 @@ function ProfileDetailsLoader() {
               {enrolledClassrooms.map((enrollment) => (
                 <li
                   key={enrollment.classroomId}
-                  className="rounded-md border-[#334155] p-3 text-white">
+                  className="rounded-sm border border-kssem-border p-4 text-kssem-text hover:bg-kssem-bg transition-colors">
                   <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
                     <div>
                       <h4 className="font-semibold">
                         {enrollment.classroomName}
                       </h4>
-                      <p className="text-sm text-[#8A99BB]">
+                      <p className="text-sm text-kssem-text-muted">
                         Subject: {enrollment.classroomSubject}
                       </p>
-                      <p className="text-sm text-[#8A99BB]">
+                      <p className="text-sm text-kssem-text-muted">
                         Your Batch:{" "}
-                        <span className="font-medium text-[#2dd4bf]">
+                        <span className="font-medium text-kssem-navy">
                           {enrollment.studentBatchInClassroom ||
                             "N/A (Whole Class)"}
                         </span>
@@ -785,17 +797,17 @@ function ProfileDetailsLoader() {
               ))}
             </ul>
           ) : (
-            <p className="text-[#8A99BB]">
+            <p className="text-kssem-text-muted">
               You are not currently enrolled in any classrooms.
             </p>
           )}
         </CardContent>
       </Card>
 
-      <Card className="shadow-lg bg-[#222B36] border-[#2a3441] text-white">
-        <CardHeader>
-          <CardTitle className="flex items-center text-xl">
-            <BookOpen className="mr-3 h-6 w-6 text-[#2dd4bf]" />
+      <Card className="shadow-prestige bg-white border border-kssem-border text-kssem-text rounded-sm">
+        <CardHeader className="border-b border-kssem-border">
+          <CardTitle className="flex items-center text-xl font-serif text-kssem-navy">
+            <BookOpen className="mr-3 h-6 w-6 text-kssem-gold" />
             Academic Details
           </CardTitle>
         </CardHeader>
@@ -932,10 +944,10 @@ function ProfileDetailsLoader() {
         </CardContent>
       </Card>
 
-      <Card className="shadow-lg bg-[#222B36] border-[#2a3441] text-white">
-        <CardHeader>
-          <CardTitle className="flex items-center text-xl">
-            <FileText className="mr-3 h-6 w-6 text-[#2dd4bf]" />
+      <Card className="shadow-prestige bg-white border border-kssem-border text-kssem-text rounded-sm">
+        <CardHeader className="border-b border-kssem-border">
+          <CardTitle className="flex items-center text-xl font-serif text-kssem-navy">
+            <FileText className="mr-3 h-6 w-6 text-kssem-gold" />
             Documents
           </CardTitle>
         </CardHeader>
@@ -981,8 +993,8 @@ function ProfileDetailsLoader() {
           </div>
           <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-              <h4 className="mb-2 flex items-center text-md font-semibold text-white">
-                <FileImage className="mr-2 h-5 w-5 text-[#8A99BB]" />
+              <h4 className="mb-2 flex items-center text-md font-semibold text-kssem-text">
+                <FileImage className="mr-2 h-5 w-5 text-kssem-navy" />
                 Uploaded Photo
               </h4>
               <Avatar className="h-[100px] w-[100px] shadow-sm rounded-md">
@@ -997,14 +1009,14 @@ function ProfileDetailsLoader() {
                   className="object-cover"
                   data-ai-hint="passport photo"
                 />
-                <AvatarFallback className="bg-[#2dd4bf]/10 text-[#2dd4bf] text-xl rounded-md">
+                <AvatarFallback className="bg-kssem-gold/10 text-kssem-gold text-xl rounded-sm">
                   {getInitials(profile.name || "User")}
                 </AvatarFallback>
               </Avatar>
             </div>
             <div>
-              <h4 className="mb-2 flex items-center text-md font-semibold text-white">
-                <FileImage className="mr-2 h-5 w-5 text-[#8A99BB]" />
+              <h4 className="mb-2 flex items-center text-md font-semibold text-kssem-text">
+                <FileImage className="mr-2 h-5 w-5 text-kssem-navy" />
                 Uploaded Signature
               </h4>
               {(
@@ -1023,21 +1035,21 @@ function ProfileDetailsLoader() {
                   alt="Uploaded Signature"
                   width={200}
                   height={80}
-                  className="rounded-md border-[#334155] bg-white object-contain p-1 shadow-sm"
+                  className="rounded-sm border border-kssem-border bg-white object-contain p-1 shadow-sm"
                   data-ai-hint="signature"
                 />
               ) : (
-                <p className="text-sm text-[#8A99BB]">N/A</p>
+                <p className="text-sm text-kssem-text-muted">N/A</p>
               )}
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="shadow-lg bg-[#222B36] border-[#2a3441] text-white">
-        <CardHeader>
-          <CardTitle className="flex items-center text-xl">
-            <ClipboardList className="mr-3 h-6 w-6 text-[#2dd4bf]" />
+      <Card className="shadow-prestige bg-white border border-kssem-border text-kssem-text rounded-sm">
+        <CardHeader className="border-b border-kssem-border">
+          <CardTitle className="flex items-center text-xl font-serif text-kssem-navy">
+            <ClipboardList className="mr-3 h-6 w-6 text-kssem-gold" />
             Exam Details
           </CardTitle>
         </CardHeader>
@@ -1129,7 +1141,7 @@ function ProfileDetailsLoader() {
                 id="currentValue"
                 value={requestOldValue}
                 readOnly
-                className="col-span-3 bg-[#0F172A]"
+                className="col-span-3 bg-kssem-bg"
               />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
@@ -1199,7 +1211,7 @@ function ProfileDetailsLoader() {
                 classmates.length > 0 && (
                   <Table>
                     <TableHeader>
-                      <TableRow className="border-[#334155] hover:bg-white/5">
+                      <TableRow className="border-kssem-border hover:bg-kssem-bg">
                         <TableHead className="w-12"></TableHead>
                         <TableHead>Name</TableHead>
                         <TableHead>Student ID</TableHead>
@@ -1211,7 +1223,7 @@ function ProfileDetailsLoader() {
                         <TableRow key={classmate.userId}>
                           <TableCell>
                             <Avatar className="h-8 w-8">
-                              <AvatarFallback className="text-[10px] bg-[#2dd4bf]/10 text-[#2dd4bf]">
+                              <AvatarFallback className="text-[10px] bg-kssem-gold/10 text-kssem-gold">
                                 {getInitials(classmate.name)}
                               </AvatarFallback>
                             </Avatar>
@@ -1227,7 +1239,7 @@ function ProfileDetailsLoader() {
               {!loadingClassmates &&
                 !fetchClassmatesError &&
                 classmates.length === 0 && (
-                  <p className="text-[#8A99BB] text-center">
+                  <p className="text-kssem-text-muted text-center">
                     No other classmates found in this classroom.
                   </p>
                 )}
@@ -1250,7 +1262,7 @@ export default function ProfilePage() {
       <MainHeader />
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
+          <h2 className="text-3xl md:text-4xl font-serif font-bold tracking-tight text-kssem-navy">
             My Profile
           </h2>
         </div>
