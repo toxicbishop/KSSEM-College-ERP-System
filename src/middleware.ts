@@ -34,7 +34,8 @@ export async function middleware(request: NextRequest) {
     // console.log(`Middleware: Fetched minimal settings for ${pathname}. Maintenance Mode: ${settings.maintenanceMode}`);
   } catch (error) {
     console.error(
-      `Middleware: CRITICAL Error fetching minimal settings for ${pathname}:`,
+      "Middleware: CRITICAL Error fetching minimal settings for pathname:",
+      pathname,
       error,
     );
     // Fallback to default minimal settings if fetching fails
