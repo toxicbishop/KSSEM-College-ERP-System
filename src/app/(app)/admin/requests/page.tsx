@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -254,21 +254,21 @@ export default function AdminRequestsPage() {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-[#222B36] border-[#2a3441] text-white">
+      <Card className="bg-[white] border-[kssem-border] text-kssem-text">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold flex items-center gap-2 text-white">
-            <Edit className="h-6 w-6 text-[#2dd4bf]" /> Profile Change Requests
+          <CardTitle className="text-2xl font-bold flex items-center gap-2 text-kssem-text">
+            <Edit className="h-6 w-6 text-[kssem-gold]" /> Profile Change Requests
           </CardTitle>
-          <CardDescription className="text-[#8A99BB]">
+          <CardDescription className="text-[kssem-text-muted]">
             Review and manage student requests to change their profile
             information.
           </CardDescription>
         </CardHeader>
       </Card>
 
-      <Card className="bg-[#222B36] border-[#2a3441] text-white">
+      <Card className="bg-[white] border-[kssem-border] text-kssem-text">
         <CardHeader>
-          <CardTitle className="text-white">Pending Requests</CardTitle>
+          <CardTitle className="text-kssem-text">Pending Requests</CardTitle>
         </CardHeader>
         <CardContent>
           {loadingRequests ? (
@@ -280,13 +280,13 @@ export default function AdminRequestsPage() {
           ) : requests.filter((r) => r.status === "pending").length > 0 ? (
             <Table>
               <TableHeader>
-                <TableRow className="border-[#334155] hover:bg-white/5">
-                  <TableHead className="text-[#8A99BB]">Student</TableHead>
-                  <TableHead className="text-[#8A99BB]">Field</TableHead>
-                  <TableHead className="text-[#8A99BB]">Old Value</TableHead>
-                  <TableHead className="text-[#8A99BB]">New Value</TableHead>
-                  <TableHead className="text-[#8A99BB]">Requested</TableHead>
-                  <TableHead className="text-right text-[#8A99BB]">
+                <TableRow className="border-[kssem-border] hover:bg-white/5">
+                  <TableHead className="text-[kssem-text-muted]">Student</TableHead>
+                  <TableHead className="text-[kssem-text-muted]">Field</TableHead>
+                  <TableHead className="text-[kssem-text-muted]">Old Value</TableHead>
+                  <TableHead className="text-[kssem-text-muted]">New Value</TableHead>
+                  <TableHead className="text-[kssem-text-muted]">Requested</TableHead>
+                  <TableHead className="text-right text-[kssem-text-muted]">
                     Actions
                   </TableHead>
                 </TableRow>
@@ -297,25 +297,25 @@ export default function AdminRequestsPage() {
                   .map((req) => (
                     <TableRow
                       key={req.id}
-                      className="border-[#334155] hover:bg-white/5">
+                      className="border-[kssem-border] hover:bg-white/5">
                       <TableCell>
-                        <div className="text-white">
+                        <div className="text-kssem-text">
                           {req.userName || req.userId}
                         </div>
-                        <div className="text-xs text-[#8A99BB]">
+                        <div className="text-xs text-[kssem-text-muted]">
                           {req.userEmail}
                         </div>
                       </TableCell>
-                      <TableCell className="font-medium text-white">
+                      <TableCell className="font-medium text-kssem-text">
                         {req.fieldName}
                       </TableCell>
-                      <TableCell className="text-[#8A99BB]">
+                      <TableCell className="text-[kssem-text-muted]">
                         {renderValue(req.oldValue)}
                       </TableCell>
-                      <TableCell className="text-white">
+                      <TableCell className="text-kssem-text">
                         {renderValue(req.newValue)}
                       </TableCell>
-                      <TableCell className="text-[#8A99BB]">
+                      <TableCell className="text-[kssem-text-muted]">
                         {req.requestedAt instanceof Date
                           ? format(req.requestedAt, "PP p")
                           : "Invalid Date"}
@@ -344,12 +344,12 @@ export default function AdminRequestsPage() {
                           </DialogTrigger>
                           {selectedRequestForDenial &&
                             selectedRequestForDenial.id === req.id && (
-                              <DialogContent className="bg-[#1A222C] border-[#334155] text-white">
+                              <DialogContent className="bg-[white] border-[kssem-border] text-kssem-text">
                                 <DialogHeader>
-                                  <DialogTitle className="text-white">
+                                  <DialogTitle className="text-kssem-text">
                                     Deny Change Request
                                   </DialogTitle>
-                                  <DialogDescription className="text-[#8A99BB]">
+                                  <DialogDescription className="text-[kssem-text-muted]">
                                     Provide a reason for denying the request
                                     from {selectedRequestForDenial.userName} to
                                     change their{" "}
@@ -359,7 +359,7 @@ export default function AdminRequestsPage() {
                                 <div className="py-4">
                                   <Label
                                     htmlFor="denialReason"
-                                    className="text-[#8A99BB]">
+                                    className="text-[kssem-text-muted]">
                                     Reason for Denial
                                   </Label>
                                   <Textarea
@@ -369,14 +369,14 @@ export default function AdminRequestsPage() {
                                       setDenialReason(e.target.value)
                                     }
                                     placeholder="e.g., Information mismatch, policy violation..."
-                                    className="bg-transparent border-[#475569] text-white placeholder:text-[#475569]"
+                                    className="bg-transparent border-[kssem-border] text-kssem-text placeholder:text-[kssem-border]"
                                   />
                                 </div>
                                 <DialogFooter>
                                   <DialogClose asChild>
                                     <Button
                                       variant="outline"
-                                      className="border-[#475569] text-white hover:bg-[#334155]"
+                                      className="border-[kssem-border] text-kssem-text hover:bg-[kssem-border]"
                                       onClick={() => {
                                         setSelectedRequestForDenial(null);
                                         setDenialReason("");
@@ -399,14 +399,14 @@ export default function AdminRequestsPage() {
               </TableBody>
             </Table>
           ) : (
-            <p className="text-center text-[#8A99BB]">No pending requests.</p>
+            <p className="text-center text-[kssem-text-muted]">No pending requests.</p>
           )}
         </CardContent>
       </Card>
 
-      <Card className="bg-[#222B36] border-[#2a3441] text-white">
+      <Card className="bg-[white] border-[kssem-border] text-kssem-text">
         <CardHeader>
-          <CardTitle className="text-white">Resolved Requests</CardTitle>
+          <CardTitle className="text-kssem-text">Resolved Requests</CardTitle>
         </CardHeader>
         <CardContent>
           {loadingRequests ? (
@@ -418,15 +418,15 @@ export default function AdminRequestsPage() {
           ) : requests.filter((r) => r.status !== "pending").length > 0 ? (
             <Table>
               <TableHeader>
-                <TableRow className="border-[#334155] hover:bg-white/5">
-                  <TableHead className="text-[#8A99BB]">Student</TableHead>
-                  <TableHead className="text-[#8A99BB]">Field</TableHead>
-                  <TableHead className="text-[#8A99BB]">
+                <TableRow className="border-[kssem-border] hover:bg-white/5">
+                  <TableHead className="text-[kssem-text-muted]">Student</TableHead>
+                  <TableHead className="text-[kssem-text-muted]">Field</TableHead>
+                  <TableHead className="text-[kssem-text-muted]">
                     New Value (If Approved)
                   </TableHead>
-                  <TableHead className="text-[#8A99BB]">Status</TableHead>
-                  <TableHead className="text-[#8A99BB]">Resolved</TableHead>
-                  <TableHead className="text-[#8A99BB]">Notes</TableHead>
+                  <TableHead className="text-[kssem-text-muted]">Status</TableHead>
+                  <TableHead className="text-[kssem-text-muted]">Resolved</TableHead>
+                  <TableHead className="text-[kssem-text-muted]">Notes</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -435,19 +435,19 @@ export default function AdminRequestsPage() {
                   .map((req) => (
                     <TableRow
                       key={req.id}
-                      className="border-[#334155] hover:bg-white/5">
+                      className="border-[kssem-border] hover:bg-white/5">
                       <TableCell>
-                        <div className="text-white">
+                        <div className="text-kssem-text">
                           {req.userName || req.userId}
                         </div>
-                        <div className="text-xs text-[#8A99BB]">
+                        <div className="text-xs text-[kssem-text-muted]">
                           {req.userEmail}
                         </div>
                       </TableCell>
-                      <TableCell className="font-medium text-white">
+                      <TableCell className="font-medium text-kssem-text">
                         {req.fieldName}
                       </TableCell>
-                      <TableCell className="text-[#8A99BB]">
+                      <TableCell className="text-[kssem-text-muted]">
                         {req.status === "approved"
                           ? renderValue(req.newValue)
                           : "N/A"}
@@ -468,14 +468,14 @@ export default function AdminRequestsPage() {
                             req.status.slice(1)}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-[#8A99BB]">
+                      <TableCell className="text-[kssem-text-muted]">
                         {req.resolvedAt
                           ? req.resolvedAt instanceof Date
                             ? format(req.resolvedAt, "PP p")
                             : "Invalid Date"
                           : "N/A"}
                       </TableCell>
-                      <TableCell className="max-w-xs truncate text-[#8A99BB]">
+                      <TableCell className="max-w-xs truncate text-[kssem-text-muted]">
                         {req.adminNotes || "N/A"}
                       </TableCell>
                     </TableRow>
@@ -483,7 +483,7 @@ export default function AdminRequestsPage() {
               </TableBody>
             </Table>
           ) : (
-            <p className="text-center text-[#8A99BB]">
+            <p className="text-center text-[kssem-text-muted]">
               No resolved requests found.
             </p>
           )}
@@ -492,3 +492,4 @@ export default function AdminRequestsPage() {
     </div>
   );
 }
+

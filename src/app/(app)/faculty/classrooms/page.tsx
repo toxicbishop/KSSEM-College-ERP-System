@@ -1,4 +1,4 @@
-
+﻿
 'use client';
 
 import { MainHeader } from '@/components/layout/main-header';
@@ -212,7 +212,7 @@ export default function FacultyClassroomsPage() {
       <MainHeader />
       <div className="space-y-6 p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold tracking-tight md:text-3xl">Manage Classrooms</h2>
+          <h2 className="text-3xl md:text-4xl font-serif font-bold tracking-tight text-kssem-navy">Manage Classrooms</h2>
           <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
             <DialogTrigger asChild><Button><PlusCircle className="mr-2 h-4 w-4" /> Create New Classroom</Button></DialogTrigger>
             <DialogContent>
@@ -370,3 +370,5 @@ export default function FacultyClassroomsPage() {
 
 
     
+
+

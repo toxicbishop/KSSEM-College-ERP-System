@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { MainHeader } from "@/components/layout/main-header";
 import {
   Card,
@@ -871,7 +871,7 @@ export default function FacultyAttendancePage() {
     <>
       <MainHeader />
       <div className="p-4 md:p-6 space-y-6">
-        <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
+        <h2 className="text-3xl md:text-4xl font-serif font-bold tracking-tight text-kssem-navy">
           Faculty Attendance
         </h2>
 
@@ -1728,3 +1728,5 @@ export default function FacultyAttendancePage() {
     </>
   );
 }
+
+
