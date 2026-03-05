@@ -240,7 +240,8 @@ export async function approveProfileChangeRequest(
     await batch.commit();
   } catch (error) {
     console.error(
-      `Error approving profile change request ${requestId} (Admin SDK):`,
+      "Error approving profile change request (Admin SDK):",
+      requestId,
       error,
     );
     throw error;
