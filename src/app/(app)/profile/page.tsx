@@ -70,9 +70,19 @@ const isSafeUrl = (url?: string | null): boolean => {
   if (!url) return false;
 
   try {
-    const parsed = new URL(url, typeof window !== "undefined" ? window.location.origin : "http://localhost");
+    const baseOrigin =
+      typeof window !== "undefined" ? window.location.origin : "http://localhost";
+    const parsed = new URL(url, baseOrigin);
     // Allow only http and https protocols to avoid javascript:, data:, etc.
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return false;
+    }
+    // In the browser, additionally enforce same-origin to avoid navigating to arbitrary domains.
+    if (typeof window !== "undefined") {
+      return parsed.origin === window.location.origin;
+    }
+    // On the server, fall back to protocol-only validation since window is not available.
+    return true;
   } catch {
     return false;
   }
