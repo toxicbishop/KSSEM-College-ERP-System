@@ -3,15 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ArrowRight,
-  BookOpen,
-  UserCheck,
   Users,
-  BarChart,
-  FileLock,
-  CheckSquare,
   ShieldCheck,
   Clock,
   Bell,
@@ -20,14 +14,12 @@ import {
   CalendarDays,
   CreditCard,
   Library,
-  Bus,
 } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Footer } from "@/components/layout/footer";
-import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 const featureCards = [
   {
@@ -94,115 +86,128 @@ export default function LandingPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // If user is logged in, redirect them to the dashboard
     if (!loading && user) {
       router.push("/dashboard");
     }
   }, [user, loading, router]);
 
-  // While checking auth state, we can show a minimal loading or blank page
   if (loading || user) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="flex h-screen w-full items-center justify-center bg-kssem-bg">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kssem-navy"></div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background overflow-x-hidden">
+    <div className="flex min-h-screen flex-col bg-kssem-bg overflow-x-hidden">
+      {/* Navy Header */}
       <motion.header
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center">
-          <div className="mr-4 flex items-center">
+        className="sticky top-0 z-50 w-full bg-kssem-navy shadow-lg">
+        <div className="container flex h-16 items-center">
+          <Link href="/" className="mr-6 flex items-center gap-2">
             <Image
               src="/collage-logo.png"
               alt="College Logo"
-              width={32}
-              height={32}
-              className="mr-2"
+              width={36}
+              height={36}
               data-ai-hint="college crest logo"
             />
-            <span className="font-bold">KSSEM</span>
-          </div>
-          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-            <Link href="/" className="transition-colors hover:text-primary">
+            <span className="font-serif font-bold text-white text-lg">
+              KSSEM
+            </span>
+          </Link>
+          <nav className="hidden md:flex items-center space-x-6 text-sm font-semibold">
+            <Link
+              href="/"
+              className="text-white transition-colors hover:text-kssem-gold">
               Home
             </Link>
             <Link
               href="/about"
-              className="transition-colors text-muted-foreground hover:text-primary">
+              className="text-gray-300 transition-colors hover:text-kssem-gold">
               About
             </Link>
             <Link
               href="/contact"
-              className="transition-colors text-muted-foreground hover:text-primary">
+              className="text-gray-300 transition-colors hover:text-kssem-gold">
               Contact
             </Link>
             <Link
               href="/faq"
-              className="transition-colors text-muted-foreground hover:text-primary">
+              className="text-gray-300 transition-colors hover:text-kssem-gold">
               FAQ
             </Link>
           </nav>
-          <nav className="ml-auto flex items-center space-x-2">
-            <ThemeToggle />
-            <Button asChild variant="ghost">
-              <Link href="/signin">Sign In</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/signup">Sign Up</Link>
-            </Button>
+          <nav className="ml-auto flex items-center space-x-3">
+            <Link
+              href="/signin"
+              className="text-gray-300 text-sm font-semibold hover:text-white transition-colors">
+              Sign In
+            </Link>
+            <Link
+              href="/signup"
+              className="bg-kssem-gold text-kssem-navy px-4 py-2 rounded-sm text-sm font-bold uppercase tracking-wider hover:bg-[#c4a030] transition-colors">
+              Sign Up
+            </Link>
           </nav>
         </div>
       </motion.header>
 
       <main className="flex-1">
-        <section className="relative">
-          <div className="container relative grid items-center gap-6 pb-8 pt-10 md:py-16">
+        {/* Hero Section: Navy background */}
+        <section className="bg-kssem-navy text-white relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-kssem-navy via-[#001a3a] to-[#003366] opacity-80" />
+          <div className="container relative py-20 md:py-32">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="mx-auto flex max-w-[980px] flex-col items-center gap-4 text-center">
-              <h1 className="text-3xl font-extrabold leading-tight tracking-tighter md:text-5xl lg:text-6xl">
-                Unified ERP for Smarter Campus Management
+              className="mx-auto flex max-w-[800px] flex-col items-center gap-5 text-center">
+              <p className="text-kssem-gold text-sm font-bold uppercase tracking-[0.25em]">
+                K.S. School of Engineering & Management
+              </p>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold leading-tight tracking-tight">
+                Unified ERP for Smarter{" "}
+                <em className="text-kssem-gold italic">Campus Management</em>
               </h1>
-              <p className="max-w-[700px] text-lg text-muted-foreground">
+              <p className="max-w-[600px] text-gray-300 text-lg leading-relaxed">
                 By the students, for the students. Streamlining every aspect of
                 your college experience.
               </p>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex flex-wrap justify-center gap-4 mt-4">
-                <Button asChild size="lg">
-                  <Link href="/signin">
-                    Login to Portal <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button asChild size="lg" variant="outline">
-                  <Link href="/signup">Request Access</Link>
-                </Button>
-              </motion.div>
+              <div className="flex flex-wrap justify-center gap-4 mt-4">
+                <Link
+                  href="/signin"
+                  className="bg-kssem-gold text-kssem-navy px-8 py-3 rounded-sm font-bold uppercase tracking-wider hover:bg-[#c4a030] transition-colors flex items-center gap-2 text-sm shadow-lg">
+                  Login to Portal <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  href="/signup"
+                  className="border-2 border-white/30 text-white px-8 py-3 rounded-sm font-bold uppercase tracking-wider hover:bg-white/10 transition-colors text-sm">
+                  Request Access
+                </Link>
+              </div>
             </motion.div>
           </div>
+          {/* Gold bottom border accent */}
+          <div className="h-1 bg-gradient-to-r from-transparent via-kssem-gold to-transparent" />
         </section>
 
-        <section className="container py-16">
+        {/* Features Section */}
+        <section className="container py-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="text-center mb-12">
-            <h2 className="text-3xl font-bold">
+            className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-kssem-navy">
               Everything You Need, All in One Place
             </h2>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-kssem-text-muted mt-3 text-lg">
               Explore the core modules of our integrated ERP system.
             </p>
           </motion.div>
@@ -214,36 +219,37 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}>
-                <Card className="h-full hover:shadow-lg transition-shadow duration-300 flex flex-col">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-3">
-                      <div className="p-2 bg-primary/10 rounded-md">
-                        <feature.icon className="h-6 w-6 text-primary" />
-                      </div>
+                <div className="card-prestige h-full group hover:-translate-y-1 transition-transform duration-300 flex flex-col">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2.5 bg-kssem-navy/5 rounded-sm group-hover:bg-kssem-navy group-hover:text-white transition-colors text-kssem-navy">
+                      <feature.icon className="h-6 w-6" />
+                    </div>
+                    <h3 className="font-bold text-kssem-navy text-lg">
                       {feature.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex-grow">
-                    <p className="text-muted-foreground">
-                      {feature.description}
-                    </p>
-                  </CardContent>
-                </Card>
+                    </h3>
+                  </div>
+                  <p className="text-kssem-text-muted text-sm flex-grow">
+                    {feature.description}
+                  </p>
+                </div>
               </motion.div>
             ))}
           </div>
         </section>
 
-        <section className="bg-muted/60 py-20">
+        {/* Value Propositions */}
+        <section className="bg-kssem-navy py-20">
           <div className="container">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="text-center mb-12">
-              <h2 className="text-3xl font-bold">Why Choose This ERP?</h2>
-              <p className="text-muted-foreground mt-2">
+              className="text-center mb-14">
+              <h2 className="text-3xl md:text-4xl font-serif font-bold text-white">
+                Why Choose This ERP?
+              </h2>
+              <p className="text-gray-400 mt-3">
                 Empowering education with data-driven efficiency and seamless
                 access.
               </p>
@@ -256,15 +262,15 @@ export default function LandingPage() {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.2 }}>
-                  <Card className="text-center p-6 h-full">
-                    <div className="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-primary/10 mb-4">
-                      <item.icon className="h-8 w-8 text-primary" />
+                  <div className="text-center p-8 bg-white/5 border border-white/10 rounded-sm h-full hover:bg-white/10 transition-colors">
+                    <div className="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-kssem-gold/20 mb-5">
+                      <item.icon className="h-8 w-8 text-kssem-gold" />
                     </div>
-                    <h3 className="text-xl font-bold text-foreground mb-2">
+                    <h3 className="text-xl font-bold text-white mb-2">
                       {item.title}
                     </h3>
-                    <p className="text-muted-foreground">{item.description}</p>
-                  </Card>
+                    <p className="text-gray-400">{item.description}</p>
+                  </div>
                 </motion.div>
               ))}
             </div>
