@@ -479,7 +479,9 @@ export async function deleteLectureAttendance(
     );
   } catch (error) {
     console.error(
-      `deleteLectureAttendance SA: Error deleting attendance for classroom ${classroomId} on ${date}:`,
+      "deleteLectureAttendance SA: Error deleting attendance for classroom %s on %s:",
+      classroomId,
+      date,
       error,
     );
     throw new Error("Failed to delete attendance records.");
