@@ -1,15 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Settings, ShieldAlert } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { ShieldAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getSystemSettings } from "@/services/system-settings";
 import type { SystemSettings } from "@/services/system-settings";
@@ -25,16 +17,11 @@ export default function MaintenancePage() {
       try {
         const currentSettings = await getSystemSettings();
         setSettings(currentSettings);
-        // If maintenance mode is somehow off, redirect to home
         if (!currentSettings.maintenanceMode) {
           router.replace("/");
         }
       } catch (error) {
-        console.error(
-          "Error fetching system settings for maintenance page:",
-          error,
-        );
-        // Fallback: assume maintenance is on if settings can't be fetched on this page
+        console.error("Error fetching system settings:", error);
       } finally {
         setLoading(false);
       }
@@ -44,9 +31,9 @@ export default function MaintenancePage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-background p-6 text-center">
-        <Settings className="h-12 w-12 animate-spin text-primary" />
-        <p className="mt-4 text-lg text-muted-foreground">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-kssem-bg p-6 text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kssem-navy" />
+        <p className="mt-4 text-lg text-kssem-text-muted">
           Loading system status...
         </p>
       </div>
@@ -54,49 +41,44 @@ export default function MaintenancePage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-background via-muted to-background p-6 text-center">
-      <Card className="w-full max-w-lg shadow-2xl">
-        <CardHeader className="items-center">
-          <Image
-            src="/collage-logo.png"
-            alt="Site Logo"
-            width={60}
-            height={60}
-            className="mb-4"
-            data-ai-hint="college crest logo"
-          />
-          <CardTitle className="text-3xl font-bold flex items-center gap-3">
-            <ShieldAlert className="h-8 w-8 text-destructive" />
+    <div className="flex min-h-screen flex-col items-center justify-center bg-kssem-bg p-6 text-center">
+      <div className="card-prestige w-full max-w-lg text-center">
+        <Image
+          src="/collage-logo.png"
+          alt="Site Logo"
+          width={60}
+          height={60}
+          className="mb-6 mx-auto"
+          data-ai-hint="college crest logo"
+        />
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <ShieldAlert className="h-8 w-8 text-kssem-gold" />
+          <h1 className="text-3xl font-serif font-bold text-kssem-navy">
             Under Maintenance
-          </CardTitle>
-          <CardDescription className="text-md text-muted-foreground pt-2">
-            {settings?.applicationName ||
-              "K.S. School of Engineering and Management"}{" "}
-            is currently undergoing scheduled maintenance. We should be back
-            online shortly. Thank you for your patience!
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="mt-4">
-          <div className="rounded-lg border border-dashed border-border p-4">
-            <h3 className="font-semibold text-primary">
-              Why am I seeing this?
-            </h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              We are working hard to improve your experience. During this time,
-              access to most parts of the site is temporarily restricted.
-            </p>
-          </div>
-          {/* Optional: Add a link for admins to log in if they land here by mistake */}
-          {/* This assumes an admin might try to navigate directly and hit the maintenance wall */}
-          <Button
-            variant="outline"
-            className="mt-6"
-            onClick={() => router.push("/signin")}>
-            Admin Sign In
-          </Button>
-        </CardContent>
-      </Card>
-      <p className="mt-8 text-xs text-muted-foreground">
+          </h1>
+        </div>
+        <p className="text-kssem-text-muted leading-relaxed mb-6">
+          {settings?.applicationName ||
+            "K.S. School of Engineering and Management"}{" "}
+          is currently undergoing scheduled maintenance. We should be back
+          online shortly. Thank you for your patience!
+        </p>
+        <div className="border border-dashed border-kssem-border rounded-sm p-4 mb-6 bg-kssem-bg">
+          <h3 className="font-bold text-kssem-navy text-sm">
+            Why am I seeing this?
+          </h3>
+          <p className="text-sm text-kssem-text-muted mt-1">
+            We are working hard to improve your experience. Access to most parts
+            of the site is temporarily restricted.
+          </p>
+        </div>
+        <button
+          onClick={() => router.push("/signin")}
+          className="border border-kssem-border text-kssem-navy px-6 py-2.5 rounded-sm text-sm font-bold uppercase tracking-wider hover:bg-kssem-navy hover:text-white transition-colors">
+          Admin Sign In
+        </button>
+      </div>
+      <p className="mt-8 text-xs text-kssem-text-muted">
         &copy; {new Date().getFullYear()}{" "}
         {settings?.applicationName ||
           "K.S. School of Engineering and Management"}

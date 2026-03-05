@@ -2,64 +2,63 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Github, Linkedin, Mail } from "lucide-react";
-import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Footer } from "@/components/layout/footer";
 
 export default function AboutPage() {
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center">
-          <div className="mr-4 flex items-center">
+    <div className="flex min-h-screen flex-col bg-kssem-bg">
+      {/* Navy Header */}
+      <header className="sticky top-0 z-50 w-full bg-kssem-navy shadow-lg">
+        <div className="container flex h-16 items-center">
+          <Link href="/" className="mr-6 flex items-center gap-2">
             <Image
               src="/collage-logo.png"
               alt="College Logo"
-              width={32}
-              height={32}
-              className="mr-2"
+              width={36}
+              height={36}
               data-ai-hint="college crest logo"
             />
-            <span className="font-bold">KSSEM</span>
-          </div>
-          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+            <span className="font-serif font-bold text-white text-lg">
+              KSSEM
+            </span>
+          </Link>
+          <nav className="hidden md:flex items-center space-x-6 text-sm font-semibold">
             <Link
               href="/"
-              className="transition-colors text-muted-foreground hover:text-primary">
+              className="text-gray-300 hover:text-kssem-gold transition-colors">
               Home
             </Link>
-            <Link
-              href="/about"
-              className="transition-colors hover:text-primary">
+            <Link href="/about" className="text-white">
               About
             </Link>
             <Link
               href="/contact"
-              className="transition-colors text-muted-foreground hover:text-primary">
+              className="text-gray-300 hover:text-kssem-gold transition-colors">
               Contact
             </Link>
             <Link
               href="/faq"
-              className="transition-colors text-muted-foreground hover:text-primary">
+              className="text-gray-300 hover:text-kssem-gold transition-colors">
               FAQ
             </Link>
           </nav>
-          <nav className="ml-auto flex items-center space-x-2">
-            <ThemeToggle />
-            <Button asChild variant="ghost">
-              <Link href="/signin">Sign In</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/signup">Sign Up</Link>
-            </Button>
+          <nav className="ml-auto flex items-center space-x-3">
+            <Link
+              href="/signin"
+              className="text-gray-300 text-sm font-semibold hover:text-white transition-colors">
+              Sign In
+            </Link>
+            <Link
+              href="/signup"
+              className="bg-kssem-gold text-kssem-navy px-4 py-2 rounded-sm text-sm font-bold uppercase tracking-wider hover:bg-[#c4a030] transition-colors">
+              Sign Up
+            </Link>
           </nav>
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-1">
         <section className="container py-16 md:py-24">
           <motion.div
@@ -67,7 +66,6 @@ export default function AboutPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className="mx-auto flex max-w-4xl flex-col items-center gap-8">
-            {/* Profile Header */}
             <div className="flex flex-col items-center gap-4 text-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -75,47 +73,50 @@ export default function AboutPage() {
                 alt="Pranav Arun"
                 width={160}
                 height={160}
-                className="rounded-full object-cover shadow-lg w-40 h-40"
+                className="rounded-full object-cover shadow-prestige w-40 h-40 border-4 border-kssem-gold"
               />
-              <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
+              <h1 className="text-4xl font-serif font-bold tracking-tight text-kssem-navy lg:text-5xl">
                 Pranav Arun
               </h1>
-              <p className="text-xl text-muted-foreground">
+              <p className="text-xl text-kssem-text-muted">
                 Full Stack Developer & AI Enthusiast
               </p>
-              <div className="flex gap-4 mt-2">
-                <Button asChild variant="outline" size="icon">
+              <div className="flex gap-3 mt-2">
+                {[
+                  {
+                    href: "https://github.com/toxicbishop",
+                    icon: Github,
+                    label: "GitHub",
+                  },
+                  {
+                    href: "https://www.linkedin.com/in/pranav-arun/",
+                    icon: Linkedin,
+                    label: "LinkedIn",
+                  },
+                  {
+                    href: "https://mail.google.com/mail/?view=cm&fs=1&to=pranavarun19@gmail.com",
+                    icon: Mail,
+                    label: "Email",
+                  },
+                ].map((s) => (
                   <a
-                    href="https://github.com/toxicbishop"
+                    key={s.label}
+                    href={s.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="GitHub Profile">
-                    <Github className="h-5 w-5" />
+                    aria-label={s.label}
+                    className="border border-kssem-border rounded-sm p-2.5 text-kssem-navy hover:bg-kssem-navy hover:text-white transition-colors">
+                    <s.icon className="h-5 w-5" />
                   </a>
-                </Button>
-                <Button asChild variant="outline" size="icon">
-                  <a
-                    href="https://www.linkedin.com/in/pranav-arun/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="LinkedIn Profile">
-                    <Linkedin className="h-5 w-5" />
-                  </a>
-                </Button>
-                <Button asChild variant="outline" size="icon">
-                  <a
-                    href="https://mail.google.com/mail/?view=cm&fs=1&to=pranavarun19@gmail.com"
-                    aria-label="Send Email">
-                    <Mail className="h-5 w-5" />
-                  </a>
-                </Button>
+                ))}
               </div>
             </div>
 
-            {/* About Me Section */}
-            <div className="w-full text-left p-6 md:p-8 border rounded-lg bg-card">
-              <h2 className="text-2xl font-bold mb-4">About Me</h2>
-              <p className="text-muted-foreground leading-relaxed">
+            <div className="w-full card-prestige">
+              <h2 className="text-2xl font-serif font-bold text-kssem-navy mb-4">
+                About Me
+              </h2>
+              <p className="text-kssem-text-muted leading-relaxed">
                 Hello! I'm Pranav, a passionate software developer with a strong
                 foundation in web technologies and a keen interest in building
                 intelligent, user-centric applications. This Advanced Student
@@ -123,39 +124,38 @@ export default function AboutPage() {
                 full-stack solutions using modern tools like Next.js, Firebase,
                 and Google's Generative AI.
               </p>
-              <p className="text-muted-foreground leading-relaxed mt-4">
+              <p className="text-kssem-text-muted leading-relaxed mt-4">
                 My goal is to leverage technology to solve real-world problems,
                 creating systems that are not only functional but also efficient
-                and enjoyable to use. I thrive on challenges and am constantly
-                exploring new technologies to expand my skill set.
+                and enjoyable to use.
               </p>
             </div>
 
-            {/* Project Info Section */}
-            <div className="w-full text-left p-6 md:p-8 border rounded-lg bg-card">
-              <h2 className="text-2xl font-bold mb-4">About This Project</h2>
-              <p className="text-muted-foreground leading-relaxed">
+            <div className="w-full card-prestige">
+              <h2 className="text-2xl font-serif font-bold text-kssem-navy mb-4">
+                About This Project
+              </h2>
+              <p className="text-kssem-text-muted leading-relaxed">
                 This application was built from the ground up as a portfolio
                 project to showcase a modern, scalable architecture for an
                 educational institution. It features role-based access control
                 (Student, Faculty, Admin), real-time data synchronization with
-                Firestore, and integrated AI capabilities for features like
-                grade analysis.
+                Firestore, and integrated AI capabilities.
               </p>
-              <p className="text-muted-foreground leading-relaxed mt-4">
-                The primary technologies used are:
-              </p>
-              <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
+              <ul className="list-disc list-inside text-kssem-text-muted mt-4 space-y-1.5">
                 <li>
-                  **Frontend:** Next.js, React, TypeScript, Tailwind CSS,
-                  ShadCN/UI
+                  <strong className="text-kssem-text">Frontend:</strong>{" "}
+                  Next.js, React, TypeScript, Tailwind CSS, ShadCN/UI
                 </li>
                 <li>
-                  **Backend & Database:** Firebase (Firestore, Authentication),
-                  Next.js Server Actions
+                  <strong className="text-kssem-text">
+                    Backend & Database:
+                  </strong>{" "}
+                  Firebase (Firestore, Authentication), Next.js Server Actions
                 </li>
                 <li>
-                  **Generative AI:** Google Genkit with the Gemini model family
+                  <strong className="text-kssem-text">Generative AI:</strong>{" "}
+                  Google Genkit with the Gemini model family
                 </li>
               </ul>
             </div>
@@ -163,7 +163,6 @@ export default function AboutPage() {
         </section>
       </main>
 
-      {/* Footer */}
       <Footer />
     </div>
   );
