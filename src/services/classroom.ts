@@ -905,7 +905,9 @@ export async function getClassmatesInfo(
     return classmates;
   } catch (error) {
     console.error(
-      `[classroomService:getClassmatesInfo SA] Error fetching classmates for classroom ${classroomId} (Admin SDK):`,
+      "[classroomService:getClassmatesInfo SA] Error fetching classmates for classroom (Admin SDK):",
+      classroomId,
+      studentUid,
       error,
     );
     throw error;
