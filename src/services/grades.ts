@@ -94,7 +94,7 @@ export async function getGrades(studentId: string): Promise<Grade[]> {
       } as Grade;
     });
   } catch (error) {
-    console.error(`Error fetching grades for student ${studentId}:`, error);
+    console.error("Error fetching grades for student %s:", studentId, error);
     throw new Error("Could not fetch grades.");
   }
 }
