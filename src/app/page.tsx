@@ -243,8 +243,14 @@ export default function LandingPage() {
         {/* Top Branding */}
         <div className="px-8 pt-8 md:px-12 md:pt-12">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-kssem-navy flex items-center justify-center text-white rounded-sm">
-              <GraduationCap className="h-7 w-7" />
+            <div className="w-12 h-12 bg-kssem-navy flex items-center justify-center text-white rounded-sm overflow-hidden">
+              <Image
+                src="/collage-logo.png"
+                alt="KSSEM Logo"
+                width={40}
+                height={40}
+                className="object-contain"
+              />
             </div>
             <div>
               <h2 className="text-kssem-navy font-bold tracking-wide text-lg leading-tight">
