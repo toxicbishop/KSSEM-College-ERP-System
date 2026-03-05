@@ -2,13 +2,6 @@
 
 import { MainHeader } from "@/components/layout/main-header";
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardDescription,
-} from "@/components/ui/card";
-import {
   Table,
   TableBody,
   TableCell,
@@ -31,7 +24,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Download } from "lucide-react";
 
 function AttendanceTableLoader() {
   const { user, loading: authLoading } = useAuth();
@@ -46,7 +39,7 @@ function AttendanceTableLoader() {
         setLoading(true);
         setError(null);
         try {
-          const idToken = await clientAuth!.currentUser!.getIdToken(); // Use cached token
+          const idToken = await clientAuth!.currentUser!.getIdToken();
           const fetchedRecords = await getAttendanceRecords(idToken);
           setRecords(fetchedRecords);
         } catch (err) {
@@ -55,7 +48,7 @@ function AttendanceTableLoader() {
             (err as Error).message || "An unknown error occurred.";
           if (errorMessage.includes("Admin SDK initialization failed")) {
             setError(
-              "Could not load attendance data because the server is not configured correctly. Please contact the administrator or check the GOOGLE_APPLICATION_CREDENTIALS_JSON variable in your .env.local file.",
+              "Server configuration error. Please contact the administrator.",
             );
           } else {
             setError("Could not load your attendance data. Please try again.");
@@ -78,17 +71,12 @@ function AttendanceTableLoader() {
 
   const groupedRecords = useMemo(() => {
     if (records.length === 0) return {};
-
     const groups: { [dateKey: string]: AttendanceRecord[] } = {};
-
     records.forEach((record) => {
       const dateKey = record.date;
-      if (!groups[dateKey]) {
-        groups[dateKey] = [];
-      }
+      if (!groups[dateKey]) groups[dateKey] = [];
       groups[dateKey].push(record);
     });
-
     return groups;
   }, [records]);
 
@@ -102,100 +90,106 @@ function AttendanceTableLoader() {
 
   if (loading || authLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <Skeleton className="h-8 w-1/2" />
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-96 w-full" />
-        </CardContent>
-      </Card>
+      <div className="bg-white shadow-prestige rounded-sm p-6">
+        <Skeleton className="h-8 w-1/2 mb-4" />
+        <Skeleton className="h-96 w-full" />
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Card className="border-destructive">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-destructive">
-            <AlertTriangle className="h-6 w-6" />
-            Error Loading Attendance
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>{error}</p>
-        </CardContent>
-      </Card>
+      <div className="bg-white shadow-prestige p-8 border-t-[3px] border-destructive rounded-sm">
+        <h2 className="flex items-center gap-2 text-destructive font-serif font-bold text-xl mb-2">
+          <AlertTriangle className="h-6 w-6" /> Error Loading Attendance
+        </h2>
+        <p className="text-kssem-text-muted">{error}</p>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Detailed Attendance Records</CardTitle>
-        <CardDescription>
-          Your day-by-day attendance summary across all subjects.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {sortedDates.length > 0 ? (
-          <Accordion type="single" collapsible className="w-full space-y-2">
-            {sortedDates.map((date) => (
-              <AccordionItem
-                value={date}
-                key={date}
-                className="border rounded-lg px-4 bg-muted/20">
-                <AccordionTrigger className="hover:no-underline">
-                  <span className="font-semibold text-primary">
-                    {format(parseISO(date), "PPP")}
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="overflow-x-auto border rounded-md">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Subject/Topic</TableHead>
-                          <TableHead>Classroom</TableHead>
-                          <TableHead>Faculty</TableHead>
-                          <TableHead className="text-right">Status</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {groupedRecords[date].map((record, index) => (
-                          <TableRow
-                            key={`${record.date}-${record.lectureName}-${index}`}>
-                            <TableCell>{record.lectureName || "N/A"}</TableCell>
-                            <TableCell>
-                              {record.classroomName || "N/A"}
-                            </TableCell>
-                            <TableCell>{record.facultyName || "N/A"}</TableCell>
-                            <TableCell
+    <div className="bg-white shadow-prestige border border-kssem-border rounded-sm overflow-hidden">
+      {sortedDates.length > 0 ? (
+        <Accordion type="single" collapsible className="w-full">
+          {sortedDates.map((date) => (
+            <AccordionItem
+              value={date}
+              key={date}
+              className="border-b border-kssem-border/50">
+              <AccordionTrigger className="hover:no-underline px-6 py-4 hover:bg-kssem-bg transition-colors">
+                <span className="font-serif font-bold text-kssem-navy text-sm">
+                  {format(parseISO(date), "PPP")}
+                </span>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-kssem-border bg-kssem-bg hover:bg-kssem-bg">
+                        <TableHead className="text-kssem-text-muted text-xs font-bold uppercase tracking-wider">
+                          Subject/Topic
+                        </TableHead>
+                        <TableHead className="text-kssem-text-muted text-xs font-bold uppercase tracking-wider">
+                          Classroom
+                        </TableHead>
+                        <TableHead className="text-kssem-text-muted text-xs font-bold uppercase tracking-wider">
+                          Faculty
+                        </TableHead>
+                        <TableHead className="text-right text-kssem-text-muted text-xs font-bold uppercase tracking-wider">
+                          Status
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {groupedRecords[date].map((record, index) => (
+                        <TableRow
+                          key={`${record.date}-${record.lectureName}-${index}`}
+                          className="border-kssem-border/50 hover:bg-kssem-gold-light/30 transition-colors">
+                          <TableCell className="text-kssem-text font-medium text-sm">
+                            {record.lectureName || "N/A"}
+                          </TableCell>
+                          <TableCell className="text-kssem-text-muted text-sm">
+                            {record.classroomName || "N/A"}
+                          </TableCell>
+                          <TableCell className="text-kssem-text-muted text-sm">
+                            {record.facultyName || "N/A"}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <span
                               className={cn(
-                                "text-right font-medium",
+                                "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border",
                                 record.status === "present"
-                                  ? "text-green-600"
-                                  : "text-red-600",
+                                  ? "bg-status-bg-success text-status-success border-status-success/20"
+                                  : "bg-red-50 text-red-600 border-red-200",
                               )}>
+                              <span
+                                className={cn(
+                                  "size-1.5 rounded-full",
+                                  record.status === "present"
+                                    ? "bg-status-success"
+                                    : "bg-red-600",
+                                )}
+                              />
                               {record.status.charAt(0).toUpperCase() +
                                 record.status.slice(1)}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        ) : (
-          <p className="text-center text-muted-foreground py-8">
-            No attendance records found.
-          </p>
-        )}
-      </CardContent>
-    </Card>
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      ) : (
+        <p className="text-center text-kssem-text-muted py-8 text-sm">
+          No attendance records found.
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -203,10 +197,17 @@ export default function AttendancePage() {
   return (
     <>
       <MainHeader />
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
-          Attendance
-        </h2>
+      <div className="space-y-6 pt-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-kssem-border pb-4">
+          <div>
+            <h1 className="font-serif font-bold text-3xl md:text-4xl text-kssem-text tracking-tight">
+              Attendance Records
+            </h1>
+            <p className="text-kssem-text-muted text-sm mt-1">
+              Your day-by-day attendance summary across all subjects.
+            </p>
+          </div>
+        </div>
         <AttendanceTableLoader />
       </div>
     </>
