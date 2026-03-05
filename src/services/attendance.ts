@@ -313,7 +313,10 @@ export async function getLectureAttendanceForDateRange(
     });
   } catch (error) {
     console.error(
-      `Error fetching lecture attendance for classroom ${classroomId} in range ${startDate} to ${endDate}:`,
+      "Error fetching lecture attendance for classroom %s in range %s to %s:",
+      classroomId,
+      startDate,
+      endDate,
       error,
     );
     throw error;
