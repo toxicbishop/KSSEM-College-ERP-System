@@ -1,7 +1,6 @@
 "use client";
 
 import type { AttendanceRecord } from "@/services/attendance";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -10,10 +9,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { CalendarDays } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface AttendanceOverviewCardProps {
   attendanceRecords: AttendanceRecord[];
@@ -22,10 +20,8 @@ interface AttendanceOverviewCardProps {
 export function AttendanceOverviewCard({
   attendanceRecords,
 }: AttendanceOverviewCardProps) {
-  // Sort records by date descending and take the most recent 5
   const recentRecords = [...attendanceRecords]
     .sort((a, b) => {
-      // Handle potential invalid date strings
       const dateA = parseISO(a.date);
       const dateB = parseISO(b.date);
       if (isNaN(dateA.getTime())) return 1;
@@ -37,24 +33,30 @@ export function AttendanceOverviewCard({
   const hasData = recentRecords.length > 0;
 
   return (
-    <Card className="shadow-md hover:shadow-lg transition-shadow bg-[#222B36] border-[#2a3441] text-white">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-white">
-          <CalendarDays className="h-5 w-5 text-[#2dd4bf]" />
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between pb-2 border-b border-kssem-border">
+        <h2 className="font-serif font-bold text-xl text-kssem-text">
           Recent Attendance
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+        </h2>
+        <Link
+          href="/attendance"
+          className="text-kssem-navy text-sm font-bold hover:underline">
+          View Full
+        </Link>
+      </div>
+      <div className="bg-white shadow-prestige rounded-sm overflow-hidden">
         {hasData ? (
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="border-[#334155] hover:bg-white/5">
-                  <TableHead className="text-[#8A99BB]">Date</TableHead>
-                  <TableHead className="text-[#8A99BB]">
+                <TableRow className="border-kssem-border hover:bg-transparent">
+                  <TableHead className="text-kssem-text-muted text-xs font-bold uppercase tracking-wider">
+                    Date
+                  </TableHead>
+                  <TableHead className="text-kssem-text-muted text-xs font-bold uppercase tracking-wider">
                     Lecture/Subject
                   </TableHead>
-                  <TableHead className="text-right text-[#8A99BB]">
+                  <TableHead className="text-right text-kssem-text-muted text-xs font-bold uppercase tracking-wider">
                     Status
                   </TableHead>
                 </TableRow>
@@ -65,30 +67,34 @@ export function AttendanceOverviewCard({
                   return (
                     <TableRow
                       key={`${record.date}-${record.lectureName}-${index}`}
-                      className="border-[#334155] hover:bg-white/5">
-                      <TableCell className="whitespace-nowrap text-[#8A99BB]">
+                      className="border-kssem-border/50 hover:bg-kssem-gold-light/30 transition-colors">
+                      <TableCell className="whitespace-nowrap text-kssem-text-muted text-sm">
                         {!isNaN(date.getTime())
                           ? format(date, "PP")
                           : "Invalid Date"}
                       </TableCell>
-                      <TableCell className="text-white">
+                      <TableCell className="text-kssem-text font-medium text-sm">
                         {record.lectureName || "N/A"}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Badge
-                          variant={
-                            record.status === "present"
-                              ? "default"
-                              : "destructive"
-                          }
+                        <span
                           className={cn(
+                            "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border",
                             record.status === "present"
-                              ? "bg-green-500/20 text-green-400 border-0"
-                              : "bg-red-500/20 text-red-400 border-0",
+                              ? "bg-status-bg-success text-status-success border-status-success/20"
+                              : "bg-red-50 text-red-600 border-red-200",
                           )}>
+                          <span
+                            className={cn(
+                              "size-1.5 rounded-full",
+                              record.status === "present"
+                                ? "bg-status-success"
+                                : "bg-red-600",
+                            )}
+                          />
                           {record.status.charAt(0).toUpperCase() +
                             record.status.slice(1)}
-                        </Badge>
+                        </span>
                       </TableCell>
                     </TableRow>
                   );
@@ -98,12 +104,12 @@ export function AttendanceOverviewCard({
           </div>
         ) : (
           <div className="flex h-full min-h-[150px] items-center justify-center">
-            <p className="text-center text-[#8A99BB]">
+            <p className="text-center text-kssem-text-muted text-sm">
               No attendance data available.
             </p>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

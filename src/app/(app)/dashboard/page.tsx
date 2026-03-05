@@ -8,7 +8,7 @@ import { AttendanceOverviewCard } from "@/components/dashboard/attendance-overvi
 import { GradesChartCard } from "@/components/dashboard/grades-chart-card";
 import { AnnouncementsCard } from "@/components/dashboard/announcements-card";
 import { SummaryCard } from "@/components/dashboard/summary-card";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MainHeader } from "@/components/layout/main-header";
@@ -18,16 +18,16 @@ import {
   CheckCircle,
   DoorOpen,
   AlertTriangle,
+  TrendingUp,
 } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
-import { auth as clientAuth, db } from "@/lib/firebase/client"; // Import clientAuth
+import { auth as clientAuth, db } from "@/lib/firebase/client";
 import type { StudentProfile } from "@/services/profile";
 import type { AttendanceRecord } from "@/services/attendance";
 import type { Grade } from "@/services/grades";
 import type { Announcement } from "@/services/announcements";
 import { doc, getDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { analyzeGrades } from "@/ai/flows/analyze-grades-flow";
 import type { GradeAnalysisOutput } from "@/services/grades";
 
@@ -95,7 +95,6 @@ export default function DashboardPage() {
           if (userDocSnap.exists()) {
             profileData = { ...userDocSnap.data() } as StudentProfile;
             if (!profileData.studentId) profileData.studentId = user.uid;
-            // Determine fallback name based on role
             const userRole =
               profileData.role ||
               (user.email === "admin@gmail.com" ? "admin" : "student");
@@ -109,7 +108,6 @@ export default function DashboardPage() {
               profileData.name = user.displayName || fallbackName;
             if (!profileData.email) profileData.email = user.email || "N/A";
           } else {
-            console.warn(`User document not found for UID: ${user.uid}`);
             const fallbackName =
               user.email === "admin@gmail.com" ? "Admin" : "Student";
             profileData = {
@@ -120,29 +118,20 @@ export default function DashboardPage() {
             } as StudentProfile;
           }
 
-          const idToken = await clientAuth!.currentUser!.getIdToken(); // Use cached token to speed up loading
-          const attendancePromise = getAttendanceRecords(idToken);
-
-          const gradesPromise = getGrades(user.uid);
-
-          const announcementsPromise = getAnnouncements();
-
+          const idToken = await clientAuth!.currentUser!.getIdToken();
           const [attendanceRecords, grades, announcements] = await Promise.all([
-            attendancePromise,
-            gradesPromise,
-            announcementsPromise,
+            getAttendanceRecords(idToken),
+            getGrades(user.uid),
+            getAnnouncements(),
           ]);
 
           const totalDays = attendanceRecords.length;
           const presentDays = attendanceRecords.filter(
-            (record) => record.status === "present",
+            (r) => r.status === "present",
           ).length;
           const attendancePercentage =
             totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
-
           const gpa = calculateGPA(grades);
-          const upcomingAppointments = 0; // Replace with actual data
-          const activeGatePasses = 0; // Replace with actual data
 
           setData({
             profile: profileData,
@@ -156,26 +145,21 @@ export default function DashboardPage() {
             announcements,
             attendancePercentage,
             gpa,
-            upcomingAppointments,
-            activeGatePasses,
+            upcomingAppointments: 0,
+            activeGatePasses: 0,
           });
 
-          // Kick off the AI analysis asynchronously so it doesn't block the dashboard from loading
           analyzeGrades(grades)
-            .then((analysis) => {
+            .then((analysis) =>
               setData((prev) =>
                 prev ? { ...prev, gradeAnalysis: analysis } : prev,
-              );
-            })
+              ),
+            )
             .catch((aiError) => {
-              console.error(
-                "Dashboard: AI grade analysis failed. Using default.",
-                aiError,
-              );
+              console.error("AI grade analysis failed.", aiError);
               toast({
                 title: "AI Analysis Unavailable",
-                description:
-                  "Could not generate AI grade analysis. Displaying grades only.",
+                description: "Could not generate AI grade analysis.",
                 variant: "default",
               });
               setData((prev) =>
@@ -188,7 +172,7 @@ export default function DashboardPage() {
             (err as Error).message || "An unknown error occurred.";
           if (errorMessage.includes("Admin SDK initialization failed")) {
             setError(
-              "Could not load all dashboard data because the server is not configured correctly. Please contact the administrator or check the GOOGLE_APPLICATION_CREDENTIALS_B64 variable in your .env.local file.",
+              "Server configuration error. Please contact the administrator.",
             );
           } else {
             setError(
@@ -207,13 +191,9 @@ export default function DashboardPage() {
       fetchData();
     } else if (!authLoading && !user) {
       setLoading(false);
-      console.log("User not logged in, dashboard won't load.");
     } else if (!authLoading && user && (!clientAuth?.currentUser || !db)) {
       setLoading(false);
       setError("Firebase services not fully initialized. Please try again.");
-      console.error(
-        "Dashboard: Firebase clientAuth.currentUser or db is null/undefined when user object exists.",
-      );
     }
   }, [user, authLoading, toast]);
 
@@ -221,22 +201,21 @@ export default function DashboardPage() {
     return (
       <>
         <MainHeader />
-        <div className="space-y-6">
-          <Skeleton className="h-8 w-48" />
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="space-y-8 pt-8">
+          <div>
+            <Skeleton className="h-4 w-48 mb-2" />
+            <Skeleton className="h-10 w-96" />
+          </div>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <Skeleton className="h-32 w-full" />
             <Skeleton className="h-32 w-full" />
             <Skeleton className="h-32 w-full" />
             <Skeleton className="h-32 w-full" />
           </div>
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <div className="space-y-6 lg:col-span-3 xl:col-span-2">
-              <Skeleton className="h-72 w-full" />
-              <Skeleton className="h-72 w-full" />
-            </div>
-            <div className="lg:col-span-3 xl:col-span-1">
-              <Skeleton className="h-full min-h-[590px] w-full" />
-            </div>
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <Skeleton className="h-72 w-full" />
+            <Skeleton className="h-72 w-full" />
+            <Skeleton className="h-72 w-full" />
           </div>
         </div>
       </>
@@ -248,17 +227,12 @@ export default function DashboardPage() {
       <>
         <MainHeader />
         <div className="flex h-[calc(100vh-150px)] items-center justify-center p-6">
-          <Card className="w-full max-w-2xl border-destructive">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-destructive">
-                <AlertTriangle className="h-6 w-6" />
-                Dashboard Error
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>{error}</p>
-            </CardContent>
-          </Card>
+          <div className="w-full max-w-2xl bg-white shadow-prestige p-8 border-t-[3px] border-destructive rounded-sm">
+            <h2 className="flex items-center gap-2 text-destructive font-serif font-bold text-xl mb-2">
+              <AlertTriangle className="h-6 w-6" /> Dashboard Error
+            </h2>
+            <p className="text-kssem-text-muted">{error}</p>
+          </div>
         </div>
       </>
     );
@@ -266,60 +240,92 @@ export default function DashboardPage() {
 
   if (!user || !data || !data.profile) {
     return (
-      <>
-        <div className="flex h-screen items-center justify-center">
-          {user ? (
-            <p className="text-muted-foreground">
-              Could not load dashboard information.
-            </p>
-          ) : (
-            <p className="text-muted-foreground">Redirecting to sign in...</p>
-          )}
-        </div>
-      </>
+      <div className="flex h-screen items-center justify-center">
+        <p className="text-kssem-text-muted">
+          {user
+            ? "Could not load dashboard information."
+            : "Redirecting to sign in..."}
+        </p>
+      </div>
     );
   }
+
+  const today = new Date();
+  const dateStr = today.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 
   return (
     <>
       <MainHeader />
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
-          Welcome, {data.profile.name}
-        </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="space-y-8 pt-8">
+        {/* Welcome Header */}
+        <section className="flex flex-col md:flex-row justify-between items-end border-b border-kssem-border pb-4">
+          <div>
+            <p className="text-kssem-navy text-sm font-semibold uppercase tracking-wider mb-1">
+              Academic Session {today.getFullYear()}-{today.getFullYear() + 1}
+            </p>
+            <h1 className="font-serif font-bold text-3xl md:text-4xl tracking-tight text-kssem-text">
+              Welcome back, Scholar {data.profile.name?.split(" ")[0]}.
+            </h1>
+          </div>
+          <div className="mt-4 md:mt-0 text-kssem-text-muted text-sm font-medium flex items-center gap-2">
+            <CalendarClock className="h-4 w-4" />
+            <span>{dateStr}</span>
+          </div>
+        </section>
+
+        {/* KPI Metrics Grid */}
+        <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <SummaryCard
-            title="Attendance Percentage"
+            title="Attendance"
             value={`${data.attendancePercentage}%`}
             icon={data.attendancePercentage < 75 ? AlertTriangle : CheckCircle}
             variant={data.attendancePercentage < 75 ? "destructive" : "default"}
+            subtitle={
+              data.attendancePercentage >= 75
+                ? "Good Standing"
+                : "Below Required"
+            }
           />
-          <SummaryCard title="GPA" value={data.gpa} icon={Award} />
           <SummaryCard
-            title="Upcoming Appointments"
-            value={data.upcomingAppointments.toString()}
-            icon={CalendarClock}
+            title="CGPA"
+            value={data.gpa}
+            icon={Award}
+            subtitle="Current Semester"
+          />
+          <SummaryCard
+            title="Fees Due"
+            value="₹0"
+            icon={TrendingUp}
+            subtitle="No Dues Pending"
           />
           <SummaryCard
             title="Active Gate Passes"
             value={data.activeGatePasses.toString()}
             icon={DoorOpen}
           />
-        </div>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="space-y-6 lg:col-span-3 xl:col-span-2">
+        </section>
+
+        {/* Main Dashboard Grid */}
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <div className="lg:col-span-1">
             <AttendanceOverviewCard
               attendanceRecords={data.attendanceRecords}
             />
+          </div>
+          <div className="lg:col-span-1">
+            <AnnouncementsCard announcements={data.announcements} />
+          </div>
+          <div className="lg:col-span-1">
             <ErrorBoundary title="Grades Analysis Error">
               <GradesChartCard
                 grades={data.grades}
                 analysis={data.gradeAnalysis}
               />
             </ErrorBoundary>
-          </div>
-          <div className="lg:col-span-3 xl:col-span-1">
-            <AnnouncementsCard announcements={data.announcements} />
           </div>
         </div>
       </div>
