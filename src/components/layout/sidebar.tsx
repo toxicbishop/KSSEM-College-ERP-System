@@ -173,7 +173,7 @@ export function Sidebar({
     <TooltipProvider delayDuration={0}>
       <aside
         className={cn(
-          "bg-sidebar-background h-screen p-4 flex flex-col justify-between shadow-lg border-r border-sidebar-border transition-all duration-300 ease-in-out",
+          "bg-kssem-navy h-screen p-4 flex flex-col justify-between shadow-lg border-r border-kssem-navy-light/20 transition-all duration-300 ease-in-out",
           isCollapsed ? "w-20 items-center" : "w-64",
         )}>
         <div>
@@ -192,12 +192,10 @@ export function Sidebar({
             />
             {!isCollapsed && (
               <div>
-                <h1 className="text-sm font-semibold text-sidebar-foreground">
+                <h1 className="text-sm font-semibold text-white font-serif">
                   {appNameLoading ? "Loading..." : collegeName}
                 </h1>
-                <p className="text-xs text-sidebar-foreground/80">
-                  Student Portal
-                </p>
+                <p className="text-xs text-slate-400">Student Portal</p>
               </div>
             )}
           </div>
@@ -217,15 +215,13 @@ export function Sidebar({
                         "flex items-center space-x-3 px-3 py-3 md:py-2.5 rounded-lg text-sm font-medium transition-colors",
                         isCollapsed ? "justify-center" : "",
                         isActive
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                          : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+                          ? "bg-white/10 text-kssem-gold"
+                          : "text-slate-300 hover:bg-white/5 hover:text-white",
                       )}>
                       <item.icon
                         className={cn(
                           "w-5 h-5 shrink-0",
-                          isActive
-                            ? "text-sidebar-accent-foreground"
-                            : "text-sidebar-primary",
+                          isActive ? "text-kssem-gold" : "text-slate-400",
                         )}
                       />
                       {!isCollapsed && <span>{item.label}</span>}
@@ -267,7 +263,7 @@ export function Sidebar({
                   variant="ghost"
                   onClick={handleLogout}
                   className={cn(
-                    "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium justify-start text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+                    "w-full flex items-center space-x-3 px-3 py-2.5 rounded-sm text-sm font-medium justify-start text-slate-300 hover:bg-white/5 hover:text-white",
                     isCollapsed ? "justify-center" : "",
                   )}>
                   <Avatar className="h-6 w-6">
@@ -275,7 +271,7 @@ export function Sidebar({
                       src={user?.photoURL || ""}
                       alt={user?.displayName || "Student"}
                     />
-                    <AvatarFallback className="text-[10px] bg-sidebar-primary text-sidebar-primary-foreground">
+                    <AvatarFallback className="text-[10px] bg-kssem-gold/20 text-kssem-gold">
                       {getInitials(user?.displayName || user?.email || "ST")}
                     </AvatarFallback>
                   </Avatar>
@@ -297,10 +293,10 @@ export function Sidebar({
                   variant="ghost"
                   onClick={() => router.push("/signin")}
                   className={cn(
-                    "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium justify-start text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+                    "w-full flex items-center space-x-3 px-3 py-2.5 rounded-sm text-sm font-medium justify-start text-slate-300 hover:bg-white/5 hover:text-white",
                     isCollapsed ? "justify-center" : "",
                   )}>
-                  <LogIn className="w-5 h-5 text-sidebar-primary shrink-0" />
+                  <LogIn className="w-5 h-5 text-kssem-gold shrink-0" />
                   {!isCollapsed && <span>Sign In</span>}
                 </Button>
               </TooltipTrigger>
@@ -318,14 +314,14 @@ export function Sidebar({
               variant="ghost"
               onClick={toggleCollapse}
               className={cn(
-                "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium justify-start text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+                "w-full flex items-center space-x-3 px-3 py-2.5 rounded-sm text-sm font-medium justify-start text-slate-300 hover:bg-white/5 hover:text-white",
                 isCollapsed ? "justify-center" : "",
               )}
               aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
               {isCollapsed ? (
-                <ChevronsRight className="w-5 h-5 text-sidebar-primary shrink-0" />
+                <ChevronsRight className="w-5 h-5 text-kssem-gold shrink-0" />
               ) : (
-                <ChevronsLeft className="w-5 h-5 text-sidebar-primary shrink-0" />
+                <ChevronsLeft className="w-5 h-5 text-kssem-gold shrink-0" />
               )}
               {!isCollapsed && <span>Collapse</span>}
             </Button>

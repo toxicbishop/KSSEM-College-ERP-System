@@ -1,11 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search, UserCircle, Menu } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { ThemeToggle } from "./theme-toggle";
 import { getSystemSettings } from "@/services/system-settings";
 import { useEffect, useState } from "react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
@@ -13,8 +10,9 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Sidebar } from "./sidebar";
 import { useAuth } from "@/context/auth-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { usePathname } from "next/navigation";
+import { Bell, Menu, GraduationCap, UserCircle } from "lucide-react";
 
-// Helper function to get initials from a name
 const getInitials = (name: string) => {
   if (!name) return "U";
   return name
@@ -25,12 +23,20 @@ const getInitials = (name: string) => {
     .toUpperCase();
 };
 
+const navLinks = [
+  { href: "/dashboard", label: "Dashboard" },
+  { href: "/grades", label: "Academics" },
+  { href: "/fee-management", label: "Finance" },
+  { href: "/classrooms", label: "Library" },
+];
+
 export function MainHeader() {
   const [collegeName, setCollegeName] = useState("KSSEM");
   const [appNameLoading, setAppNameLoading] = useState(true);
   const isMobile = useIsMobile();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user } = useAuth();
+  const pathname = usePathname();
 
   useEffect(() => {
     const fetchAppName = async () => {
@@ -52,78 +58,99 @@ export function MainHeader() {
     fetchAppName();
   }, []);
 
-  return (
-    <header className="sticky top-0 z-40 flex h-16 items-center justify-between gap-4 border-b border-[#2a3441] bg-[#1A222C] px-4 sm:px-6">
-      <div className="flex items-center gap-4">
-        {isMobile ? (
-          <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-            <SheetTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="border-[#334155] text-[#8A99BB] hover:bg-[#222B36]">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle Menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="p-0 w-64">
-              <Sidebar
-                isCollapsed={false}
-                toggleCollapse={() => {}}
-                onLinkClick={() => setIsSidebarOpen(false)}
-              />
-            </SheetContent>
-          </Sheet>
-        ) : (
-          <Image
-            src="/collage-logo.png"
-            alt="College Logo"
-            width={40}
-            height={40}
-            className="h-8 w-8 md:h-10 md:w-10"
-            data-ai-hint="college crest logo"
-          />
-        )}
-        <div>
-          <h1 className="text-base font-semibold text-white md:text-xl">
-            {appNameLoading ? "Loading..." : collegeName}
-          </h1>
-          <p className="text-xs text-[#8A99BB]">Student Dashboard</p>
-        </div>
-      </div>
+  const isNavActive = (href: string) => {
+    if (href === "/dashboard") return pathname === "/dashboard";
+    return pathname.startsWith(href);
+  };
 
-      <div className="flex items-center gap-2 md:gap-4">
-        <div className="relative hidden md:block">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-[#8A99BB]" />
-          <Input
-            type="search"
-            placeholder="Search..."
-            className="w-full rounded-lg bg-[#0F172A] border-[#334155] text-white placeholder:text-[#475569] pl-8 md:w-[200px] lg:w-[300px] focus-visible:ring-[#2dd4bf]"
-          />
+  return (
+    <header className="sticky top-0 z-40 bg-kssem-navy shadow-md border-b border-kssem-navy-light/20">
+      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        {/* Brand */}
+        <div className="flex items-center gap-3">
+          {isMobile ? (
+            <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-white hover:bg-white/10">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Toggle Menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="p-0 w-64">
+                <Sidebar
+                  isCollapsed={false}
+                  toggleCollapse={() => {}}
+                  onLinkClick={() => setIsSidebarOpen(false)}
+                />
+              </SheetContent>
+            </Sheet>
+          ) : (
+            <div className="bg-white/10 p-1.5 rounded-sm">
+              <GraduationCap className="h-6 w-6 text-white" />
+            </div>
+          )}
+          <div className="flex flex-col">
+            <span className="text-white font-serif font-bold text-lg leading-none tracking-wide">
+              {appNameLoading ? "..." : collegeName}
+            </span>
+            <span className="text-slate-300 text-[10px] uppercase tracking-wider font-medium">
+              Portal Access
+            </span>
+          </div>
         </div>
-        <ThemeToggle />
-        <Link href="/profile">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full hover:bg-[#222B36]">
-            <Avatar className="h-8 w-8 hover:ring-2 hover:ring-[#2dd4bf] transition-all">
+
+        {/* Navigation Links */}
+        <nav className="hidden md:flex items-center gap-8">
+          {navLinks.map((link) => {
+            const active = isNavActive(link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`text-sm font-medium transition-colors relative ${
+                  active
+                    ? "text-kssem-gold font-semibold after:content-[''] after:absolute after:-bottom-[22px] after:left-0 after:w-full after:h-[3px] after:bg-kssem-gold"
+                    : "text-slate-300 hover:text-white"
+                }`}>
+                {link.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* User Profile & Actions */}
+        <div className="flex items-center gap-6">
+          <button className="text-slate-300 hover:text-white transition-colors hidden sm:block">
+            <Bell className="h-5 w-5" />
+          </button>
+          <div className="h-6 w-px bg-white/20 hidden sm:block"></div>
+          <Link href="/profile" className="flex items-center gap-3">
+            <div className="text-right hidden sm:block">
+              <p className="text-white text-sm font-semibold leading-tight">
+                {user?.displayName || "Student"}
+              </p>
+              <p className="text-slate-300 text-xs">
+                Scholar ID: {user?.uid?.substring(0, 8) || "N/A"}
+              </p>
+            </div>
+            <Avatar className="h-9 w-9 rounded-full border border-kssem-gold/50">
               <AvatarImage
                 src={user?.photoURL || ""}
                 alt={user?.displayName || "User profile"}
-                data-ai-hint="user avatar current profile"
               />
-              <AvatarFallback className="bg-[#2dd4bf]/10 text-[#2dd4bf]">
+              <AvatarFallback className="bg-kssem-gold/20 text-kssem-gold text-sm font-bold">
                 {user ? (
                   getInitials(user.displayName || user.email || "User")
                 ) : (
-                  <UserCircle className="h-6 w-6 text-[#8A99BB]" />
+                  <UserCircle className="h-5 w-5 text-slate-300" />
                 )}
               </AvatarFallback>
             </Avatar>
-            <span className="sr-only">User profile</span>
-          </Button>
-        </Link>
+          </Link>
+        </div>
       </div>
     </header>
   );
