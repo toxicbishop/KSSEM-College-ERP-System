@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import kssemLogo from "@/app/icon.png";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -245,7 +246,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-kssem-navy flex items-center justify-center text-white rounded-sm overflow-hidden">
               <Image
-                src="/collage-logo.png"
+                src={kssemLogo}
                 alt="KSSEM Logo"
                 width={40}
                 height={40}
