@@ -1,36 +1,65 @@
+"use client";
 
-'use client';
-
-import { MainHeader } from '@/components/layout/main-header';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useEffect, useState, Suspense } from 'react';
-import { useAuth } from '@/context/auth-context';
-import { auth as clientAuth } from '@/lib/firebase/client';
-import { getStudentClassroomsWithBatchInfo, getClassmatesInfo } from '@/services/classroom';
-import type { StudentClassroomEnrollmentInfo, ClassmateInfo } from '@/services/classroom';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { Users, Loader2, Network, MessageSquare } from 'lucide-react'; // Added MessageSquare
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ChatRoom } from '@/components/chat/ChatRoom'; // Import ChatRoom
+import { MainHeader } from "@/components/layout/main-header";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useEffect, useState, Suspense } from "react";
+import { useAuth } from "@/context/auth-context";
+import { auth as clientAuth } from "@/lib/firebase/client";
+import {
+  getStudentClassroomsWithBatchInfo,
+  getClassmatesInfo,
+} from "@/services/classroom";
+import type {
+  StudentClassroomEnrollmentInfo,
+  ClassmateInfo,
+} from "@/services/classroom";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Users,
+  Loader2,
+  Network,
+  MessageSquare,
+  BookOpen,
+  ChevronRight,
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ChatRoom } from "@/components/chat/ChatRoom";
 
 function StudentClassroomsLoader() {
   const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
-  const [enrolledClassrooms, setEnrolledClassrooms] = useState<StudentClassroomEnrollmentInfo[]>([]);
+  const [enrolledClassrooms, setEnrolledClassrooms] = useState<
+    StudentClassroomEnrollmentInfo[]
+  >([]);
   const [loadingClassrooms, setLoadingClassroomsState] = useState(true);
 
-  const [selectedClassroomForClassmates, setSelectedClassroomForClassmates] = useState<StudentClassroomEnrollmentInfo | null>(null);
+  const [selectedClassroomForClassmates, setSelectedClassroomForClassmates] =
+    useState<StudentClassroomEnrollmentInfo | null>(null);
   const [classmates, setClassmates] = useState<ClassmateInfo[]>([]);
   const [loadingClassmatesView, setLoadingClassmatesView] = useState(false);
   const [classmatesError, setClassmatesError] = useState<string | null>(null);
   const [isClassmatesModalOpen, setIsClassmatesModalOpen] = useState(false);
 
-  const [selectedClassroomForChat, setSelectedClassroomForChat] = useState<StudentClassroomEnrollmentInfo | null>(null);
+  const [selectedClassroomForChat, setSelectedClassroomForChat] =
+    useState<StudentClassroomEnrollmentInfo | null>(null);
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
-
 
   useEffect(() => {
     if (!authLoading && user && clientAuth.currentUser) {
@@ -38,13 +67,15 @@ function StudentClassroomsLoader() {
         setLoadingClassroomsState(true);
         try {
           const idToken = await clientAuth.currentUser.getIdToken();
-          const fetchedClassrooms = await getStudentClassroomsWithBatchInfo(idToken);
+          const fetchedClassrooms =
+            await getStudentClassroomsWithBatchInfo(idToken);
           setEnrolledClassrooms(fetchedClassrooms);
         } catch (err) {
           console.error("Failed to fetch student classroom data:", err);
           toast({
             title: "Loading Error",
-            description: "Could not load your classroom information. Please try refreshing.",
+            description:
+              "Could not load your classroom information. Please try refreshing.",
             variant: "destructive",
           });
         } finally {
@@ -57,9 +88,15 @@ function StudentClassroomsLoader() {
     }
   }, [user, authLoading, toast]);
 
-  const handleViewClassmates = async (classroom: StudentClassroomEnrollmentInfo) => {
+  const handleViewClassmates = async (
+    classroom: StudentClassroomEnrollmentInfo,
+  ) => {
     if (!clientAuth.currentUser) {
-      toast({ title: "Authentication Error", description: "Please sign in again.", variant: "destructive" });
+      toast({
+        title: "Authentication Error",
+        description: "Please sign in again.",
+        variant: "destructive",
+      });
       return;
     }
     setSelectedClassroomForClassmates(classroom);
@@ -68,12 +105,22 @@ function StudentClassroomsLoader() {
     setClassmatesError(null);
     try {
       const idToken = await clientAuth.currentUser.getIdToken();
-      const fetchedClassmates = await getClassmatesInfo(idToken, classroom.classroomId);
+      const fetchedClassmates = await getClassmatesInfo(
+        idToken,
+        classroom.classroomId,
+      );
       setClassmates(fetchedClassmates);
     } catch (err) {
       console.error("Error fetching classmates:", err);
-      setClassmatesError((err as Error).message || "Could not load classmates for this classroom.");
-      toast({ title: "Error", description: (err as Error).message || "Failed to fetch classmates.", variant: "destructive" });
+      setClassmatesError(
+        (err as Error).message ||
+          "Could not load classmates for this classroom.",
+      );
+      toast({
+        title: "Error",
+        description: (err as Error).message || "Failed to fetch classmates.",
+        variant: "destructive",
+      });
     } finally {
       setLoadingClassmatesView(false);
     }
@@ -84,92 +131,94 @@ function StudentClassroomsLoader() {
     setIsChatModalOpen(true);
   };
 
-
   if (loadingClassrooms || authLoading) {
     return (
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center text-xl">
-            <Network className="mr-3 h-6 w-6 text-primary" />
-            My Enrolled Classrooms
-          </CardTitle>
-          <CardDescription>Loading your classroom and batch details...</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-40 w-full rounded-lg" />
-        </CardContent>
-      </Card>
+      <div className="space-y-4">
+        <Skeleton className="h-28 w-full rounded-sm" />
+        <Skeleton className="h-28 w-full rounded-sm" />
+        <Skeleton className="h-28 w-full rounded-sm" />
+      </div>
     );
   }
 
   if (!user) {
     return (
-        <Card className="shadow-lg">
-            <CardHeader>
-            <CardTitle className="flex items-center text-xl">
-                <Network className="mr-3 h-6 w-6 text-primary" />
-                My Enrolled Classrooms
-            </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <p className="text-muted-foreground text-center">Please sign in to view your classrooms.</p>
-            </CardContent>
-      </Card>
+      <div className="bg-white shadow-prestige rounded-sm p-8 text-center">
+        <p className="text-kssem-text-muted">
+          Please sign in to view your classrooms.
+        </p>
+      </div>
     );
   }
 
   return (
     <>
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center text-xl">
-            <Network className="mr-3 h-6 w-6 text-primary" />
-            My Enrolled Classrooms
-          </CardTitle>
-          <CardDescription>View your classroom enrollments, assigned batches, classmates, and join chats.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {enrolledClassrooms.length > 0 ? (
-            <ul className="space-y-4">
-              {enrolledClassrooms.map((enrollment) => (
-                <li key={enrollment.classroomId} className="rounded-md border p-4 shadow-sm">
-                  <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-                    <div>
-                      <h4 className="text-lg font-semibold text-foreground">{enrollment.classroomName}</h4>
-                      <p className="text-sm text-muted-foreground">Subject: {enrollment.classroomSubject}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Your Batch: <span className="font-medium text-primary">{enrollment.studentBatchInClassroom || 'N/A (Whole Class)'}</span>
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        <Button variant="outline" size="sm" onClick={() => handleViewClassmates(enrollment)}>
-                          <Users className="mr-2 h-4 w-4" /> View Classmates
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => openChatModal(enrollment)}>
-                            <MessageSquare className="mr-2 h-4 w-4" /> Chat
-                        </Button>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-muted-foreground text-center py-4">You are not currently enrolled in any classrooms.</p>
-          )}
-        </CardContent>
-      </Card>
+      {enrolledClassrooms.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {enrolledClassrooms.map((enrollment) => (
+            <div
+              key={enrollment.classroomId}
+              className="card-prestige group hover:-translate-y-1 transition-transform duration-300">
+              <div className="flex items-start gap-3 mb-4">
+                <div className="bg-kssem-navy/5 text-kssem-navy p-2.5 rounded-sm group-hover:bg-kssem-navy group-hover:text-white transition-colors shrink-0">
+                  <BookOpen className="h-5 w-5" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-kssem-text font-bold text-base leading-snug group-hover:text-kssem-navy transition-colors truncate">
+                    {enrollment.classroomName}
+                  </h3>
+                  <p className="text-kssem-text-muted text-sm truncate">
+                    {enrollment.classroomSubject}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 mb-5 bg-kssem-bg rounded-sm px-3 py-2">
+                <span className="text-kssem-text-muted text-xs font-bold uppercase tracking-wider">
+                  Batch:
+                </span>
+                <span className="text-kssem-navy font-bold text-sm">
+                  {enrollment.studentBatchInClassroom || "Whole Class"}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleViewClassmates(enrollment)}
+                  className="flex-1 flex items-center justify-center gap-1.5 text-kssem-navy border border-kssem-border hover:border-kssem-navy hover:bg-kssem-navy hover:text-white py-2 px-3 rounded-sm text-xs font-bold uppercase tracking-wider transition-all">
+                  <Users className="h-3.5 w-3.5" /> Classmates
+                </button>
+                <button
+                  onClick={() => openChatModal(enrollment)}
+                  className="flex-1 flex items-center justify-center gap-1.5 bg-kssem-gold text-kssem-navy hover:bg-[#c4a030] py-2 px-3 rounded-sm text-xs font-bold uppercase tracking-wider transition-colors">
+                  <MessageSquare className="h-3.5 w-3.5" /> Chat
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white shadow-prestige rounded-sm p-12 text-center">
+          <Network className="h-12 w-12 text-kssem-text-muted mx-auto mb-3" />
+          <p className="text-kssem-text-muted">
+            You are not currently enrolled in any classrooms.
+          </p>
+        </div>
+      )}
 
       {selectedClassroomForClassmates && (
-        <Dialog open={isClassmatesModalOpen} onOpenChange={(isOpen) => {
-          setIsClassmatesModalOpen(isOpen);
-          if (!isOpen) {
-            setSelectedClassroomForClassmates(null);
-            setClassmates([]);
-          }
-        }}>
+        <Dialog
+          open={isClassmatesModalOpen}
+          onOpenChange={(isOpen) => {
+            setIsClassmatesModalOpen(isOpen);
+            if (!isOpen) {
+              setSelectedClassroomForClassmates(null);
+              setClassmates([]);
+            }
+          }}>
           <DialogContent className="max-w-lg">
             <DialogHeader>
-              <DialogTitle>Classmates in {selectedClassroomForClassmates.classroomName}</DialogTitle>
+              <DialogTitle className="font-serif text-kssem-navy">
+                Classmates in {selectedClassroomForClassmates.classroomName}
+              </DialogTitle>
               <DialogDescription>
                 Subject: {selectedClassroomForClassmates.classroomSubject}
               </DialogDescription>
@@ -177,34 +226,58 @@ function StudentClassroomsLoader() {
             <div className="py-4 max-h-[60vh] overflow-y-auto">
               {loadingClassmatesView && (
                 <div className="flex items-center justify-center space-x-2">
-                  <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                  <Loader2 className="h-5 w-5 animate-spin text-kssem-navy" />
                   <span>Loading classmates...</span>
                 </div>
               )}
-              {classmatesError && <p className="text-destructive text-center">{classmatesError}</p>}
-              {!loadingClassmatesView && !classmatesError && classmates.length > 0 && (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Student ID</TableHead>
-                      <TableHead>Batch</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {classmates.map((classmate) => (
-                      <TableRow key={classmate.userId}>
-                        <TableCell>{classmate.name}</TableCell>
-                        <TableCell>{classmate.studentIdNumber}</TableCell>
-                        <TableCell>{classmate.batch || 'N/A'}</TableCell>
+              {classmatesError && (
+                <p className="text-destructive text-center">
+                  {classmatesError}
+                </p>
+              )}
+              {!loadingClassmatesView &&
+                !classmatesError &&
+                classmates.length > 0 && (
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-kssem-border hover:bg-kssem-bg">
+                        <TableHead className="text-kssem-text-muted text-xs font-bold uppercase tracking-wider">
+                          Name
+                        </TableHead>
+                        <TableHead className="text-kssem-text-muted text-xs font-bold uppercase tracking-wider">
+                          Student ID
+                        </TableHead>
+                        <TableHead className="text-kssem-text-muted text-xs font-bold uppercase tracking-wider">
+                          Batch
+                        </TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-              {!loadingClassmatesView && !classmatesError && classmates.length === 0 && (
-                <p className="text-muted-foreground text-center">No other classmates found in this classroom.</p>
-              )}
+                    </TableHeader>
+                    <TableBody>
+                      {classmates.map((classmate) => (
+                        <TableRow
+                          key={classmate.userId}
+                          className="border-kssem-border/50 hover:bg-kssem-gold-light/30 transition-colors">
+                          <TableCell className="text-kssem-text font-medium text-sm">
+                            {classmate.name}
+                          </TableCell>
+                          <TableCell className="text-kssem-text-muted text-sm">
+                            {classmate.studentIdNumber}
+                          </TableCell>
+                          <TableCell className="text-kssem-text-muted text-sm">
+                            {classmate.batch || "N/A"}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              {!loadingClassmatesView &&
+                !classmatesError &&
+                classmates.length === 0 && (
+                  <p className="text-kssem-text-muted text-center">
+                    No other classmates found in this classroom.
+                  </p>
+                )}
             </div>
             <DialogFooter>
               <DialogClose asChild>
@@ -216,30 +289,35 @@ function StudentClassroomsLoader() {
       )}
 
       {selectedClassroomForChat && user && (
-         <Dialog open={isChatModalOpen} onOpenChange={(isOpen) => {
+        <Dialog
+          open={isChatModalOpen}
+          onOpenChange={(isOpen) => {
             setIsChatModalOpen(isOpen);
-            if(!isOpen) setSelectedClassroomForChat(null);
-         }}>
-            <DialogContent className="max-w-2xl h-[70vh] flex flex-col p-0">
-                {/* DialogHeader can be integrated into ChatRoom or kept minimal here */}
-                <div className="p-4 border-b">
-                     <DialogTitle>Chat: {selectedClassroomForChat.classroomName}</DialogTitle>
-                     <DialogDescription>Subject: {selectedClassroomForChat.classroomSubject}</DialogDescription>
-                </div>
-                <div className="flex-grow overflow-hidden">
-                    <ChatRoom
-                        classroomId={selectedClassroomForChat.classroomId}
-                        currentUserId={user.uid}
-                        currentUserName={user.displayName || user.email || 'You'}
-                    />
-                </div>
-                <DialogFooter className="p-4 border-t">
-                    <DialogClose asChild>
-                        <Button variant="outline">Close Chat</Button>
-                    </DialogClose>
-                </DialogFooter>
-            </DialogContent>
-         </Dialog>
+            if (!isOpen) setSelectedClassroomForChat(null);
+          }}>
+          <DialogContent className="max-w-2xl h-[70vh] flex flex-col p-0">
+            <div className="p-4 border-b border-kssem-border bg-kssem-navy text-white">
+              <DialogTitle className="font-serif">
+                Chat: {selectedClassroomForChat.classroomName}
+              </DialogTitle>
+              <DialogDescription className="text-gray-300">
+                Subject: {selectedClassroomForChat.classroomSubject}
+              </DialogDescription>
+            </div>
+            <div className="flex-grow overflow-hidden">
+              <ChatRoom
+                classroomId={selectedClassroomForChat.classroomId}
+                currentUserId={user.uid}
+                currentUserName={user.displayName || user.email || "You"}
+              />
+            </div>
+            <DialogFooter className="p-4 border-t border-kssem-border">
+              <DialogClose asChild>
+                <Button variant="outline">Close Chat</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
     </>
   );
@@ -249,24 +327,23 @@ export default function StudentClassroomsPage() {
   return (
     <>
       <MainHeader />
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
-          My Classrooms
-        </h2>
-        <Suspense fallback={
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center text-xl">
-                <Network className="mr-3 h-6 w-6 text-primary" />
-                My Enrolled Classrooms
-              </CardTitle>
-              <CardDescription>Loading your classroom and batch details...</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-40 w-full rounded-lg" />
-            </CardContent>
-          </Card>
-        }>
+      <div className="space-y-6 pt-8">
+        <div className="border-b border-kssem-border pb-4">
+          <h1 className="text-3xl md:text-4xl font-serif font-bold tracking-tight text-kssem-navy">
+            My Classrooms
+          </h1>
+          <p className="text-kssem-text-muted text-sm mt-1">
+            View your enrolled classrooms, assigned batches, and join
+            discussions.
+          </p>
+        </div>
+        <Suspense
+          fallback={
+            <div className="space-y-4">
+              <Skeleton className="h-28 w-full rounded-sm" />
+              <Skeleton className="h-28 w-full rounded-sm" />
+            </div>
+          }>
           <StudentClassroomsLoader />
         </Suspense>
       </div>
