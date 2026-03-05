@@ -675,7 +675,7 @@ export async function deleteClassroom(
 
     await classroomDocRef.delete();
   } catch (error) {
-    console.error(`Error deleting classroom ${classroomId}:`, error);
+    console.error("Error deleting classroom " + classroomId + ":", error);
     throw error;
   }
 }
