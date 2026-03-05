@@ -1,6 +1,5 @@
 "use client";
 import type { LucideIcon } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 interface SummaryCardProps {
@@ -8,6 +7,7 @@ interface SummaryCardProps {
   value: string | number;
   icon: LucideIcon;
   variant?: "default" | "destructive";
+  subtitle?: string;
 }
 
 export function SummaryCard({
@@ -15,50 +15,44 @@ export function SummaryCard({
   value,
   icon: Icon,
   variant = "default",
+  subtitle,
 }: SummaryCardProps) {
-  const cardClasses = {
-    default: "bg-[#222B36] border-[#2a3441]",
-    destructive: "bg-destructive/10 border-destructive/30",
-  };
-
-  const textClasses = {
-    default: "text-white",
-    destructive: "text-destructive",
-  };
-
-  const iconContainerClasses = {
-    default: "bg-[#2dd4bf]/10",
-    destructive: "bg-destructive/20",
-  };
-
-  const iconClasses = {
-    default: "text-[#2dd4bf]",
-    destructive: "text-destructive",
-  };
-
   return (
-    <Card
-      className={cn(
-        "shadow-sm hover:shadow-md transition-shadow",
-        cardClasses[variant],
-      )}>
-      <CardContent className="flex items-center justify-between p-4">
+    <div className="card-prestige group hover:-translate-y-1 transition-transform duration-300">
+      <div className="flex justify-between items-start">
         <div>
-          <p
-            className={cn(
-              "text-sm font-medium text-[#8A99BB]",
-              variant === "destructive" && textClasses[variant],
-            )}>
+          <p className="text-kssem-text-muted text-xs font-bold uppercase tracking-wider mb-1">
             {title}
           </p>
-          <p className={cn("text-2xl font-bold", textClasses[variant])}>
+          <p
+            className={cn(
+              "font-serif font-bold text-3xl",
+              variant === "destructive"
+                ? "text-destructive"
+                : "text-kssem-text",
+            )}>
             {value}
           </p>
         </div>
-        <div className={cn("rounded-full p-3", iconContainerClasses[variant])}>
-          <Icon className={cn("h-6 w-6", iconClasses[variant])} />
+        <div
+          className={cn(
+            "p-2 rounded-sm transition-colors",
+            variant === "destructive"
+              ? "bg-destructive/10 text-destructive group-hover:bg-destructive group-hover:text-white"
+              : "bg-kssem-navy/5 text-kssem-navy group-hover:bg-kssem-navy group-hover:text-white",
+          )}>
+          <Icon className="h-5 w-5" />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+      {subtitle && (
+        <div
+          className={cn(
+            "mt-4 text-xs font-medium flex items-center gap-1",
+            variant === "destructive" ? "text-destructive" : "text-emerald-600",
+          )}>
+          <span>{subtitle}</span>
+        </div>
+      )}
+    </div>
   );
 }
