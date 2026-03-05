@@ -6,18 +6,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase/client";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -29,9 +22,9 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { getSystemSettings } from "@/services/system-settings";
 import type { SystemSettings } from "@/services/system-settings";
-import { Skeleton } from "@/components/ui/skeleton"; // Added Skeleton import
+import { Skeleton } from "@/components/ui/skeleton";
+import { GraduationCap, Users, ShieldCheck, ArrowRight } from "lucide-react";
 
-// Schema including name, studentId, major, and parentEmail
 const signUpSchema = z.object({
   name: z.string().min(1, { message: "Name is required." }),
   studentId: z.string().min(1, { message: "Student ID is required." }),
@@ -45,7 +38,6 @@ const signUpSchema = z.object({
 
 type SignUpFormValues = z.infer<typeof signUpSchema>;
 
-// Helper function to set a cookie
 function setCookie(name: string, value: string, days: number) {
   let expires = "";
   if (days) {
@@ -54,7 +46,6 @@ function setCookie(name: string, value: string, days: number) {
     expires = "; expires=" + date.toUTCString();
   }
   if (typeof document !== "undefined") {
-    // Ensure document is available (client-side)
     document.cookie = name + "=" + (value || "") + expires + "; path=/";
   }
 }
@@ -77,8 +68,7 @@ export default function SignUpPage() {
         console.error("Failed to load system settings:", error);
         toast({
           title: "Error",
-          description:
-            "Could not load application settings. Please try again later.",
+          description: "Could not load settings.",
           variant: "destructive",
         });
       } finally {
@@ -102,33 +92,24 @@ export default function SignUpPage() {
 
   const onSubmit = async (data: SignUpFormValues) => {
     setLoading(true);
-
     if (loadingSettings) {
-      toast({
-        title: "Please wait",
-        description: "Loading application settings...",
-        variant: "default",
-      });
+      toast({ title: "Please wait", description: "Loading settings..." });
       setLoading(false);
       return;
     }
-
     if (!systemSettings?.allowNewUserRegistration) {
       toast({
         title: "Registration Disabled",
-        description:
-          "New user registration is currently disabled by the administrator.",
+        description: "New registration is currently disabled.",
         variant: "destructive",
       });
       setLoading(false);
       return;
     }
-
     if (!auth || !db) {
       toast({
         title: "Initialization Error",
-        description:
-          "Firebase is not configured correctly. Please check the console and environment variables.",
+        description: "Firebase is not configured correctly.",
         variant: "destructive",
       });
       setLoading(false);
@@ -142,19 +123,16 @@ export default function SignUpPage() {
         data.password,
       );
       const user = userCredential.user;
-
       await setDoc(doc(db, "users", user.uid), {
         name: data.name,
         studentId: data.studentId,
         major: data.major,
         email: data.email,
-        parentEmail: data.parentEmail, // Save parent's email
+        parentEmail: data.parentEmail,
         role: "student",
       });
-
       const idToken = await user.getIdToken();
       setCookie("firebaseAuthToken", idToken, 1);
-
       toast({
         title: "Sign Up Successful",
         description: "Your account has been created.",
@@ -163,172 +141,167 @@ export default function SignUpPage() {
     } catch (error: any) {
       console.error("Sign up error:", error);
       let description = "An unexpected error occurred. Please try again.";
-      if (error.code === "auth/email-already-in-use") {
+      if (error.code === "auth/email-already-in-use")
         description = "This email address is already in use.";
-      } else if (error.code === "auth/invalid-email") {
+      else if (error.code === "auth/invalid-email")
         description = "Please enter a valid email address.";
-      } else if (error.code === "auth/weak-password") {
-        description =
-          "The password is too weak. Please choose a stronger password.";
-      } else if (error.code === "auth/api-key-not-valid") {
-        description =
-          "Firebase API Key is invalid. Please check your environment configuration.";
-      } else if (error.code === "auth/network-request-failed") {
-        description = "Network error. Please check your internet connection.";
-      }
-      toast({
-        title: "Sign Up Failed",
-        description: description,
-        variant: "destructive",
-      });
+      else if (error.code === "auth/weak-password")
+        description = "The password is too weak.";
+      toast({ title: "Sign Up Failed", description, variant: "destructive" });
     } finally {
       setLoading(false);
     }
   };
 
+  const formFields: {
+    name: keyof SignUpFormValues;
+    label: string;
+    placeholder: string;
+    type?: string;
+  }[] = [
+    { name: "name", label: "Full Name", placeholder: "Pranav Arun" },
+    { name: "studentId", label: "Student ID", placeholder: "e.g., 1KS22CS001" },
+    {
+      name: "major",
+      label: "Major / Program",
+      placeholder: "e.g., Computer Science",
+    },
+    { name: "email", label: "Email Address", placeholder: "you@example.com" },
+    {
+      name: "password",
+      label: "Password",
+      placeholder: "••••••••",
+      type: "password",
+    },
+    {
+      name: "parentEmail",
+      label: "Parent's Email",
+      placeholder: "parent@example.com",
+    },
+  ];
+
   if (loadingSettings) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <Card className="w-full max-w-md shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center">
-              Sign Up
-            </CardTitle>
-            <CardDescription className="text-center">
-              Loading settings...
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-          </CardContent>
-        </Card>
+      <div className="flex min-h-screen items-center justify-center bg-kssem-bg">
+        <div className="w-full max-w-md p-8">
+          <Skeleton className="h-8 w-1/2 mx-auto mb-4" />
+          <div className="space-y-4">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} className="h-10 w-full rounded-sm" />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">
-            Sign Up
-          </CardTitle>
-          <CardDescription className="text-center">
-            Create your student account.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+    <div className="flex min-h-screen">
+      {/* Left: Form Panel */}
+      <div className="w-full lg:w-[45%] flex flex-col justify-center px-8 md:px-16 py-12 bg-white">
+        <div className="max-w-md mx-auto w-full">
+          <Link href="/" className="flex items-center gap-2 mb-10">
+            <Image
+              src="/collage-logo.png"
+              alt="Logo"
+              width={36}
+              height={36}
+              data-ai-hint="college crest"
+            />
+            <span className="font-serif font-bold text-kssem-navy text-xl">
+              KSSEM
+            </span>
+          </Link>
+
+          <h1 className="font-serif font-bold text-3xl text-kssem-navy mb-1">
+            Create Your Account
+          </h1>
+          <p className="text-kssem-text-muted text-sm mb-8">
+            Join the KSSEM academic community.
+          </p>
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="John Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="studentId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Student ID</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., S12345" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="major"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Major</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., Computer Science" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="you@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="••••••••"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="parentEmail"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Parent&apos;s Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="parent@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {formFields.map((f) => (
+                  <FormField
+                    key={f.name}
+                    control={form.control}
+                    name={f.name}
+                    render={({ field }) => (
+                      <FormItem
+                        className={
+                          f.name === "email" || f.name === "parentEmail"
+                            ? "sm:col-span-2"
+                            : ""
+                        }>
+                        <FormLabel className="text-kssem-text-muted text-xs font-bold uppercase tracking-wider">
+                          {f.label}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type={f.type || "text"}
+                            placeholder={f.placeholder}
+                            className="border-kssem-border rounded-sm focus-visible:ring-kssem-navy bg-kssem-bg"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ))}
+              </div>
+              <button
                 type="submit"
-                className="w-full"
-                disabled={
-                  loading ||
-                  loadingSettings ||
-                  !systemSettings?.allowNewUserRegistration
-                }>
-                {loading ? "Creating Account..." : "Sign Up"}
-              </Button>
+                disabled={loading || !systemSettings?.allowNewUserRegistration}
+                className="w-full bg-kssem-navy text-white py-3 rounded-sm font-bold uppercase tracking-wider text-sm hover:bg-kssem-navy-light transition-colors disabled:opacity-50 mt-2">
+                {loading ? "Creating Account..." : "Create Account"}
+              </button>
             </form>
           </Form>
-          <div className="mt-4 text-center text-sm">
+
+          <p className="mt-6 text-center text-sm text-kssem-text-muted">
             Already have an account?{" "}
             <Link
               href="/signin"
-              className="text-primary underline hover:text-primary/90">
+              className="text-kssem-navy font-bold hover:text-kssem-gold transition-colors">
               Sign In
             </Link>
+          </p>
+        </div>
+      </div>
+
+      {/* Right: Navy Hero Panel */}
+      <div className="hidden lg:flex lg:w-[55%] bg-kssem-navy flex-col items-center justify-center p-16 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-kssem-navy via-[#001a3a] to-[#003366]" />
+        <div className="relative z-10 text-center max-w-lg">
+          <GraduationCap className="h-16 w-16 text-kssem-gold mx-auto mb-6" />
+          <h2 className="font-serif font-bold text-3xl text-white mb-3">
+            Begin Your{" "}
+            <em className="text-kssem-gold italic">Academic Journey</em>
+          </h2>
+          <p className="text-gray-400 leading-relaxed mb-8">
+            Access your entire academic ecosystem — attendance, grades, fees,
+            and more — all from one secure platform.
+          </p>
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              { icon: ShieldCheck, label: "Secure Access" },
+              { icon: Users, label: "Community" },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="bg-white/5 border border-white/10 rounded-sm p-4 flex items-center gap-3">
+                <item.icon className="h-5 w-5 text-kssem-gold shrink-0" />
+                <span className="text-white text-sm font-semibold">
+                  {item.label}
+                </span>
+              </div>
+            ))}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
