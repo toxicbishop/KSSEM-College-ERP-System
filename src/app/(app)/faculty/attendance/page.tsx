@@ -776,7 +776,7 @@ export default function FacultyAttendancePage() {
       .map((student, index) => {
         const rowData: Record<string, any> = {
           "Sr. No": index + 1,
-          "Roll No": student.studentIdNumber,
+          USN: student.studentIdNumber,
           "Name of Student": student.name,
         };
 
@@ -1092,7 +1092,7 @@ export default function FacultyAttendancePage() {
                                   Sr. No.
                                 </TableHead>
                                 <TableHead className="w-[150px] px-3 py-2 border">
-                                  Roll No.
+                                  USN
                                 </TableHead>
                                 <TableHead className="min-w-[200px] px-3 py-2 border">
                                   Name of Student
@@ -1726,5 +1726,3 @@ export default function FacultyAttendancePage() {
     </>
   );
 }
-
-

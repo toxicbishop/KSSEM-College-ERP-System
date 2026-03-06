@@ -1,6 +1,7 @@
 "use client";
 
 import { MainHeader } from "@/components/layout/main-header";
+import { PageHeader } from "@/components/layout/page-header";
 import {
   Table,
   TableBody,
@@ -124,30 +125,28 @@ export default function GradesPage() {
   return (
     <>
       <MainHeader />
-      <div className="space-y-6 pt-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-kssem-border">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-serif font-bold text-kssem-navy mb-2">
-              Examination Results
-            </h1>
-            <p className="text-kssem-text-muted text-sm italic">
-              {isDummyUser
-                ? "B.tech in Computer Science and business Systems"
-                : "Bachelor of Technology"}
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 border border-kssem-navy text-kssem-navy hover:bg-kssem-navy hover:text-white transition-colors text-sm font-bold uppercase tracking-wide rounded-sm group">
-              <Download className="h-4 w-4" />
+      <PageHeader
+        title="Examination Results"
+        description={
+          isDummyUser
+            ? "B.tech in Computer Science and business Systems — Official academic record for all semesters. View and download your certified grade reports."
+            : "Bachelor of Technology — Official academic record for all semesters. View and download your certified grade reports."
+        }
+        actions={
+          <>
+            <button className="flex items-center gap-2 text-kssem-navy font-bold text-sm px-5 py-2.5 bg-kssem-gold hover:bg-[#c4a030] rounded-sm transition-all shadow-md group border-none">
+              <Download className="h-4 w-4 group-hover:-translate-y-0.5 transition-transform" />
               <span>Download PDF</span>
             </button>
             <button
-              className="flex items-center justify-center size-9 border border-kssem-border text-kssem-text-muted hover:text-kssem-navy hover:border-kssem-navy transition-colors rounded-sm bg-white"
+              className="flex items-center justify-center h-10 w-10 border border-kssem-border text-kssem-text-muted hover:text-kssem-navy hover:bg-slate-50 transition-colors rounded-sm shadow-sm bg-white"
               title="Print">
               <Printer className="h-4 w-4" />
             </button>
-          </div>
-        </div>
+          </>
+        }
+      />
+      <div className="space-y-6">
         <Suspense fallback={<Skeleton className="h-72 w-full" />}>
           <GradesTableLoader />
         </Suspense>

@@ -1,6 +1,7 @@
 "use client";
 
 import { MainHeader } from "@/components/layout/main-header";
+import { PageHeader } from "@/components/layout/page-header";
 import {
   Card,
   CardHeader,
@@ -1320,12 +1321,19 @@ export default function ProfilePage() {
   return (
     <>
       <MainHeader />
+      <PageHeader
+        title="My Profile"
+        description="Manage your personal academic profile, contact details, and semester-level information. Keep your data accurate for official records."
+        actions={
+          <div className="flex items-center gap-2 bg-kssem-bg border border-kssem-border px-4 py-2 rounded-sm shadow-sm">
+            <UserSquare className="h-4 w-4 text-kssem-gold" />
+            <span className="text-kssem-navy text-sm font-bold tracking-wide">
+              Student Identity Verified
+            </span>
+          </div>
+        }
+      />
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold tracking-tight text-kssem-navy">
-            My Profile
-          </h2>
-        </div>
         <Suspense
           fallback={
             <div className="space-y-6">

@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { MainHeader } from "@/components/layout/main-header";
+import { PageHeader } from "@/components/layout/page-header";
 import {
   GraduationCap,
   Download,
@@ -18,23 +19,18 @@ export default function FeeManagementPage() {
   return (
     <>
       <MainHeader />
-      <div className="space-y-10 pt-8">
-        {/* Page Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-kssem-border pb-6">
-          <div>
-            <h1 className="text-kssem-navy dark:text-kssem-gold text-3xl md:text-4xl font-serif font-bold leading-tight">
-              Fee Management
-            </h1>
-            <p className="text-kssem-text-muted text-sm mt-2">
-              Secure portal for tuition, lab fees, and transaction history.
-            </p>
-          </div>
-          <button className="hidden sm:flex items-center gap-2 text-kssem-navy font-bold text-sm border border-kssem-border px-4 py-2 bg-white hover:bg-slate-50 rounded-sm transition-colors shadow-sm mt-4 md:mt-0">
-            <Download className="h-4 w-4" />
-            Download Statement
+      <PageHeader
+        title="Fee Management"
+        description="Secure portal for tuition, laboratory fees, and transaction history. Access your historical payments and current academic semester dues."
+        actions={
+          <button className="flex items-center gap-2 text-kssem-navy font-bold text-sm px-5 py-2.5 bg-kssem-gold hover:bg-[#c4a030] rounded-sm transition-all shadow-md group border-none">
+            <Download className="h-4 w-4 group-hover:-translate-y-0.5 transition-transform" />
+            Download Summary
           </button>
-        </div>
+        }
+      />
 
+      <div className="space-y-10">
         {/* Current Dues Section */}
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Total Outstanding Card */}

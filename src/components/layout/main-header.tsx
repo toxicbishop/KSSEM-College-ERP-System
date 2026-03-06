@@ -55,7 +55,11 @@ export function MainHeader() {
                 user.email?.split("@")[0] ||
                 "Student",
             );
-            setScholarId(data.studentId || user.uid.substring(0, 8));
+            setScholarId(
+              user.email === "pranavarun26@gmail.com"
+                ? "1MTCG900"
+                : data.studentId || user.uid.substring(0, 8),
+            );
           } else {
             setUserName(
               user.displayName || user.email?.split("@")[0] || "Student",
