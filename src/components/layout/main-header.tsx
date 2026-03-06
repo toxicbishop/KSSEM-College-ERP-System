@@ -172,7 +172,7 @@ export function MainHeader() {
                 {userName || "Student"}
               </p>
               <p className="text-slate-300 text-[10px] uppercase tracking-wider font-bold">
-                ID: {scholarId || "N/A"}
+                USN: {scholarId || "N/A"}
               </p>
             </div>
             <Avatar className="h-9 w-9 rounded-full border border-kssem-gold/50">

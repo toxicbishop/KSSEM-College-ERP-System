@@ -874,21 +874,10 @@ function ProfileDetailsLoader() {
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-x-6 gap-y-1 md:grid-cols-2">
           <InfoItem
-            label="Enrollment Number / Roll Number"
+            label="USN (University Seat Number)"
             value={profile.enrollmentNumber}
             fieldName="enrollmentNumber"
-            isEditable={
-              !profile.enrollmentNumber ||
-              profile.enrollmentNumber.length > 20 ||
-              isAdmin
-            }
-            onEditRequest={
-              profile.enrollmentNumber &&
-              profile.enrollmentNumber.length <= 20 &&
-              !isAdmin
-                ? openRequestModal
-                : undefined
-            }
+            isEditable={false} // USN is fixed by university
             isEditMode={isEditMode}
             handleInputChange={handleInputChange}
             editableProfileValue={editableProfile.enrollmentNumber}

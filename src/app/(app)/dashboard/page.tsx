@@ -6,7 +6,8 @@ import { AttendanceOverviewCard } from "@/components/dashboard/attendance-overvi
 import { GradesChartCard } from "@/components/dashboard/grades-chart-card";
 import { AnnouncementsCard } from "@/components/dashboard/announcements-card";
 import { SummaryCard } from "@/components/dashboard/summary-card";
-import { useEffect, useState } from "react";
+import { ProfileSetupModal } from "@/components/dashboard/profile-setup-modal";
+import { useEffect, useState, useCallback } from "react";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MainHeader } from "@/components/layout/main-header";
@@ -323,6 +324,11 @@ export default function DashboardPage() {
     }
   }, [user, authLoading, toast]);
 
+  const onProfileSetupComplete = useCallback(() => {
+    // Reload the page to ensure all components refresh with the new profile data
+    window.location.reload();
+  }, []);
+
   if (loading || authLoading) {
     return (
       <>
@@ -474,6 +480,14 @@ export default function DashboardPage() {
             </ErrorBoundary>
           </div>
         </div>
+
+        {/* Profile Completion Onboarding Modal */}
+        {data?.profile && (
+          <ProfileSetupModal
+            profile={data.profile}
+            onComplete={onProfileSetupComplete}
+          />
+        )}
       </div>
     </>
   );
