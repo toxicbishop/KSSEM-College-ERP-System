@@ -16,7 +16,7 @@ export async function createNewClassroom(
   idToken: string,
   name: string,
   subject: string
-): Promise<void> {
+): Promise<string> {
   try {
     return await createClassroom(idToken, name, subject);
   } catch (error) {
@@ -45,10 +45,10 @@ export async function fetchFacultyClassroomsList(
 export async function addFacultyToClassroom(
   idToken: string,
   classroomId: string,
-  facultyIds: string[]
+  facultyId: string
 ): Promise<void> {
   try {
-    return await addInvitedFacultyToClassroom(idToken, classroomId, facultyIds);
+    return await addInvitedFacultyToClassroom(idToken, classroomId, facultyId);
   } catch (error) {
     console.error("Add faculty error:", error);
     throw error;
@@ -58,9 +58,11 @@ export async function addFacultyToClassroom(
 /**
  * Server action to get all faculty users.
  */
-export async function getAllFacultyUsersList(): Promise<FacultyUser[]> {
+export async function getAllFacultyUsersList(
+  idToken: string
+): Promise<FacultyUser[]> {
   try {
-    return await getAllFacultyUsers();
+    return await getAllFacultyUsers(idToken);
   } catch (error) {
     console.error("Get faculty users error:", error);
     return [];
