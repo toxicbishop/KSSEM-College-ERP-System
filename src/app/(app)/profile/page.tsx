@@ -177,18 +177,20 @@ const InfoItem = ({
         />
       )
     ) : isEditMode && onEditRequest ? (
-      <div className="flex items-center gap-2 mt-1">
+      <div className="flex items-center gap-2 mt-1 light">
         <span className="text-kssem-text break-all">{value || "N/A"}</span>
         <Button
           variant="outline"
           size="sm"
           onClick={() => onEditRequest(fieldName, label)}
-          className="whitespace-nowrap">
+          className="whitespace-nowrap bg-white border-kssem-border text-kssem-navy hover:bg-kssem-navy hover:text-white transition-all">
           <Send className="mr-2 h-3 w-3" /> Request Change
         </Button>
       </div>
     ) : (
-      <span className="ml-2 text-kssem-text break-all">{value || "N/A"}</span>
+      <span className="ml-2 text-kssem-text break-all font-medium transition-colors hover:text-kssem-navy hover:underline cursor-default">
+        {value || "N/A"}
+      </span>
     )}
   </div>
 );
@@ -230,7 +232,7 @@ const DocumentOrActionItem = ({
             variant="outline"
             size="sm"
             asChild
-            className="w-full sm:w-auto">
+            className="w-full sm:w-auto bg-white border-kssem-border text-kssem-navy hover:bg-kssem-navy hover:text-white transition-all shadow-sm">
             <a
               href={safeUrl}
               download={isDownloadable}
@@ -245,7 +247,10 @@ const DocumentOrActionItem = ({
             </a>
           </Button>
         ) : actionType === "button" && actionLabel ? (
-          <Button variant="outline" size="sm" className="w-full sm:w-auto">
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full sm:w-auto bg-white border-kssem-border text-kssem-navy hover:bg-kssem-navy hover:text-white transition-all shadow-sm">
             {IconComponent && <IconComponent className="mr-2 h-4 w-4" />}{" "}
             {actionLabel}
           </Button>
@@ -540,7 +545,7 @@ function ProfileDetailsLoader() {
         )}
       </div>
 
-      <Card className="card-prestige !bg-white text-kssem-text">
+      <Card className="card-prestige !bg-white text-kssem-text light">
         <CardHeader className="border-b border-kssem-border">
           <CardTitle className="flex items-center text-xl font-serif text-kssem-navy">
             <UserSquare className="mr-3 h-6 w-6 text-kssem-gold" />
@@ -577,8 +582,12 @@ function ProfileDetailsLoader() {
               label="Full Name"
               value={profile.name}
               fieldName="name"
-              isEditable={isAdmin}
-              onEditRequest={isAdmin ? undefined : openRequestModal}
+              isEditable={!profile.name || profile.name === "N/A" || isAdmin} // Allow users to fill their name if missing
+              onEditRequest={
+                profile.name && profile.name !== "N/A" && !isAdmin
+                  ? openRequestModal
+                  : undefined
+              }
               isEditMode={isEditMode}
               handleInputChange={handleInputChange}
               editableProfileValue={editableProfile.name}
@@ -654,7 +663,12 @@ function ProfileDetailsLoader() {
               label="Email Address"
               value={profile.email}
               fieldName="email"
-              isEditable={false} // Email cannot be changed here
+              isEditable={!profile.email || profile.email === "N/A" || isAdmin} // Allow filling if empty
+              onEditRequest={
+                profile.email && profile.email !== "N/A" && !isAdmin
+                  ? openRequestModal
+                  : undefined
+              }
               isEditMode={isEditMode}
               handleInputChange={handleInputChange}
               editableProfileValue={editableProfile.email}
@@ -781,7 +795,7 @@ function ProfileDetailsLoader() {
         </CardContent>
       </Card>
 
-      <Card className="card-prestige !bg-white text-kssem-text">
+      <Card className="card-prestige !bg-white text-kssem-text light">
         <CardHeader className="border-b border-kssem-border">
           <CardTitle className="flex items-center text-xl font-serif text-kssem-navy">
             <Users className="mr-3 h-6 w-6 text-kssem-gold" />
@@ -821,7 +835,8 @@ function ProfileDetailsLoader() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleViewClassmates(enrollment)}>
+                      onClick={() => handleViewClassmates(enrollment)}
+                      className="bg-white border-kssem-border text-kssem-navy hover:bg-kssem-navy hover:text-white transition-all shadow-sm">
                       <Users className="mr-2 h-4 w-4" /> View Classmates
                     </Button>
                   </div>
@@ -836,7 +851,7 @@ function ProfileDetailsLoader() {
         </CardContent>
       </Card>
 
-      <Card className="shadow-prestige bg-white border border-kssem-border text-kssem-text rounded-sm">
+      <Card className="shadow-prestige bg-white border border-kssem-border text-kssem-text rounded-sm light">
         <CardHeader className="border-b border-kssem-border">
           <CardTitle className="flex items-center text-xl font-serif text-kssem-navy">
             <BookOpen className="mr-3 h-6 w-6 text-kssem-gold" />
@@ -848,8 +863,18 @@ function ProfileDetailsLoader() {
             label="Enrollment Number / Roll Number"
             value={profile.enrollmentNumber}
             fieldName="enrollmentNumber"
-            isEditable={isAdmin}
-            onEditRequest={isAdmin ? undefined : openRequestModal}
+            isEditable={
+              !profile.enrollmentNumber ||
+              profile.enrollmentNumber.length > 20 ||
+              isAdmin
+            }
+            onEditRequest={
+              profile.enrollmentNumber &&
+              profile.enrollmentNumber.length <= 20 &&
+              !isAdmin
+                ? openRequestModal
+                : undefined
+            }
             isEditMode={isEditMode}
             handleInputChange={handleInputChange}
             editableProfileValue={editableProfile.enrollmentNumber}
@@ -976,7 +1001,7 @@ function ProfileDetailsLoader() {
         </CardContent>
       </Card>
 
-      <Card className="shadow-prestige bg-white border border-kssem-border text-kssem-text rounded-sm">
+      <Card className="shadow-prestige bg-white border border-kssem-border text-kssem-text rounded-sm light">
         <CardHeader className="border-b border-kssem-border">
           <CardTitle className="flex items-center text-xl font-serif text-kssem-navy">
             <FileText className="mr-3 h-6 w-6 text-kssem-gold" />
@@ -1078,7 +1103,7 @@ function ProfileDetailsLoader() {
         </CardContent>
       </Card>
 
-      <Card className="shadow-prestige bg-white border border-kssem-border text-kssem-text rounded-sm">
+      <Card className="shadow-prestige bg-white border border-kssem-border text-kssem-text rounded-sm light">
         <CardHeader className="border-b border-kssem-border">
           <CardTitle className="flex items-center text-xl font-serif text-kssem-navy">
             <ClipboardList className="mr-3 h-6 w-6 text-kssem-gold" />
