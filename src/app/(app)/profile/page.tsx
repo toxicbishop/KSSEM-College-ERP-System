@@ -296,8 +296,7 @@ function ProfileDetailsLoader() {
 
           // Fetch classrooms separately and handle its error state independently
           try {
-            const fetchedClassrooms =
-              await fetchStudentClassrooms(idToken);
+            const fetchedClassrooms = await fetchStudentClassrooms(idToken);
             setEnrolledClassrooms(fetchedClassrooms);
           } catch (classroomErr) {
             const errorMessage =
@@ -518,7 +517,7 @@ function ProfileDetailsLoader() {
         )}
       </div>
 
-      <Card className="shadow-prestige bg-white border border-kssem-border text-kssem-text rounded-sm">
+      <Card className="card-prestige !bg-white text-kssem-text">
         <CardHeader className="border-b border-kssem-border">
           <CardTitle className="flex items-center text-xl font-serif text-kssem-navy">
             <UserSquare className="mr-3 h-6 w-6 text-kssem-gold" />
@@ -746,7 +745,7 @@ function ProfileDetailsLoader() {
         </CardContent>
       </Card>
 
-      <Card className="shadow-prestige bg-white border border-kssem-border text-kssem-text rounded-sm">
+      <Card className="card-prestige !bg-white text-kssem-text">
         <CardHeader className="border-b border-kssem-border">
           <CardTitle className="flex items-center text-xl font-serif text-kssem-navy">
             <Users className="mr-3 h-6 w-6 text-kssem-gold" />
