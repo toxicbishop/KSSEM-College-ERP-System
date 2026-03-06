@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import withBundleAnalyzer from "@next/bundle-analyzer";
+// @ts-ignore
 import withPWAInit from "@ducanh2912/next-pwa";
 
 const withPWA = withPWAInit({
@@ -42,6 +43,9 @@ const nextConfig: NextConfig = {
     "@genkit-ai/googleai",
     "@genkit-ai/next",
     "genkit",
+    "@grpc/grpc-js",
+    "@opentelemetry/sdk-node",
+    "@opentelemetry/otlp-grpc-exporter-base",
   ],
 
   allowedDevOrigins: [
@@ -62,6 +66,23 @@ const nextConfig: NextConfig = {
     "https://*.cluster-44kx2eiocbhe2tyk3zoyo3ryuo.cloudworkstations.dev",
     "https://*.cloudworkstations.dev",
   ],
+
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        dns: false,
+        net: false,
+        tls: false,
+        fs: false,
+        http2: false,
+        dgram: false,
+        child_process: false,
+        os: false,
+      };
+    }
+    return config;
+  },
 };
 
 export default withPWA(
