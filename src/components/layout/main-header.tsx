@@ -11,7 +11,7 @@ import { Sidebar } from "./sidebar";
 import { useAuth } from "@/context/auth-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { usePathname } from "next/navigation";
-import { Bell, Menu, GraduationCap, UserCircle } from "lucide-react";
+import { Bell, Menu, UserCircle } from "lucide-react";
 
 const getInitials = (name: string) => {
   if (!name) return "U";
@@ -88,8 +88,14 @@ export function MainHeader() {
               </SheetContent>
             </Sheet>
           ) : (
-            <div className="bg-white/10 p-1.5 rounded-sm">
-              <GraduationCap className="h-6 w-6 text-white" />
+            <div className="bg-white p-1 rounded-sm flex items-center justify-center">
+              <Image
+                src="/collage-logo.png"
+                alt="KSSEM Logo"
+                width={32}
+                height={32}
+                className="object-contain"
+              />
             </div>
           )}
           <div className="flex flex-col">
