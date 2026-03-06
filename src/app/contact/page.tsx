@@ -20,7 +20,11 @@ import {
 } from "@/components/ui/form";
 
 const contactFormSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  name: z
+    .string()
+    .regex(/^[a-zA-Z\s]{2,50}$/, {
+      message: "Name must contain only alphabets and spaces (2-50 chars).",
+    }),
   email: z.string().email({ message: "Please enter a valid email address." }),
   message: z
     .string()
@@ -126,7 +130,7 @@ export default function ContactPage() {
                     />
                     <button
                       type="submit"
-                      className="w-full bg-kssem-navy text-white py-3 rounded-sm font-bold uppercase tracking-wider text-sm hover:bg-kssem-navy-light transition-colors flex items-center justify-center gap-2">
+                      className="w-full bg-kssem-gold text-kssem-navy py-3 rounded-sm font-bold uppercase tracking-widest text-sm hover:bg-[#c4a030] transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
                       Send Message <Send className="h-4 w-4" />
                     </button>
                   </form>

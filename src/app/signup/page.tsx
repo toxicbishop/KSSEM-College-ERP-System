@@ -26,7 +26,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { GraduationCap, Users, ShieldCheck, ArrowRight } from "lucide-react";
 
 const signUpSchema = z.object({
-  name: z.string().min(1, { message: "Name is required." }),
+  name: z
+    .string()
+    .regex(/^[a-zA-Z\s]{2,50}$/, {
+      message: "Name must contain only alphabets and spaces (2-50 chars).",
+    }),
   studentId: z.string().min(1, { message: "Student ID is required." }),
   major: z.string().min(1, { message: "Major is required." }),
   email: z.string().email({ message: "Invalid email address." }),
@@ -255,7 +259,7 @@ export default function SignUpPage() {
               <button
                 type="submit"
                 disabled={loading || !systemSettings?.allowNewUserRegistration}
-                className="w-full bg-kssem-navy text-white py-3 rounded-sm font-bold uppercase tracking-wider text-sm hover:bg-kssem-navy-light transition-colors disabled:opacity-50 mt-2">
+                className="w-full bg-kssem-gold text-kssem-navy py-3 rounded-sm font-bold uppercase tracking-widest text-sm hover:bg-[#c4a030] transition-all shadow-md active:scale-95 disabled:opacity-50 mt-2">
                 {loading ? "Creating Account..." : "Create Account"}
               </button>
             </form>
