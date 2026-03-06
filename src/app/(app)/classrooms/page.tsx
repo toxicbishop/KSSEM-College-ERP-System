@@ -59,43 +59,43 @@ function StudentClassroomsLoader() {
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && user && clientAuth.currentUser) {
+    if (!authLoading && user && clientAuth?.currentUser) {
       const isDummyUser =
         user.displayName?.toLowerCase().includes("pranavarun") ||
         user.email?.includes("pranavarun");
       const fetchClassrooms = async () => {
         setLoadingClassroomsState(true);
         try {
-          const idToken = await clientAuth.currentUser.getIdToken();
+          const idToken = await clientAuth!.currentUser!.getIdToken();
           const fetchedClassrooms = isDummyUser
             ? ([
                 {
                   classroomId: "1",
-                  classroomName: "Theory of Computation",
+                  classroomName: "Business Process Management",
                   classroomSubject: "Computer Science and Business Systems",
                   studentBatchInClassroom: "Batch A",
                 },
                 {
                   classroomId: "2",
-                  classroomName: "Database Management Systems",
-                  classroomSubject: "CS502",
-                  studentBatchInClassroom: "Batch A",
-                },
-                {
-                  classroomId: "3",
-                  classroomName: "Artificial Intelligence",
+                  classroomName: "Machine Learning Concepts",
                   classroomSubject: "AI&DS",
                   studentBatchInClassroom: "Batch A",
                 },
                 {
-                  classroomId: "4",
-                  classroomName: "Operating Systems",
+                  classroomId: "3",
+                  classroomName: "Data Structures & Algos",
                   classroomSubject: "CSE",
                   studentBatchInClassroom: "Batch A",
                 },
                 {
+                  classroomId: "4",
+                  classroomName: "Power Systems",
+                  classroomSubject: "EEE",
+                  studentBatchInClassroom: "Batch A",
+                },
+                {
                   classroomId: "5",
-                  classroomName: "Digital Electronics",
+                  classroomName: "Microprocessors",
                   classroomSubject: "ECE",
                   studentBatchInClassroom: "Batch A",
                 },
@@ -123,7 +123,7 @@ function StudentClassroomsLoader() {
   const handleViewClassmates = async (
     classroom: StudentClassroomEnrollmentInfo,
   ) => {
-    if (!clientAuth.currentUser) {
+    if (!clientAuth?.currentUser) {
       toast({
         title: "Authentication Error",
         description: "Please sign in again.",
@@ -136,7 +136,7 @@ function StudentClassroomsLoader() {
     setLoadingClassmatesView(true);
     setClassmatesError(null);
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
+      const idToken = await clientAuth!.currentUser!.getIdToken();
       const fetchedClassmates = await fetchClassmates(
         idToken,
         classroom.classroomId,
