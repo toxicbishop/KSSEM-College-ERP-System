@@ -38,7 +38,7 @@ export default function FeeManagementPage() {
         {/* Current Dues Section */}
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Total Outstanding Card */}
-          <div className="lg:col-span-1 bg-white shadow-prestige border-t-4 border-kssem-navy p-8 rounded-sm flex flex-col justify-between relative overflow-hidden group">
+          <div className="lg:col-span-1 card-prestige bg-white !border-t-kssem-navy p-8 group">
             <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
               <svg
                 width="120"
@@ -49,7 +49,7 @@ export default function FeeManagementPage() {
               </svg>
             </div>
             <div>
-              <p className="text-kssem-text-muted text-sm uppercase tracking-widest font-bold mb-2">
+              <p className="text-kssem-text-muted text-xs uppercase tracking-widest font-bold mb-2">
                 Total Outstanding
               </p>
               <p className="text-kssem-navy font-serif text-5xl font-bold tracking-tight">
@@ -75,7 +75,7 @@ export default function FeeManagementPage() {
           </div>
 
           {/* Fee Breakdown */}
-          <div className="lg:col-span-2 bg-white shadow-prestige border border-kssem-border rounded-sm overflow-hidden">
+          <div className="lg:col-span-2 card-prestige bg-white !border-t-kssem-border p-0 overflow-hidden">
             <div className="bg-kssem-bg px-6 py-4 border-b border-kssem-border flex justify-between items-center">
               <h3 className="text-kssem-navy font-serif text-xl font-bold">
                 Fee Breakdown

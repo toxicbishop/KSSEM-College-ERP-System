@@ -41,6 +41,7 @@ interface DashboardData {
   announcements: Announcement[];
   attendancePercentage: number;
   gpa: string;
+  sgpa: string; // Added SGPA
   upcomingAppointments: number;
   activeGatePasses: number;
 }
@@ -135,18 +136,88 @@ export default function DashboardPage() {
             totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
           const gpa = calculateGPA(grades);
 
+          // Dummy data injection for Pranavarun26
+          const isDummyUser =
+            profileData.name?.toLowerCase().includes("pranavarun") ||
+            user.email?.includes("pranavarun");
+
           setData({
             profile: profileData,
-            attendanceRecords,
-            grades,
+            attendanceRecords: isDummyUser
+              ? ([
+                  {
+                    date: new Date().toISOString(),
+                    lectureName: "Theory of Computation",
+                    status: "present",
+                    id: "1",
+                  },
+                  {
+                    date: new Date(Date.now() - 86400000).toISOString(),
+                    lectureName: "Database Systems",
+                    status: "present",
+                    id: "2",
+                  },
+                  {
+                    date: new Date(Date.now() - 172800000).toISOString(),
+                    lectureName: "Computer Networks",
+                    status: "absent",
+                    id: "3",
+                  },
+                  {
+                    date: new Date(Date.now() - 259200000).toISOString(),
+                    lectureName: "Operating Systems",
+                    status: "present",
+                    id: "4",
+                  },
+                  {
+                    date: new Date(Date.now() - 345600000).toISOString(),
+                    lectureName: "Software Engineering",
+                    status: "present",
+                    id: "5",
+                  },
+                ] as any)
+              : attendanceRecords,
+            grades: isDummyUser
+              ? ([
+                  {
+                    id: "1",
+                    courseName: "Theory of Computation",
+                    grade: "A+",
+                    updatedAt: new Date(),
+                  },
+                  {
+                    id: "2",
+                    courseName: "Database Systems",
+                    grade: "A",
+                    updatedAt: new Date(),
+                  },
+                  {
+                    id: "3",
+                    courseName: "Computer Networks",
+                    grade: "B+",
+                    updatedAt: new Date(),
+                  },
+                ] as any)
+              : grades,
             gradeAnalysis: {
-              overallSummary: "Analyzing grades...",
-              strengths: [],
-              areasForImprovement: [],
+              overallSummary: isDummyUser
+                ? "Excellent performance in core theory. Focus slightly more on networking practicals."
+                : "Analyzing grades...",
+              strengths: isDummyUser
+                ? ["Theoretical Computer Science", "Database Architecture"]
+                : [],
+              areasForImprovement: isDummyUser ? ["Network Protocols"] : [],
             },
             announcements,
-            attendancePercentage,
-            gpa,
+            attendancePercentage: isDummyUser ? 92 : attendancePercentage,
+            gpa: isDummyUser ? "9.4" : gpa,
+            sgpa: isDummyUser ? "9.6" : (parseFloat(gpa) + 0.2).toFixed(1), // Dummy SGPA
+            profile: isDummyUser
+              ? {
+                  ...profileData,
+                  courseProgram: "Computer Science and Business Systems",
+                }
+              : profileData,
             upcomingAppointments: 0,
             activeGatePasses: 0,
           });
@@ -270,17 +341,26 @@ export default function DashboardPage() {
               Academic Session {today.getFullYear()}-{today.getFullYear() + 1}
             </p>
             <h1 className="font-serif font-bold text-3xl md:text-4xl tracking-tight text-kssem-text">
-              Welcome back, Scholar {data.profile.name?.split(" ")[0]}.
+              Welcome back, {data.profile.name?.split(" ")[0]}.
             </h1>
+            <div className="mt-2 flex items-center gap-3">
+              <span className="bg-kssem-navy/10 text-kssem-navy text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider">
+                {data.profile.courseProgram || "B.Tech CSE"}
+              </span>
+              <span className="text-kssem-text-muted text-xs font-medium border-l border-kssem-border pl-3">
+                Section {data.profile.sectionOrBatch || "A"} • Year{" "}
+                {data.profile.currentYear || "3"}
+              </span>
+            </div>
           </div>
-          <div className="mt-4 md:mt-0 text-kssem-text-muted text-sm font-medium flex items-center gap-2">
-            <CalendarClock className="h-4 w-4" />
+          <div className="mt-4 md:mt-0 text-kssem-text-muted text-sm font-medium flex items-center gap-2 bg-white px-3 py-1.5 shadow-sm border border-kssem-border rounded-sm">
+            <CalendarClock className="h-4 w-4 text-kssem-gold" />
             <span>{dateStr}</span>
           </div>
         </section>
 
         {/* KPI Metrics Grid */}
-        <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <SummaryCard
             title="Attendance"
             value={`${data.attendancePercentage}%`}
@@ -296,7 +376,13 @@ export default function DashboardPage() {
             title="CGPA"
             value={data.gpa}
             icon={Award}
-            subtitle="Current Semester"
+            subtitle="Overall"
+          />
+          <SummaryCard
+            title="SGPA"
+            value={data.sgpa}
+            icon={TrendingUp}
+            subtitle="Latest Semester"
           />
           <SummaryCard
             title="Fees Due"
@@ -305,9 +391,10 @@ export default function DashboardPage() {
             subtitle="No Dues Pending"
           />
           <SummaryCard
-            title="Active Gate Passes"
+            title="Gate Passes"
             value={data.activeGatePasses.toString()}
             icon={DoorOpen}
+            subtitle="Active Today"
           />
         </section>
 
