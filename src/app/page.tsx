@@ -408,7 +408,7 @@ export default function LandingPage() {
                             <Button
                               type="submit"
                               disabled={loading}
-                              className="bg-kssem-navy hover:bg-kssem-navy-light">
+                              className="bg-kssem-gold text-kssem-navy hover:bg-[#c4a030]">
                               {loading ? "Sending..." : "Send Reset Link"}
                             </Button>
                           </DialogFooter>
@@ -422,7 +422,7 @@ export default function LandingPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-kssem-navy hover:bg-kssem-navy-light text-white font-bold py-4 px-6 rounded-sm shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 group disabled:opacity-50">
+                    className="w-full bg-kssem-gold hover:bg-[#c4a030] text-kssem-navy font-bold py-4 px-6 rounded-sm shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 group disabled:opacity-50">
                     <span>{loading ? "Signing In..." : "Secure Login"}</span>
                     {!loading && (
                       <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
