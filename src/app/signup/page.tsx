@@ -26,12 +26,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { GraduationCap, Users, ShieldCheck, ArrowRight } from "lucide-react";
 
 const signUpSchema = z.object({
-  name: z
-    .string()
-    .regex(/^[a-zA-Z\s]{2,50}$/, {
-      message: "Name must contain only alphabets and spaces (2-50 chars).",
-    }),
-  studentId: z.string().min(1, { message: "Student ID is required." }),
+  name: z.string().regex(/^[a-zA-Z\s]{2,50}$/, {
+    message: "Name must contain only alphabets and spaces (2-50 chars).",
+  }),
+  studentId: z.string().min(1, { message: "USN is required." }),
   major: z.string().min(1, { message: "Major is required." }),
   email: z.string().email({ message: "Invalid email address." }),
   password: z
@@ -164,7 +162,7 @@ export default function SignUpPage() {
     type?: string;
   }[] = [
     { name: "name", label: "Full Name", placeholder: "Pranav Arun" },
-    { name: "studentId", label: "Student ID", placeholder: "e.g., 1KS22CS001" },
+    { name: "studentId", label: "USN", placeholder: "e.g., 1KS22CS001" },
     {
       name: "major",
       label: "Major / Program",
