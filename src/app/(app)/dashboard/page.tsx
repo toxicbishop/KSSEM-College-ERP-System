@@ -142,7 +142,12 @@ export default function DashboardPage() {
             user.email?.includes("pranavarun");
 
           setData({
-            profile: profileData,
+            profile: isDummyUser
+              ? {
+                  ...profileData,
+                  courseProgram: "Computer Science and Business Systems",
+                }
+              : profileData,
             attendanceRecords: isDummyUser
               ? ([
                   {
@@ -172,22 +177,40 @@ export default function DashboardPage() {
                   {
                     date: new Date(Date.now() - 345600000).toISOString(),
                     lectureName: "Software Engineering",
-            profile: isDummyUser ? { ...profileData, courseProgram: "Computer Science and Business Systems" } : profileData,
-            attendanceRecords: isDummyUser ? [
-              { date: new Date().toISOString(), lectureName: "Theory of Computation", status: "present", id: "1" },
-              { date: new Date(Date.now() - 86400000).toISOString(), lectureName: "Database Systems", status: "present", id: "2" },
-              { date: new Date(Date.now() - 172800000).toISOString(), lectureName: "Computer Networks", status: "absent", id: "3" },
-              { date: new Date(Date.now() - 259200000).toISOString(), lectureName: "Operating Systems", status: "present", id: "4" },
-              { date: new Date(Date.now() - 345600000).toISOString(), lectureName: "Software Engineering", status: "present", id: "5" },
-            ] as any : attendanceRecords,
-            grades: isDummyUser ? [
-              { id: "1", courseName: "Theory of Computation", grade: "A+", updatedAt: new Date() },
-              { id: "2", courseName: "Database Systems", grade: "A", updatedAt: new Date() },
-              { id: "3", courseName: "Computer Networks", grade: "B+", updatedAt: new Date() },
-            ] as any : grades,
+                    status: "present",
+                    id: "5",
+                  },
+                ] as any)
+              : attendanceRecords,
+            grades: isDummyUser
+              ? ([
+                  {
+                    id: "1",
+                    courseName: "Theory of Computation",
+                    grade: "A+",
+                    updatedAt: new Date(),
+                  },
+                  {
+                    id: "2",
+                    courseName: "Database Systems",
+                    grade: "A",
+                    updatedAt: new Date(),
+                  },
+                  {
+                    id: "3",
+                    courseName: "Computer Networks",
+                    grade: "B+",
+                    updatedAt: new Date(),
+                  },
+                ] as any)
+              : grades,
             gradeAnalysis: {
-              overallSummary: isDummyUser ? "Excellent performance in core theory. Focus slightly more on networking practicals." : "Analyzing grades...",
-              strengths: isDummyUser ? ["Theoretical Computer Science", "Database Architecture"] : [],
+              overallSummary: isDummyUser
+                ? "Excellent performance in core theory. Focus slightly more on networking practicals."
+                : "Analyzing grades...",
+              strengths: isDummyUser
+                ? ["Theoretical Computer Science", "Database Architecture"]
+                : [],
               areasForImprovement: isDummyUser ? ["Network Protocols"] : [],
             },
             announcements,
@@ -198,23 +221,27 @@ export default function DashboardPage() {
             activeGatePasses: 0,
           });
 
-          analyzeStudentGrades(grades)
-            .then((analysis) =>
-              setData((prev) =>
-                prev ? { ...prev, gradeAnalysis: analysis } : prev,
-              ),
-            )
-            .catch((aiError) => {
-              console.error("AI grade analysis failed.", aiError);
-              toast({
-                title: "AI Analysis Unavailable",
-                description: "Could not generate AI grade analysis.",
-                variant: "default",
+          if (!isDummyUser) {
+            analyzeStudentGrades(grades)
+              .then((analysis) =>
+                setData((prev) =>
+                  prev ? { ...prev, gradeAnalysis: analysis } : prev,
+                ),
+              )
+              .catch((aiError) => {
+                console.error("AI grade analysis failed.", aiError);
+                toast({
+                  title: "AI Analysis Unavailable",
+                  description: "Could not generate AI grade analysis.",
+                  variant: "default",
+                });
+                setData((prev) =>
+                  prev
+                    ? { ...prev, gradeAnalysis: defaultGradeAnalysis }
+                    : prev,
+                );
               });
-              setData((prev) =>
-                prev ? { ...prev, gradeAnalysis: defaultGradeAnalysis } : prev,
-              );
-            });
+          }
         } catch (err) {
           console.error("Failed to fetch dashboard data:", err);
           const errorMessage =
