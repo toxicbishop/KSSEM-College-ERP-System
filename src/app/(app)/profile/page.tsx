@@ -645,6 +645,8 @@ function ProfileDetailsLoader() {
                   value={currentValue || ""}
                   onChange={handleChange}
                   placeholder="+1234567890"
+                  pattern="^\+?[\d\s-]{10,15}$"
+                  title="Valid phone number (e.g. +1234567890)"
                 />
               )}
             />
@@ -747,6 +749,8 @@ function ProfileDetailsLoader() {
                   value={currentValue || ""}
                   onChange={handleChange}
                   placeholder="Jane Doe"
+                  pattern="^[a-zA-Z\s]{2,50}$"
+                  title="Alphabetical characters and spaces only (2-50 characters)"
                 />
               )}
             />
@@ -768,6 +772,8 @@ function ProfileDetailsLoader() {
                   value={currentValue || ""}
                   onChange={handleChange}
                   placeholder="+0987654321"
+                  pattern="^\+?[\d\s-]{10,15}$"
+                  title="Valid phone number (e.g. +1234567890)"
                 />
               )}
             />
