@@ -44,7 +44,7 @@ import {
   ArrowLeft,
   Edit,
 } from "lucide-react";
-import { auth as clientAuth } from "@/lib/firebase/client"; // For getIdToken
+// For getIdToken
 import type {
   ClassroomStudentInfo,
   StudentSearchResultItem,
@@ -93,10 +93,10 @@ export default function ManageClassroomStudentsPage() {
   const [isBatchEditModalOpen, setIsBatchEditModalOpen] = useState(false);
 
   const fetchClassroomDetailsAndStudents = async () => {
-    if (!user || !clientAuth.currentUser || !classroomId) return;
+    if (!user || !classroomId) return;
     setLoadingStudents(true);
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
+      const idToken = await user.getIdToken();
 
       const facultyClassrooms = await fetchFacultyClassroomsForStudent(idToken);
       const currentClassroom = facultyClassrooms.find(
@@ -138,11 +138,11 @@ export default function ManageClassroomStudentsPage() {
   }, [user, authLoading, classroomId]);
 
   const handleSearchStudents = async () => {
-    if (!searchTerm.trim() || !user || !clientAuth.currentUser) return;
+    if (!searchTerm.trim() || !user) return;
     setLoadingSearch(true);
     setSelectedStudents({});
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
+      const idToken = await user.getIdToken();
       const results = await searchForStudents(idToken, classroomId, searchTerm);
       setSearchResults(results);
       if (results.length === 0) {
@@ -164,7 +164,7 @@ export default function ManageClassroomStudentsPage() {
   };
 
   const handleAddSelectedStudents = async () => {
-    if (!user || !clientAuth.currentUser) return;
+    if (!user) return;
     const studentUidsToAdd = Object.keys(selectedStudents);
     if (studentUidsToAdd.length === 0) {
       toast({
@@ -176,7 +176,7 @@ export default function ManageClassroomStudentsPage() {
 
     setIsSubmitting(true);
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
+      const idToken = await user.getIdToken();
       const studentsDetails = studentUidsToAdd.map(
         (uid) => selectedStudents[uid],
       );
@@ -202,10 +202,10 @@ export default function ManageClassroomStudentsPage() {
   };
 
   const handleRemoveStudent = async (studentUid: string) => {
-    if (!user || !clientAuth.currentUser) return;
+    if (!user) return;
     setIsSubmitting(true);
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
+      const idToken = await user.getIdToken();
       await removeStudentFromClass(idToken, classroomId, studentUid);
       toast({
         title: "Student Removed",
@@ -230,10 +230,10 @@ export default function ManageClassroomStudentsPage() {
   };
 
   const handleSaveBatch = async () => {
-    if (!editingStudent || !user || !clientAuth.currentUser) return;
+    if (!editingStudent || !user) return;
     setIsSubmitting(true);
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
+      const idToken = await user.getIdToken();
       await updateStudentBatchForClassroom(
         idToken,
         classroomId,
