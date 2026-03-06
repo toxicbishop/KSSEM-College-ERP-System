@@ -56,32 +56,32 @@
   }
 
   .dark {
-    --background: 213 38% 10%; /* #0f1923 */
+    --background: 212 100% 7%; /* Deep KSSEM Navy */
     --foreground: 0 0% 98%;
 
-    --card: 213 24% 15%; /* #1a2634 */
+    --card: 212 100% 12%; /* Navy Card */
     --card-foreground: 0 0% 98%;
 
-    --popover: 213 24% 15%;
+    --popover: 212 100% 12%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 212 73% 35%; /* #0456ae — lighter navy for dark mode */
-    --primary-foreground: 0 0% 100%;
+    --primary: 43 62% 52%; /* Gold as primary in dark mode for high contrast */
+    --primary-foreground: 212 100% 10%;
 
-    --secondary: 213 18% 20%;
+    --secondary: 212 60% 20%;
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 213 18% 20%;
-    --muted-foreground: 215 16% 55%;
+    --muted: 212 60% 20%;
+    --muted-foreground: 212 20% 70%;
 
-    --accent: 43 62% 52%; /* Gold stays */
+    --accent: 43 62% 52%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 213 16% 22%;
-    --input: 213 16% 22%;
+    --border: 212 60% 20%;
+    --input: 212 60% 20%;
     --ring: 43 62% 52%;
 
     --chart-1: 43 62% 52%;
@@ -130,5 +130,13 @@
   /* Prestige card pattern from design system */
   .card-prestige {
     @apply bg-white border-t-[3px] border-accent shadow-prestige p-6 flex flex-col gap-2 rounded-sm relative overflow-hidden;
+  }
+
+  /* Force light inputs inside prestige cards to ensure readability against forced-white backgrounds */
+  .card-prestige input,
+  .card-prestige textarea,
+  .card-prestige select,
+  .card-prestige [role="combobox"] {
+    @apply bg-slate-50 text-kssem-navy border-slate-200 !important;
   }
 }

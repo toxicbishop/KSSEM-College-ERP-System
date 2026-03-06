@@ -22,7 +22,7 @@ export default function FeeManagementPage() {
         {/* Page Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-kssem-border pb-6">
           <div>
-            <h1 className="text-kssem-navy text-3xl md:text-4xl font-serif font-bold leading-tight">
+            <h1 className="text-kssem-navy dark:text-kssem-gold text-3xl md:text-4xl font-serif font-bold leading-tight">
               Fee Management
             </h1>
             <p className="text-kssem-text-muted text-sm mt-2">
@@ -160,12 +160,12 @@ export default function FeeManagementPage() {
         {/* Transaction History */}
         <section className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
-            <h3 className="text-kssem-navy font-serif text-2xl font-bold whitespace-nowrap">
+            <h3 className="text-kssem-navy dark:text-kssem-gold font-serif text-2xl font-bold whitespace-nowrap">
               Transaction History
             </h3>
             <div className="h-px bg-kssem-border w-full"></div>
           </div>
-          <div className="bg-white shadow-prestige border border-kssem-border rounded-sm overflow-hidden">
+          <div className="card-prestige !bg-white p-0 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
