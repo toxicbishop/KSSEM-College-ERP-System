@@ -114,25 +114,6 @@ export default function AboutPage() {
 
             <div className="w-full card-prestige">
               <h2 className="text-2xl font-serif font-bold text-kssem-navy mb-4">
-                About Me
-              </h2>
-              <p className="text-kssem-text-muted leading-relaxed">
-                Hello! I'm Pranav, a passionate software developer with a strong
-                foundation in web technologies and a keen interest in building
-                intelligent, user-centric applications. This Advanced Student
-                ERP project is a demonstration of my skills in creating complex,
-                full-stack solutions using modern tools like Next.js, Firebase,
-                and Google's Generative AI.
-              </p>
-              <p className="text-kssem-text-muted leading-relaxed mt-4">
-                My goal is to leverage technology to solve real-world problems,
-                creating systems that are not only functional but also efficient
-                and enjoyable to use.
-              </p>
-            </div>
-
-            <div className="w-full card-prestige">
-              <h2 className="text-2xl font-serif font-bold text-kssem-navy mb-4">
                 About This Project
               </h2>
               <p className="text-kssem-text-muted leading-relaxed">
