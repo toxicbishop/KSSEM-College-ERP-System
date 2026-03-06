@@ -60,9 +60,7 @@ function StudentClassroomsLoader() {
 
   useEffect(() => {
     if (!authLoading && user && clientAuth?.currentUser) {
-      const isDummyUser =
-        user.displayName?.toLowerCase().includes("pranavarun") ||
-        user.email?.includes("pranavarun");
+      const isDummyUser = user.email === "pranavarun26@gmail.com";
       const fetchClassrooms = async () => {
         setLoadingClassroomsState(true);
         try {
@@ -72,7 +70,8 @@ function StudentClassroomsLoader() {
                 {
                   classroomId: "1",
                   classroomName: "Business Process Management",
-                  classroomSubject: "Computer Science and Business Systems",
+                  classroomSubject:
+                    "B.tech in Computer Science and business Systems",
                   studentBatchInClassroom: "Batch A",
                 },
                 {

@@ -15,6 +15,10 @@ export interface Announcement {
    * The main content/body of the announcement.
    */
   content: string;
+  /**
+   * Optional category (e.g., 'Exams', 'Finance', 'Events').
+   */
+  category?: string;
 }
 
 /**
@@ -28,34 +32,34 @@ export async function getAnnouncements(): Promise<Announcement[]> {
   // Returning mock data similar to the screenshot's Lorem Ipsum content
   return [
     {
-      id: '1',
-      date: '2024-08-28',
-      title: 'Recent Announcement',
-      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      id: "1",
+      date: "2024-08-28",
+      title: "Recent Announcement",
+      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
     },
     {
-      id: '2',
-      date: '2024-08-27',
-      title: 'Recent Announcement',
-      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      id: "2",
+      date: "2024-08-27",
+      title: "Recent Announcement",
+      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
     },
     {
-        id: '3',
-        date: '2024-08-26',
-        title: 'Recent Announcement',
-        content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      },
-      {
-        id: '4',
-        date: '2024-08-25',
-        title: 'Recent Announcement',
-        content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      },
-      {
-        id: '5',
-        date: '2024-08-24',
-        title: 'Recent Announcement',
-        content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      },
+      id: "3",
+      date: "2024-08-26",
+      title: "Recent Announcement",
+      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    },
+    {
+      id: "4",
+      date: "2024-08-25",
+      title: "Recent Announcement",
+      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    },
+    {
+      id: "5",
+      date: "2024-08-24",
+      title: "Recent Announcement",
+      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    },
   ];
 }
