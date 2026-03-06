@@ -1,63 +1,13 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { Footer } from "@/components/layout/footer";
+import { PublicHeader } from "@/components/layout/public-header";
 
 export default function TermsOfServicePage() {
   return (
     <div className="flex min-h-screen flex-col bg-kssem-bg">
-      <header className="sticky top-0 z-50 w-full bg-kssem-navy shadow-lg">
-        <div className="container flex h-16 items-center">
-          <Link href="/" className="mr-6 flex items-center gap-2">
-            <Image
-              src="/collage-logo.png"
-              alt="Logo"
-              width={36}
-              height={36}
-              data-ai-hint="college crest logo"
-            />
-            <span className="font-serif font-bold text-white text-lg">
-              KSSEM
-            </span>
-          </Link>
-          <nav className="hidden md:flex items-center space-x-6 text-sm font-semibold">
-            <Link
-              href="/"
-              className="text-gray-300 hover:text-kssem-gold transition-colors">
-              Home
-            </Link>
-            <Link
-              href="/about"
-              className="text-gray-300 hover:text-kssem-gold transition-colors">
-              About
-            </Link>
-            <Link
-              href="/contact"
-              className="text-gray-300 hover:text-kssem-gold transition-colors">
-              Contact
-            </Link>
-            <Link
-              href="/faq"
-              className="text-gray-300 hover:text-kssem-gold transition-colors">
-              FAQ
-            </Link>
-          </nav>
-          <nav className="ml-auto flex items-center space-x-3">
-            <Link
-              href="/signin"
-              className="text-gray-300 text-sm font-semibold hover:text-white transition-colors">
-              Sign In
-            </Link>
-            <Link
-              href="/signup"
-              className="bg-kssem-gold text-kssem-navy px-4 py-2 rounded-sm text-sm font-bold uppercase tracking-wider hover:bg-[#c4a030] transition-colors">
-              Sign Up
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <PublicHeader />
 
       <main className="flex-1">
         <section className="container py-16 md:py-24">
