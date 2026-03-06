@@ -604,7 +604,7 @@ export default function FacultyAttendancePage() {
     }));
 
     try {
-      await submitAttendance(idToken, selectedClassroomId, recordsToSubmit);
+      await submitAttendance(recordsToSubmit);
       const batchDescription =
         selectedBatchFilter === WHOLE_CLASS_FILTER_VALUE
           ? "whole class"
@@ -644,7 +644,7 @@ export default function FacultyAttendancePage() {
     try {
       const idToken = await clientAuth?.currentUser.getIdToken();
       const dateString = format(selectedDate, "yyyy-MM-dd");
-      await deleteAttendance(idToken, dateString);
+      await deleteAttendance(idToken, selectedClassroomId, dateString);
       toast({
         title: "Attendance Deleted",
         description: `All attendance records for this classroom on ${format(selectedDate, "PPP")} have been deleted.`,

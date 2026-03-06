@@ -127,7 +127,7 @@ export default function FacultyClassroomsPage() {
     
     try {
         const idToken = await clientAuth.currentUser.getIdToken();
-        const facultyList = await getAllFacultyUsersList();
+        const facultyList = await getAllFacultyUsersList(idToken);
         const ownerId = user?.uid; 
         const alreadyInvitedIds = classroom.invitedFacultyIds || [];
         const eligibleFaculty = facultyList.filter(f => f.uid !== ownerId && !alreadyInvitedIds.includes(f.uid));

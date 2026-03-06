@@ -35,10 +35,11 @@ export async function fetchClassroomsByFaculty(
  * Server action to fetch students in a classroom.
  */
 export async function fetchStudentsInClassroom(
+  idToken: string,
   classroomId: string
 ): Promise<ClassroomStudentInfo[]> {
   try {
-    return await getStudentsInClassroom(classroomId);
+    return await getStudentsInClassroom(idToken, classroomId);
   } catch (error) {
     console.error("Fetch students error:", error);
     return [];
@@ -49,12 +50,10 @@ export async function fetchStudentsInClassroom(
  * Server action to submit lecture attendance.
  */
 export async function submitAttendance(
-  idToken: string,
-  classroomId: string,
-  records: LectureAttendanceRecord[]
+  records: Omit<LectureAttendanceRecord, "id" | "submittedAt">[]
 ): Promise<void> {
   try {
-    return await submitLectureAttendance(idToken, classroomId, records);
+    return await submitLectureAttendance(records);
   } catch (error) {
     console.error("Submit attendance error:", error);
     throw error;
@@ -104,10 +103,11 @@ export async function getAttendanceForDateRange(
  */
 export async function deleteAttendance(
   idToken: string,
-  docId: string
+  classroomId: string,
+  date: string
 ): Promise<void> {
   try {
-    return await deleteLectureAttendance(idToken, docId);
+    return await deleteLectureAttendance(idToken, classroomId, date);
   } catch (error) {
     console.error("Delete attendance error:", error);
     throw error;
