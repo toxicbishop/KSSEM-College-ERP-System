@@ -99,6 +99,18 @@ function StudentClassroomsLoader() {
                   classroomSubject: "ECE",
                   studentBatchInClassroom: "Batch A",
                 },
+                {
+                  classroomId: "6",
+                  classroomName: "Thermodynamics",
+                  classroomSubject: "MECH",
+                  studentBatchInClassroom: "Batch A",
+                },
+                {
+                  classroomId: "7",
+                  classroomName: "Structural Analysis",
+                  classroomSubject: "Civil",
+                  studentBatchInClassroom: "Batch A",
+                },
               ] as any)
             : await fetchStudentClassrooms(idToken);
           setEnrolledClassrooms(fetchedClassrooms);
