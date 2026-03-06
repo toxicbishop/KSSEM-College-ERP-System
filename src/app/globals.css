@@ -5,7 +5,8 @@
 /* KSSEM Design System — Navy/Gold/Serif */
 
 @layer base {
-  :root {
+  :root,
+  .light {
     /* ── Core Palette ── */
     --background: 210 14% 97%; /* #F8F9FA — off-white */
     --foreground: 215 47% 11%; /* #0F172A — near-black */
@@ -129,14 +130,34 @@
 @layer utilities {
   /* Prestige card pattern from design system */
   .card-prestige {
-    @apply bg-white border-t-[3px] border-accent shadow-prestige p-6 flex flex-col gap-2 rounded-sm relative overflow-hidden;
+    /* ── Force Light Theme Variables for the card subtree ── */
+    --background: 210 14% 97%;
+    --foreground: 215 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 47% 11%;
+    --primary: 212 100% 14%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 212 100% 14%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 43 62% 52%;
+    --accent-foreground: 212 100% 14%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 43 62% 52%;
+
+    @apply bg-white border-t-[3px] border-accent shadow-prestige p-6 flex flex-col gap-2 rounded-sm relative overflow-hidden text-kssem-text !important;
   }
 
-  /* Force light inputs inside prestige cards to ensure readability against forced-white backgrounds */
+  /* Ensure inputs have a slightly darker shadow/border for contrast against pure white cards */
   .card-prestige input,
   .card-prestige textarea,
-  .card-prestige select,
-  .card-prestige [role="combobox"] {
-    @apply bg-slate-50 text-kssem-navy border-slate-200 !important;
+  .card-prestige select {
+    @apply bg-slate-50/50 border-slate-200 focus:border-kssem-navy transition-colors !important;
   }
 }
