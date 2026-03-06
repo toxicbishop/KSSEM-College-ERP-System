@@ -183,7 +183,7 @@ const InfoItem = ({
           variant="outline"
           size="sm"
           onClick={() => onEditRequest(fieldName, label)}
-          className="whitespace-nowrap bg-white border-kssem-border text-kssem-navy hover:bg-kssem-navy hover:text-white transition-all">
+          className="whitespace-nowrap bg-kssem-gold text-kssem-navy border-kssem-gold hover:bg-[#c4a030] transition-all shadow-md font-bold uppercase tracking-wider text-[10px]">
           <Send className="mr-2 h-3 w-3" /> Request Change
         </Button>
       </div>
