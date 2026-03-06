@@ -150,7 +150,30 @@ const InfoItem = ({
           className="mt-1"
           value={String(editableProfileValue ?? "")}
           onChange={handleInputChange}
-          type={typeof profileValue === "number" ? "number" : "text"}
+          type={
+            typeof profileValue === "number"
+              ? "number"
+              : fieldName.toLocaleLowerCase().includes("phone") ||
+                  fieldName.toLocaleLowerCase().includes("number")
+                ? "tel"
+                : "text"
+          }
+          pattern={
+            fieldName.toLocaleLowerCase().includes("name")
+              ? "^[a-zA-Z\\s]{2,50}$"
+              : fieldName.toLocaleLowerCase().includes("phone") ||
+                  fieldName.toLocaleLowerCase().includes("number")
+                ? "^\\+?[\\d\\s-]{10,15}$"
+                : undefined
+          }
+          title={
+            fieldName.toLocaleLowerCase().includes("name")
+              ? "Alphabetical characters and spaces only (2-50 characters)"
+              : fieldName.toLocaleLowerCase().includes("phone") ||
+                  fieldName.toLocaleLowerCase().includes("number")
+                ? "Valid phone number (e.g. +1234567890)"
+                : undefined
+          }
         />
       )
     ) : isEditMode && onEditRequest ? (
@@ -629,8 +652,7 @@ function ProfileDetailsLoader() {
               label="Email Address"
               value={profile.email}
               fieldName="email"
-              isEditable={isAdmin}
-              onEditRequest={isAdmin ? undefined : openRequestModal}
+              isEditable={false} // Email cannot be changed here
               isEditMode={isEditMode}
               handleInputChange={handleInputChange}
               editableProfileValue={editableProfile.email}
@@ -690,14 +712,22 @@ function ProfileDetailsLoader() {
               editableProfileValue={editableProfile.bloodGroup}
               profileValue={profile.bloodGroup}
               editModeRender={(currentValue, handleChange, name) => (
-                <Input
+                <select
                   id={name as string}
                   name={name as string}
-                  className="mt-1"
                   value={currentValue || ""}
                   onChange={handleChange}
-                  placeholder="O+"
-                />
+                  className="mt-1 block w-full rounded-sm border-kssem-border bg-slate-50/50 p-2 text-sm h-10">
+                  <option value="">Select Blood Group</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                </select>
               )}
             />
             <InfoItem

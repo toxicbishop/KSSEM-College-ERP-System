@@ -17,9 +17,9 @@
     --popover: 0 0% 100%;
     --popover-foreground: 215 47% 11%;
 
-    /* Navy primary */
-    --primary: 212 100% 14%; /* #002147 */
-    --primary-foreground: 0 0% 100%;
+    /* Primary Action Color (Gold for prestige and visibility) */
+    --primary: 43 62% 52%; /* #D4AF37 — KSSEM Gold */
+    --primary-foreground: 212 100% 14%; /* #002147 — KSSEM Navy */
 
     --secondary: 210 40% 96%;
     --secondary-foreground: 212 100% 14%;
@@ -137,8 +137,8 @@
     --card-foreground: 215 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 215 47% 11%;
-    --primary: 212 100% 14%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 43 62% 52%; /* KSSEM Gold */
+    --primary-foreground: 212 100% 14%; /* Navy text for gold background */
     --secondary: 210 40% 96%;
     --secondary-foreground: 212 100% 14%;
     --muted: 210 40% 96%;
