@@ -172,52 +172,28 @@ export default function DashboardPage() {
                   {
                     date: new Date(Date.now() - 345600000).toISOString(),
                     lectureName: "Software Engineering",
-                    status: "present",
-                    id: "5",
-                  },
-                ] as any)
-              : attendanceRecords,
-            grades: isDummyUser
-              ? ([
-                  {
-                    id: "1",
-                    courseName: "Theory of Computation",
-                    grade: "A+",
-                    updatedAt: new Date(),
-                  },
-                  {
-                    id: "2",
-                    courseName: "Database Systems",
-                    grade: "A",
-                    updatedAt: new Date(),
-                  },
-                  {
-                    id: "3",
-                    courseName: "Computer Networks",
-                    grade: "B+",
-                    updatedAt: new Date(),
-                  },
-                ] as any)
-              : grades,
+            profile: isDummyUser ? { ...profileData, courseProgram: "Computer Science and Business Systems" } : profileData,
+            attendanceRecords: isDummyUser ? [
+              { date: new Date().toISOString(), lectureName: "Theory of Computation", status: "present", id: "1" },
+              { date: new Date(Date.now() - 86400000).toISOString(), lectureName: "Database Systems", status: "present", id: "2" },
+              { date: new Date(Date.now() - 172800000).toISOString(), lectureName: "Computer Networks", status: "absent", id: "3" },
+              { date: new Date(Date.now() - 259200000).toISOString(), lectureName: "Operating Systems", status: "present", id: "4" },
+              { date: new Date(Date.now() - 345600000).toISOString(), lectureName: "Software Engineering", status: "present", id: "5" },
+            ] as any : attendanceRecords,
+            grades: isDummyUser ? [
+              { id: "1", courseName: "Theory of Computation", grade: "A+", updatedAt: new Date() },
+              { id: "2", courseName: "Database Systems", grade: "A", updatedAt: new Date() },
+              { id: "3", courseName: "Computer Networks", grade: "B+", updatedAt: new Date() },
+            ] as any : grades,
             gradeAnalysis: {
-              overallSummary: isDummyUser
-                ? "Excellent performance in core theory. Focus slightly more on networking practicals."
-                : "Analyzing grades...",
-              strengths: isDummyUser
-                ? ["Theoretical Computer Science", "Database Architecture"]
-                : [],
+              overallSummary: isDummyUser ? "Excellent performance in core theory. Focus slightly more on networking practicals." : "Analyzing grades...",
+              strengths: isDummyUser ? ["Theoretical Computer Science", "Database Architecture"] : [],
               areasForImprovement: isDummyUser ? ["Network Protocols"] : [],
             },
             announcements,
             attendancePercentage: isDummyUser ? 92 : attendancePercentage,
             gpa: isDummyUser ? "9.4" : gpa,
             sgpa: isDummyUser ? "9.6" : (parseFloat(gpa) + 0.2).toFixed(1), // Dummy SGPA
-            profile: isDummyUser
-              ? {
-                  ...profileData,
-                  courseProgram: "Computer Science and Business Systems",
-                }
-              : profileData,
             upcomingAppointments: 0,
             activeGatePasses: 0,
           });
