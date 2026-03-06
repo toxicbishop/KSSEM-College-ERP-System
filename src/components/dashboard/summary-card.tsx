@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 interface SummaryCardProps {
   title: string;
-  value: string | number;
+  value: string | number | React.ReactNode;
   icon: LucideIcon;
   variant?: "default" | "destructive";
   subtitle?: string;

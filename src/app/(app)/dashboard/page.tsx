@@ -439,7 +439,11 @@ export default function DashboardPage() {
           />
           <SummaryCard
             title="Fees Due"
-            value="₹0"
+            value={
+              <span className="flex items-center">
+                <span className="font-sans">₹</span>0
+              </span>
+            }
             icon={TrendingUp}
             subtitle="No Dues Pending"
           />

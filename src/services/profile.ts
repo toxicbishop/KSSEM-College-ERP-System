@@ -221,10 +221,33 @@ export async function updateStudentProfile(
   // Sanitize data: remove fields that should not be directly updated by the user
   const sanitizedData = { ...profileData };
   delete sanitizedData.role;
-  delete sanitizedData.email;
-  delete sanitizedData.name;
   delete sanitizedData.studentId;
-  // Add any other fields that should be protected and only changed via admin request
+
+  // For critical fields (name, email), only allow update if current Firestore value is missing or N/A
+  try {
+    const existingSnap = await userDocRef.get();
+    if (existingSnap.exists) {
+      const existingData = existingSnap.data()!;
+      if (
+        existingData.name &&
+        existingData.name !== "N/A" &&
+        decodedToken.email !== "admin@gmail.com"
+      ) {
+        delete sanitizedData.name;
+      }
+      if (
+        existingData.email &&
+        existingData.email !== "N/A" &&
+        decodedToken.email !== "admin@gmail.com"
+      ) {
+        delete sanitizedData.email;
+      }
+    }
+  } catch (err) {
+    console.error("Error reading existing profile for sanitization:", err);
+    delete sanitizedData.email;
+    delete sanitizedData.name;
+  }
 
   try {
     await userDocRef.update(sanitizedData);

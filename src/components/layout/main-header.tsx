@@ -11,7 +11,9 @@ import { Sidebar } from "./sidebar";
 import { useAuth } from "@/context/auth-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { usePathname } from "next/navigation";
-import { Bell, Menu, UserCircle } from "lucide-react";
+import { Bell, Menu, UserCircle, LogOut } from "lucide-react";
+import { db } from "@/lib/firebase/client";
+import { doc, getDoc } from "firebase/firestore";
 
 const getInitials = (name: string) => {
   if (!name) return "U";
@@ -37,6 +39,37 @@ export function MainHeader() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user } = useAuth();
   const pathname = usePathname();
+  const [userName, setUserName] = useState<string | null>(null);
+  const [scholarId, setScholarId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user && db) {
+      const fetchProfile = async () => {
+        try {
+          const userDoc = await getDoc(doc(db!, "users", user.uid));
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            setUserName(
+              data.name ||
+                user.displayName ||
+                user.email?.split("@")[0] ||
+                "Student",
+            );
+            setScholarId(data.studentId || user.uid.substring(0, 8));
+          } else {
+            setUserName(
+              user.displayName || user.email?.split("@")[0] || "Student",
+            );
+            setScholarId(user.uid.substring(0, 8));
+          }
+        } catch (error) {
+          console.error("Error fetching header profile:", error);
+          setUserName(user.displayName || "Student");
+        }
+      };
+      fetchProfile();
+    }
+  }, [user]);
 
   useEffect(() => {
     const fetchAppName = async () => {
@@ -136,10 +169,10 @@ export function MainHeader() {
           <Link href="/profile" className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
               <p className="text-white text-sm font-semibold leading-tight">
-                {user?.displayName || "Student"}
+                {userName || "Student"}
               </p>
-              <p className="text-slate-300 text-xs">
-                Scholar ID: {user?.uid?.substring(0, 8) || "N/A"}
+              <p className="text-slate-300 text-[10px] uppercase tracking-wider font-bold">
+                ID: {scholarId || "N/A"}
               </p>
             </div>
             <Avatar className="h-9 w-9 rounded-full border border-kssem-gold/50">
@@ -149,7 +182,9 @@ export function MainHeader() {
               />
               <AvatarFallback className="bg-kssem-gold/20 text-kssem-gold text-sm font-bold">
                 {user ? (
-                  getInitials(user.displayName || user.email || "User")
+                  getInitials(
+                    userName || user.displayName || user.email || "User",
+                  )
                 ) : (
                   <UserCircle className="h-5 w-5 text-slate-300" />
                 )}

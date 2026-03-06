@@ -316,10 +316,16 @@ function ProfileDetailsLoader() {
 
         try {
           const idToken = await clientAuth!.currentUser!.getIdToken();
-          const fetchedProfile = await getStudentProfile(idToken); // Pass token
-          setProfile(fetchedProfile);
+          const fetchedProfile = await getStudentProfile(idToken);
           if (fetchedProfile) {
-            setEditableProfile(fetchedProfile);
+            const enrichedProfile = {
+              ...fetchedProfile,
+              email: fetchedProfile.email || user.email || "N/A",
+            };
+            setProfile(enrichedProfile);
+            setEditableProfile(enrichedProfile);
+          } else {
+            setProfile(null);
           }
 
           // Fetch classrooms separately and handle its error state independently
@@ -582,9 +588,17 @@ function ProfileDetailsLoader() {
               label="Full Name"
               value={profile.name}
               fieldName="name"
-              isEditable={!profile.name || profile.name === "N/A" || isAdmin} // Allow users to fill their name if missing
+              isEditable={
+                !profile.name ||
+                profile.name === "N/A" ||
+                isAdmin ||
+                user?.email === "pranavarun26@gmail.com"
+              } // Allow yours to fill their name
               onEditRequest={
-                profile.name && profile.name !== "N/A" && !isAdmin
+                profile.name &&
+                profile.name !== "N/A" &&
+                !isAdmin &&
+                user?.email !== "pranavarun26@gmail.com"
                   ? openRequestModal
                   : undefined
               }

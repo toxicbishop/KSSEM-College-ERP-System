@@ -101,8 +101,8 @@ export default function FeeManagementPage() {
                       </p>
                     </div>
                   </div>
-                  <span className="text-kssem-text font-bold font-serif text-xl">
-                    ₹40,000
+                  <span className="text-kssem-text font-bold text-xl flex items-center gap-1">
+                    <span className="font-sans">₹</span>40,000
                   </span>
                 </div>
               </div>
@@ -122,8 +122,8 @@ export default function FeeManagementPage() {
                       </p>
                     </div>
                   </div>
-                  <span className="text-kssem-text font-bold font-serif text-xl">
-                    ₹3,000
+                  <span className="text-kssem-text font-bold text-xl flex items-center gap-1">
+                    <span className="font-sans">₹</span>3,000
                   </span>
                 </div>
               </div>
@@ -143,8 +143,8 @@ export default function FeeManagementPage() {
                       </p>
                     </div>
                   </div>
-                  <span className="text-kssem-text font-bold font-serif text-xl">
-                    ₹2,000
+                  <span className="text-kssem-text font-bold text-xl flex items-center gap-1">
+                    <span className="font-sans">₹</span>2,000
                   </span>
                 </div>
               </div>

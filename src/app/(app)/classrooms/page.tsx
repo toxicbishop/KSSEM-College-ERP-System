@@ -70,8 +70,7 @@ function StudentClassroomsLoader() {
                 {
                   classroomId: "1",
                   classroomName: "Business Process Management",
-                  classroomSubject:
-                    "B.tech in Computer Science and business Systems",
+                  classroomSubject: "CS&BS",
                   studentBatchInClassroom: "Batch A",
                 },
                 {
@@ -101,7 +100,7 @@ function StudentClassroomsLoader() {
                 {
                   classroomId: "6",
                   classroomName: "Thermodynamics",
-                  classroomSubject: "MECH",
+                  classroomSubject: "Mechanical",
                   studentBatchInClassroom: "Batch A",
                 },
                 {
