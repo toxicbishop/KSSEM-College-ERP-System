@@ -10,13 +10,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getGrades } from "@/services/grades";
 import { Suspense, useEffect, useState } from "react";
 import { useAuth } from "@/context/auth-context";
 import type { Grade } from "@/services/grades";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Download, Printer } from "lucide-react";
+import { fetchGrades } from "./actions";
 
 const gradeColor = (grade: string) => {
   const g = grade.toUpperCase();
@@ -37,11 +37,11 @@ function GradesTableLoader() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      const fetchGrades = async () => {
+      const fetchGradesData = async () => {
         setLoading(true);
         setError(null);
         try {
-          const fetchedGrades = await getGrades(user.uid);
+          const fetchedGrades = await fetchGrades(user.uid);
           setGrades(fetchedGrades);
         } catch (err) {
           console.error("Failed to fetch grades:", err);
@@ -50,7 +50,7 @@ function GradesTableLoader() {
           setLoading(false);
         }
       };
-      fetchGrades();
+      fetchGradesData();
     } else if (!authLoading && !user) {
       setLoading(false);
       setError("Please sign in to view grades.");

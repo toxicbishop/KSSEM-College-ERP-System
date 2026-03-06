@@ -1,5 +1,3 @@
-
-'use server';
 /**
  * @fileOverview This Genkit flow for sending leave application notifications has been removed.
  */

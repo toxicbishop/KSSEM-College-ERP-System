@@ -1,8 +1,6 @@
 "use client";
 
 import { getStudentProfile } from "@/services/profile";
-import { getAttendanceRecords } from "@/services/attendance";
-import { getGrades } from "@/services/grades";
 import { getAnnouncements } from "@/services/announcements";
 import { AttendanceOverviewCard } from "@/components/dashboard/attendance-overview-card";
 import { GradesChartCard } from "@/components/dashboard/grades-chart-card";
@@ -28,7 +26,11 @@ import type { Grade } from "@/services/grades";
 import type { Announcement } from "@/services/announcements";
 import { doc, getDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
-import { analyzeGrades } from "@/ai/flows/analyze-grades-flow";
+import {
+  analyzeStudentGrades,
+  fetchAttendanceRecords,
+  fetchStudentGrades,
+} from "./actions";
 import type { GradeAnalysisOutput } from "@/services/grades";
 
 interface DashboardData {
@@ -120,8 +122,8 @@ export default function DashboardPage() {
 
           const idToken = await clientAuth!.currentUser!.getIdToken();
           const [attendanceRecords, grades, announcements] = await Promise.all([
-            getAttendanceRecords(idToken),
-            getGrades(user.uid),
+            fetchAttendanceRecords(idToken),
+            fetchStudentGrades(user.uid),
             getAnnouncements(),
           ]);
 
@@ -149,7 +151,7 @@ export default function DashboardPage() {
             activeGatePasses: 0,
           });
 
-          analyzeGrades(grades)
+          analyzeStudentGrades(grades)
             .then((analysis) =>
               setData((prev) =>
                 prev ? { ...prev, gradeAnalysis: analysis } : prev,

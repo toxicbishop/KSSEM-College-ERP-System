@@ -15,14 +15,11 @@ import { db, auth as clientAuth } from "@/lib/firebase/client";
 import type { StudentProfile } from "@/services/profile";
 import { getStudentProfile, updateStudentProfile } from "@/services/profile";
 import { createProfileChangeRequest } from "@/services/profile-change-request";
-import {
-  getStudentClassroomsWithBatchInfo,
-  getClassmatesInfo,
-} from "@/services/classroom"; // Import new service
 import type {
   StudentClassroomEnrollmentInfo,
   ClassmateInfo,
-} from "@/services/classroom"; // Import new type
+} from "@/services/classroom";
+import { fetchStudentClassrooms, fetchClassmates } from "../classrooms/actions";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -300,7 +297,7 @@ function ProfileDetailsLoader() {
           // Fetch classrooms separately and handle its error state independently
           try {
             const fetchedClassrooms =
-              await getStudentClassroomsWithBatchInfo(idToken);
+              await fetchStudentClassrooms(idToken);
             setEnrolledClassrooms(fetchedClassrooms);
           } catch (classroomErr) {
             const errorMessage =
@@ -453,7 +450,7 @@ function ProfileDetailsLoader() {
     setFetchClassmatesError(null);
     try {
       const idToken = await clientAuth.currentUser.getIdToken();
-      const fetchedClassmates = await getClassmatesInfo(
+      const fetchedClassmates = await fetchClassmates(
         idToken,
         classroom.classroomId,
       );

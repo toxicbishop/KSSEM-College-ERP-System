@@ -1,5 +1,3 @@
-"use server";
-
 import {
   adminDb,
   adminAuth,

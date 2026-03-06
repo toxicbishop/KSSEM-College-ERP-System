@@ -1,5 +1,4 @@
 
-'use server';
 /**
  * @fileOverview A Genkit flow for analyzing a student's academic grades.
  *

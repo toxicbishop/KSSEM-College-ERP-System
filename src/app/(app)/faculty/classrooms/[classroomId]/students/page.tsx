@@ -16,16 +16,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { PlusCircle, Trash2, Search, UserPlus, Loader2, ArrowLeft, Edit } from 'lucide-react';
 import { auth as clientAuth } from '@/lib/firebase/client'; // For getIdToken
-import { 
-    getStudentsInClassroom,
-    removeStudentFromClassroom, 
-    addStudentsToClassroom,
-    searchStudents,
-    getClassroomsByFaculty,
-    updateStudentBatchInClassroom,
-    type ClassroomStudentInfo,
-    type StudentSearchResultItem
-} from '@/services/classroom';
+import type { ClassroomStudentInfo, StudentSearchResultItem } from '@/services/classroom';
+import {
+  fetchStudentsInClass,
+  removeStudentFromClass,
+  addStudentsToClass,
+  searchForStudents,
+  updateStudentBatchForClassroom,
+  fetchFacultyClassroomsForStudent,
+} from './actions';
 
 export default function ManageClassroomStudentsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -56,7 +55,7 @@ export default function ManageClassroomStudentsPage() {
     try {
       const idToken = await clientAuth.currentUser.getIdToken();
       
-      const facultyClassrooms = await getClassroomsByFaculty(idToken);
+      const facultyClassrooms = await fetchFacultyClassroomsForStudent(idToken);
       const currentClassroom = facultyClassrooms.find(c => c.id === classroomId);
       if (currentClassroom) {
         setClassroom({ id: currentClassroom.id, name: currentClassroom.name, subject: currentClassroom.subject });
@@ -66,7 +65,7 @@ export default function ManageClassroomStudentsPage() {
         return;
       }
 
-      const students = await getStudentsInClassroom(idToken, classroomId);
+      const students = await fetchStudentsInClass(idToken, classroomId);
       setCurrentStudents(students);
     } catch (error) {
       toast({ title: "Error", description: `Could not load classroom data: ${(error as Error).message}`, variant: "destructive" });
@@ -87,7 +86,7 @@ export default function ManageClassroomStudentsPage() {
     setSelectedStudents({});
     try {
       const idToken = await clientAuth.currentUser.getIdToken();
-      const results = await searchStudents(idToken, classroomId, searchTerm);
+      const results = await searchForStudents(idToken, classroomId, searchTerm);
       setSearchResults(results);
       if (results.length === 0) {
         toast({ title: "No Results", description: "No students found matching your search criteria or eligible to be added." });
@@ -111,7 +110,7 @@ export default function ManageClassroomStudentsPage() {
     try {
       const idToken = await clientAuth.currentUser.getIdToken();
       const studentsDetails = studentUidsToAdd.map(uid => selectedStudents[uid]);
-      await addStudentsToClassroom(idToken, classroomId, studentsDetails);
+      await addStudentsToClass(idToken, classroomId, studentsDetails);
 
       toast({ title: "Students Added", description: `${studentUidsToAdd.length} student(s) have been added to the classroom.` });
       fetchClassroomDetailsAndStudents(); 
@@ -130,7 +129,7 @@ export default function ManageClassroomStudentsPage() {
     setIsSubmitting(true);
     try {
       const idToken = await clientAuth.currentUser.getIdToken();
-      await removeStudentFromClassroom(idToken, classroomId, studentUid);
+      await removeStudentFromClass(idToken, classroomId, studentUid);
       toast({ title: "Student Removed", description: "The student has been removed from the classroom." });
       fetchClassroomDetailsAndStudents(); 
     } catch (error) {
@@ -151,7 +150,7 @@ export default function ManageClassroomStudentsPage() {
     setIsSubmitting(true);
     try {
       const idToken = await clientAuth.currentUser.getIdToken();
-      await updateStudentBatchInClassroom(idToken, classroomId, editingStudent.userId, newBatchValue.trim());
+      await updateStudentBatchForClassroom(idToken, classroomId, editingStudent.userId, newBatchValue.trim());
       toast({ title: "Batch Updated", description: `${editingStudent.name}'s batch updated to "${newBatchValue.trim() || 'N/A'}".` });
       fetchClassroomDetailsAndStudents();
       setIsBatchEditModalOpen(false);

@@ -12,8 +12,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Users, Eye, Search } from 'lucide-react';
 import { auth as clientAuth } from '@/lib/firebase/client';
-import { getClassroomsByFaculty, getStudentsInClassroom } from '@/services/classroom';
 import type { Classroom, ClassroomStudentInfo } from '@/services/classroom';
+import { fetchFacultyClassroomsData, fetchStudentsInClassroomData } from './actions';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
@@ -57,7 +57,7 @@ export default function FacultyViewStudentsPage() {
     setLoadingClassrooms(true);
     try {
       const idToken = await clientAuth.currentUser.getIdToken();
-      const fetchedClassrooms = await getClassroomsByFaculty(idToken);
+      const fetchedClassrooms = await fetchFacultyClassroomsData(idToken);
       setClassrooms(fetchedClassrooms);
     } catch (error) {
       toast({ title: "Error", description: "Could not load your classrooms.", variant: "destructive" });
@@ -71,7 +71,7 @@ export default function FacultyViewStudentsPage() {
     setLoadingStudents(true);
     try {
         const idToken = await clientAuth.currentUser.getIdToken();
-        const students = await getStudentsInClassroom(idToken, classroomId);
+        const students = await fetchStudentsInClassroomData(idToken, classroomId);
         const sortedStudents = students.sort((a, b) => 
             (a.studentIdNumber || '').localeCompare(b.studentIdNumber || '', undefined, { numeric: true })
         );

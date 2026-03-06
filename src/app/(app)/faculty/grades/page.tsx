@@ -14,10 +14,17 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Save, UserSearch, PlusCircle, Trash2, Users, Download } from 'lucide-react';
 import { auth as clientAuth } from '@/lib/firebase/client';
-import { getClassroomsByFaculty, getStudentsInClassroom } from '@/services/classroom';
-import { getGrades, updateStudentGrade, getUniqueCourseNames, deleteStudentGrade, getGradesForClassroom } from '@/services/grades';
 import type { Classroom, ClassroomStudentInfo } from '@/services/classroom';
 import type { Grade } from '@/services/grades';
+import {
+  fetchFacultyClassrooms,
+  fetchStudentsForClassroom,
+  fetchStudentGradesForFaculty,
+  getUniqueCoursesForFaculty,
+  updateGradeForStudent,
+  deleteGradeRecord,
+  fetchGradesForClassroom,
+} from './actions';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { exportDataToCsv } from '@/lib/csv-exporter';
@@ -62,7 +69,7 @@ export default function ManageGradesPage() {
     setLoadingClassrooms(true);
     try {
       const idToken = await clientAuth.currentUser.getIdToken();
-      const fetchedClassrooms = await getClassroomsByFaculty(idToken);
+      const fetchedClassrooms = await fetchFacultyClassrooms(idToken);
       setClassrooms(fetchedClassrooms);
     } catch (error) {
       toast({ title: "Error", description: "Could not load your classrooms.", variant: "destructive" });
@@ -75,7 +82,7 @@ export default function ManageGradesPage() {
     if (!user || !clientAuth.currentUser) return;
     try {
       const idToken = await clientAuth.currentUser.getIdToken();
-      const courses = await getUniqueCourseNames(idToken);
+      const courses = await getUniqueCoursesForFaculty(idToken);
       setUniqueCourses(courses);
     } catch (error) {
       toast({ title: "Error", description: "Could not fetch existing course names.", variant: "destructive" });
@@ -94,7 +101,7 @@ export default function ManageGradesPage() {
     setLoadingStudents(true);
     try {
       const idToken = await clientAuth.currentUser.getIdToken();
-      const students = await getStudentsInClassroom(idToken, classroomId);
+      const students = await fetchStudentsForClassroom(idToken, classroomId);
       const sortedStudents = students.sort((a, b) => 
         (a.studentIdNumber || '').localeCompare(b.studentIdNumber || '', undefined, { numeric: true })
       );
@@ -110,7 +117,7 @@ export default function ManageGradesPage() {
     setSelectedStudent(student);
     setLoadingGrades(true);
     try {
-      const fetchedGrades = await getGrades(student.userId);
+      const fetchedGrades = await fetchStudentGradesForFaculty(student.userId);
       setStudentGrades(fetchedGrades);
     } catch (error) {
       toast({ title: "Error", description: `Could not fetch grades for ${student.name}.`, variant: "destructive" });
@@ -130,7 +137,7 @@ export default function ManageGradesPage() {
     setIsSubmitting(true);
     try {
         const idToken = await clientAuth.currentUser.getIdToken();
-        await updateStudentGrade(idToken, { studentId, courseName: courseName.trim(), grade, maxMarks });
+        await updateGradeForStudent(idToken, { studentId, courseName: courseName.trim(), grade, maxMarks });
         toast({ title: "Grade Saved", description: `Grade for ${courseName.trim()} saved successfully.` });
         
         if (selectedStudent) {
@@ -156,7 +163,7 @@ export default function ManageGradesPage() {
     setIsSubmitting(true);
     try {
         const idToken = await clientAuth.currentUser.getIdToken();
-        await deleteStudentGrade(idToken, gradeId);
+        await deleteGradeRecord(idToken, gradeId);
         toast({ title: "Grade Deleted", description: "The grade has been successfully deleted." });
         selectStudentForGrading(selectedStudent);
     } catch (error) {
@@ -172,7 +179,7 @@ export default function ManageGradesPage() {
         try {
             const idToken = await clientAuth.currentUser.getIdToken();
             const studentUids = studentsInClassroom.map(s => s.userId);
-            const grades = await getGradesForClassroom(idToken, studentUids);
+            const grades = await fetchGradesForClassroom(idToken, studentUids);
             setClassroomGrades(grades);
         } catch (error) {
             toast({ title: "Error", description: "Could not fetch classroom grade report.", variant: "destructive" });
