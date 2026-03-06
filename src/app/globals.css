@@ -129,6 +129,6 @@
 @layer utilities {
   /* Prestige card pattern from design system */
   .card-prestige {
-    @apply bg-white dark:bg-card border-t-[3px] border-accent shadow-prestige p-6 flex flex-col gap-2 rounded-sm relative overflow-hidden;
+    @apply bg-white border-t-[3px] border-accent shadow-prestige p-6 flex flex-col gap-2 rounded-sm relative overflow-hidden;
   }
 }

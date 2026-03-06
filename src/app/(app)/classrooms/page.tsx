@@ -60,12 +60,47 @@ function StudentClassroomsLoader() {
 
   useEffect(() => {
     if (!authLoading && user && clientAuth.currentUser) {
+      const isDummyUser =
+        user.displayName?.toLowerCase().includes("pranavarun") ||
+        user.email?.includes("pranavarun");
       const fetchClassrooms = async () => {
         setLoadingClassroomsState(true);
         try {
           const idToken = await clientAuth.currentUser.getIdToken();
-          const fetchedClassrooms =
-            await fetchStudentClassrooms(idToken);
+          const fetchedClassrooms = isDummyUser
+            ? ([
+                {
+                  classroomId: "1",
+                  classroomName: "Theory of Computation",
+                  classroomSubject: "Computer Science and Business Systems",
+                  studentBatchInClassroom: "Batch A",
+                },
+                {
+                  classroomId: "2",
+                  classroomName: "Database Management Systems",
+                  classroomSubject: "CS502",
+                  studentBatchInClassroom: "Batch A",
+                },
+                {
+                  classroomId: "3",
+                  classroomName: "Artificial Intelligence",
+                  classroomSubject: "AI&DS",
+                  studentBatchInClassroom: "Batch A",
+                },
+                {
+                  classroomId: "4",
+                  classroomName: "Operating Systems",
+                  classroomSubject: "CSE",
+                  studentBatchInClassroom: "Batch A",
+                },
+                {
+                  classroomId: "5",
+                  classroomName: "Digital Electronics",
+                  classroomSubject: "ECE",
+                  studentBatchInClassroom: "Batch A",
+                },
+              ] as any)
+            : await fetchStudentClassrooms(idToken);
           setEnrolledClassrooms(fetchedClassrooms);
         } catch (err) {
           console.error("Failed to fetch student classroom data:", err);
