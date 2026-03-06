@@ -11,6 +11,7 @@ import { useEffect, useState, useCallback } from "react";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MainHeader } from "@/components/layout/main-header";
+import { PageHeader } from "@/components/layout/page-header";
 import {
   Award,
   CalendarClock,
@@ -392,32 +393,21 @@ export default function DashboardPage() {
   return (
     <>
       <MainHeader />
-      <div className="space-y-8 pt-8">
-        {/* Welcome Header */}
-        <section className="flex flex-col md:flex-row justify-between items-end border-b border-kssem-border pb-4">
-          <div>
-            <p className="text-kssem-navy text-sm font-semibold uppercase tracking-wider mb-1">
-              Academic Session {today.getFullYear()}-{today.getFullYear() + 1}
-            </p>
-            <h1 className="font-serif font-bold text-3xl md:text-4xl tracking-tight text-kssem-text">
-              Welcome back, {data.profile.name?.split(" ")[0]}.
-            </h1>
-            <div className="mt-2 flex items-center gap-3">
-              <span className="bg-kssem-navy/10 text-kssem-navy text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider">
-                {data.profile.courseProgram || "B.Tech CSE"}
-              </span>
-              <span className="text-kssem-text-muted text-xs font-medium border-l border-kssem-border pl-3">
-                Section {data.profile.sectionOrBatch || "A"} • Year{" "}
-                {data.profile.currentYear || "3"}
-              </span>
-            </div>
-          </div>
-          <div className="mt-4 md:mt-0 text-kssem-text-muted text-sm font-medium flex items-center gap-2 bg-white px-3 py-1.5 shadow-sm border border-kssem-border rounded-sm">
+      <PageHeader
+        title={`Welcome back, ${data.profile.name?.split(" ")[0]}.`}
+        description={`${data.profile.courseProgram || "B.Tech CSE"} • Section ${data.profile.sectionOrBatch || "N/A"} • Year ${data.profile.currentYear || "3"}`}
+        breadcrumbs={`Academic Session ${today.getFullYear()}-${today.getFullYear() + 1}`}
+        actions={
+          <div className="flex items-center gap-2 bg-kssem-bg border border-kssem-border px-4 py-2 rounded-sm shadow-sm">
             <CalendarClock className="h-4 w-4 text-kssem-gold" />
-            <span>{dateStr}</span>
+            <span className="text-kssem-navy text-sm font-bold tracking-wide">
+              {dateStr}
+            </span>
           </div>
-        </section>
+        }
+      />
 
+      <div className="space-y-8">
         {/* KPI Metrics Grid */}
         <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <SummaryCard

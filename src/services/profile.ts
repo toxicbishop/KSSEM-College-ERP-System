@@ -222,6 +222,7 @@ export async function updateStudentProfile(
   const sanitizedData = { ...profileData };
   delete sanitizedData.role;
   delete sanitizedData.studentId;
+  delete sanitizedData.enrollmentNumber;
 
   // For critical fields (name, email), only allow update if current Firestore value is missing or N/A
   try {

@@ -1,6 +1,7 @@
 "use client";
 
 import { MainHeader } from "@/components/layout/main-header";
+import { PageHeader } from "@/components/layout/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect, useState, Suspense } from "react";
 import { useAuth } from "@/context/auth-context";
@@ -369,16 +370,19 @@ export default function StudentClassroomsPage() {
   return (
     <>
       <MainHeader />
-      <div className="space-y-6 pt-8">
-        <div className="border-b border-kssem-border pb-4">
-          <h1 className="text-3xl md:text-4xl font-serif font-bold tracking-tight text-kssem-navy">
-            My Classrooms
-          </h1>
-          <p className="text-kssem-text-muted text-sm mt-1">
-            View your enrolled classrooms, assigned batches, and join
-            discussions.
-          </p>
-        </div>
+      <PageHeader
+        title="My Classrooms"
+        description="View your enrolled academic classrooms, assigned batches, and participate in peer discussions. Connect with your faculty and class group."
+        actions={
+          <div className="flex items-center gap-2 bg-kssem-bg border border-kssem-border px-4 py-2 rounded-sm shadow-sm">
+            <BookOpen className="h-4 w-4 text-kssem-gold" />
+            <span className="text-kssem-navy text-sm font-bold tracking-wide">
+              Academic Year 2026-27
+            </span>
+          </div>
+        }
+      />
+      <div className="space-y-6">
         <Suspense
           fallback={
             <div className="space-y-4">
