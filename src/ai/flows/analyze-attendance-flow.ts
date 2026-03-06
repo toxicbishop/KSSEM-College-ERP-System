@@ -1,3 +1,5 @@
+"use server";
+
 /**
  * @fileOverview A Genkit flow for analyzing student attendance records.
  *
@@ -5,36 +7,38 @@
  * including a summary, key observations, and actionable suggestions for the faculty.
  */
 
-import { ai } from '@/ai/ai-instance';
-import { z } from 'zod';
-import { 
-  AttendanceAnalysisInputSchema, 
+import { ai } from "@/ai/ai-instance";
+import { z } from "zod";
+import {
+  AttendanceAnalysisInputSchema,
   AttendanceAnalysisOutputSchema,
   type AttendanceAnalysisInput,
-  type AttendanceAnalysisOutput
-} from '@/services/attendance';
-import type { LectureAttendanceRecord } from '@/services/attendance';
+  type AttendanceAnalysisOutput,
+} from "@/services/attendance";
+import type { LectureAttendanceRecord } from "@/services/attendance";
 
 /**
  * Analyzes a list of student attendance records and provides an AI-generated analysis.
  * @param records An array of LectureAttendanceRecord objects.
  * @returns A promise that resolves to the AI-generated attendance analysis.
  */
-export async function analyzeAttendance(records: LectureAttendanceRecord[]): Promise<AttendanceAnalysisOutput> {
+export async function analyzeAttendance(
+  records: LectureAttendanceRecord[],
+): Promise<AttendanceAnalysisOutput> {
   // Map the full LectureAttendanceRecord objects to the simpler structure expected by the prompt.
-  const analysisInput: AttendanceAnalysisInput = records.map(r => ({
+  const analysisInput: AttendanceAnalysisInput = records.map((r) => ({
     date: r.date,
     studentName: r.studentName,
     status: r.status,
   }));
-  
+
   return analyzeAttendanceFlow(analysisInput);
 }
 
 // Define the Genkit prompt for attendance analysis.
 const attendanceAnalysisPrompt = ai.definePrompt({
-  name: 'attendanceAnalysisPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  name: "attendanceAnalysisPrompt",
+  model: "googleai/gemini-1.5-flash",
   input: { schema: AttendanceAnalysisInputSchema },
   output: { schema: AttendanceAnalysisOutputSchema },
   prompt: `You are an expert academic data analyst. You are tasked with analyzing a set of attendance records for a classroom over a specific period. Your goal is to provide insightful and actionable feedback to the faculty member.
@@ -64,36 +68,39 @@ Here are the attendance records:
 // Define the Genkit flow.
 const analyzeAttendanceFlow = ai.defineFlow(
   {
-    name: 'analyzeAttendanceFlow',
+    name: "analyzeAttendanceFlow",
     inputSchema: AttendanceAnalysisInputSchema,
     outputSchema: AttendanceAnalysisOutputSchema,
   },
   async (input) => {
     // If there are no records, return a default empty state.
     if (input.length === 0) {
-        return {
-            overallSummary: "No attendance records were provided for analysis.",
-            keyObservations: [],
-            actionableSuggestions: [],
-        };
+      return {
+        overallSummary: "No attendance records were provided for analysis.",
+        keyObservations: [],
+        actionableSuggestions: [],
+      };
     }
-    
+
     try {
       const { output } = await attendanceAnalysisPrompt(input);
-      
+
       if (!output) {
-          throw new Error("The AI model did not return a valid analysis for attendance.");
+        throw new Error(
+          "The AI model did not return a valid analysis for attendance.",
+        );
       }
-      
+
       return output;
     } catch (error) {
       console.error("[analyzeAttendanceFlow] Genkit prompt failed:", error);
       // Return a default structure on error to prevent the client from crashing.
       return {
-        overallSummary: "AI analysis for attendance is currently unavailable. Please check the API key or try again later.",
+        overallSummary:
+          "AI analysis for attendance is currently unavailable. Please check the API key or try again later.",
         keyObservations: [],
         actionableSuggestions: [],
       };
     }
-  }
+  },
 );
