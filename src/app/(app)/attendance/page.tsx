@@ -10,7 +10,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getAttendanceRecords } from "@/services/attendance";
 import { useEffect, useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
@@ -25,6 +24,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { AlertTriangle, Download } from "lucide-react";
+import { fetchAttendanceRecords } from "./actions";
 
 function AttendanceTableLoader() {
   const { user, loading: authLoading } = useAuth();
@@ -40,7 +40,7 @@ function AttendanceTableLoader() {
         setError(null);
         try {
           const idToken = await clientAuth!.currentUser!.getIdToken();
-          const fetchedRecords = await getAttendanceRecords(idToken);
+          const fetchedRecords = await fetchAttendanceRecords(idToken);
           setRecords(fetchedRecords);
         } catch (err) {
           console.error("Failed to fetch attendance records:", err);

@@ -5,14 +5,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect, useState, Suspense } from "react";
 import { useAuth } from "@/context/auth-context";
 import { auth as clientAuth } from "@/lib/firebase/client";
-import {
-  getStudentClassroomsWithBatchInfo,
-  getClassmatesInfo,
-} from "@/services/classroom";
 import type {
   StudentClassroomEnrollmentInfo,
   ClassmateInfo,
 } from "@/services/classroom";
+import { fetchStudentClassrooms, fetchClassmates } from "./actions";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -68,7 +65,7 @@ function StudentClassroomsLoader() {
         try {
           const idToken = await clientAuth.currentUser.getIdToken();
           const fetchedClassrooms =
-            await getStudentClassroomsWithBatchInfo(idToken);
+            await fetchStudentClassrooms(idToken);
           setEnrolledClassrooms(fetchedClassrooms);
         } catch (err) {
           console.error("Failed to fetch student classroom data:", err);
@@ -105,7 +102,7 @@ function StudentClassroomsLoader() {
     setClassmatesError(null);
     try {
       const idToken = await clientAuth.currentUser.getIdToken();
-      const fetchedClassmates = await getClassmatesInfo(
+      const fetchedClassmates = await fetchClassmates(
         idToken,
         classroom.classroomId,
       );

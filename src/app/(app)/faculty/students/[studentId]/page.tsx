@@ -25,13 +25,15 @@ import {
 } from "lucide-react";
 import { auth as clientAuth } from "@/lib/firebase/client";
 import { getStudentProfile } from "@/services/profile";
-import { getAttendanceRecords } from "@/services/attendance";
-import { getGradesForStudent } from "@/services/grades"; // Changed from getGrades
-import { analyzeGrades } from "@/ai/flows/analyze-grades-flow";
 import type { StudentProfile } from "@/services/profile";
 import type { AttendanceRecord } from "@/services/attendance";
-import type { Grade } from "@/types/grades";
-import type { GradeAnalysisOutput } from "@/types/grade-analysis";
+import type { Grade } from "@/services/grades";
+import type { GradeAnalysisOutput } from "@/services/grades";
+import {
+  fetchAttendanceForStudent,
+  fetchGradesForStudent,
+  analyzeStudentGradesData,
+} from "./actions";
 import Image from "next/image";
 import {
   Table,
@@ -98,9 +100,9 @@ export default function FacultyStudentDetailPage() {
     try {
       const idToken = await clientAuth!.currentUser!.getIdToken();
 
-      const attendancePromise = getAttendanceRecords(idToken, studentId);
+      const attendancePromise = fetchAttendanceForStudent(idToken, studentId);
       const profilePromise = getStudentProfile(idToken, studentId);
-      const gradesPromise = getGradesForStudent(idToken, studentId); // Use the correct service function
+      const gradesPromise = fetchGradesForStudent(idToken, studentId);
 
       const [profile, attendance, grades] = await Promise.all([
         profilePromise,
@@ -114,7 +116,7 @@ export default function FacultyStudentDetailPage() {
 
       let analysis: GradeAnalysisOutput;
       try {
-        analysis = await analyzeGrades(grades);
+        analysis = await analyzeStudentGradesData(grades);
       } catch (aiError) {
         console.error(
           "Faculty Student Detail Page: AI grade analysis failed.",

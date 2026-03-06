@@ -65,16 +65,6 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/auth-context";
 import { auth as clientAuth } from "@/lib/firebase/client";
-import {
-  getClassroomsByFaculty,
-  getStudentsInClassroom,
-} from "@/services/classroom";
-import {
-  submitLectureAttendance,
-  getLectureAttendanceForDate,
-  getLectureAttendanceForDateRange,
-  deleteLectureAttendance,
-} from "@/services/attendance";
 import type { Classroom, ClassroomStudentInfo } from "@/services/classroom";
 import type { LectureAttendanceRecord } from "@/services/attendance";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -86,9 +76,17 @@ import {
 } from "@/components/ui/accordion";
 import { exportDataToCsv } from "@/lib/csv-exporter";
 import { Slider } from "@/components/ui/slider";
-import { analyzeAttendance } from "@/ai/flows/analyze-attendance-flow";
 import type { AttendanceAnalysisOutput } from "@/services/attendance";
 import dynamic from "next/dynamic";
+import {
+  fetchClassroomsByFaculty,
+  fetchStudentsInClassroom,
+  submitAttendance,
+  getAttendanceForDate,
+  getAttendanceForDateRange,
+  deleteAttendance,
+  analyzeAttendanceData,
+} from "./actions";
 
 const AttendancePieChart = dynamic(
   () => import("@/components/charts/attendance-pie-chart"),
@@ -330,7 +328,7 @@ export default function FacultyAttendancePage() {
     setLoadingClassrooms(true);
     try {
       const idToken = await clientAuth?.currentUser.getIdToken();
-      const fetchedClassrooms = await getClassroomsByFaculty(idToken);
+      const fetchedClassrooms = await fetchClassroomsByFaculty(idToken);
       setClassrooms(fetchedClassrooms);
     } catch (error) {
       console.error("Error fetching faculty classrooms:", error);
@@ -357,7 +355,7 @@ export default function FacultyAttendancePage() {
     setLoadingStudents(true);
     try {
       const idToken = await clientAuth?.currentUser.getIdToken();
-      const students: ClassroomStudentInfo[] = await getStudentsInClassroom(
+      const students: ClassroomStudentInfo[] = await fetchStudentsInClassroom(
         idToken,
         classroomId,
       );
@@ -418,7 +416,7 @@ export default function FacultyAttendancePage() {
     try {
       const idToken = await clientAuth?.currentUser.getIdToken();
       const dateString = format(selectedDate, "yyyy-MM-dd");
-      const previousRecords = await getLectureAttendanceForDate(
+      const previousRecords = await getAttendanceForDate(
         idToken,
         selectedClassroomId,
         dateString,
@@ -606,7 +604,7 @@ export default function FacultyAttendancePage() {
     }));
 
     try {
-      await submitLectureAttendance(recordsToSubmit);
+      await submitAttendance(idToken, selectedClassroomId, recordsToSubmit);
       const batchDescription =
         selectedBatchFilter === WHOLE_CLASS_FILTER_VALUE
           ? "whole class"
@@ -646,7 +644,7 @@ export default function FacultyAttendancePage() {
     try {
       const idToken = await clientAuth?.currentUser.getIdToken();
       const dateString = format(selectedDate, "yyyy-MM-dd");
-      await deleteLectureAttendance(idToken, selectedClassroomId, dateString);
+      await deleteAttendance(idToken, dateString);
       toast({
         title: "Attendance Deleted",
         description: `All attendance records for this classroom on ${format(selectedDate, "PPP")} have been deleted.`,
@@ -703,7 +701,7 @@ export default function FacultyAttendancePage() {
     setAnalysisResult(null);
     try {
       const idToken = await clientAuth?.currentUser.getIdToken();
-      const fetchedRecords = await getLectureAttendanceForDateRange(
+      const fetchedRecords = await getAttendanceForDateRange(
         idToken,
         selectedClassroomId,
         format(startDate, "yyyy-MM-dd"),
@@ -720,7 +718,7 @@ export default function FacultyAttendancePage() {
       } else {
         // Trigger AI analysis
         try {
-          const analysis = await analyzeAttendance(fetchedRecords);
+          const analysis = await analyzeAttendanceData(fetchedRecords);
           setAnalysisResult(analysis);
         } catch (aiError) {
           console.error("AI Analysis failed:", aiError);

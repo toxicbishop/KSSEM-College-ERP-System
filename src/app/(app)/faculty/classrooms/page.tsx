@@ -17,12 +17,18 @@ import { PlusCircle, Users, Edit, UserPlus, LinkIcon, Trash2, Loader2, MessageSq
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { useToast } from '@/hooks/use-toast';
-import { createClassroom, getClassroomsByFaculty, addInvitedFacultyToClassroom, getAllFacultyUsers, deleteClassroom } from '@/services/classroom';
 import type { Classroom, FacultyUser } from '@/services/classroom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { auth as clientAuth } from '@/lib/firebase/client';
 import Link from 'next/link';
-import { ChatRoom } from '@/components/chat/ChatRoom'; // Import ChatRoom
+import { ChatRoom } from '@/components/chat/ChatRoom';
+import {
+  createNewClassroom,
+  fetchFacultyClassroomsList,
+  addFacultyToClassroom,
+  getAllFacultyUsersList,
+  deleteClassroomRecord,
+} from './actions';
 
 
 export default function FacultyClassroomsPage() {
@@ -60,7 +66,7 @@ export default function FacultyClassroomsPage() {
     setLoadingClassrooms(true);
     try {
       const idToken = await clientAuth.currentUser.getIdToken();
-      const fetchedClassrooms = await getClassroomsByFaculty(idToken);
+      const fetchedClassrooms = await fetchFacultyClassroomsList(idToken);
       setClassrooms(fetchedClassrooms);
       console.log(`[FacultyClassroomsPage:fetchClassrooms] Fetched ${fetchedClassrooms.length} classrooms.`);
     } catch (error) {
@@ -96,7 +102,7 @@ export default function FacultyClassroomsPage() {
     setIsSubmittingCreate(true);
     try {
       const idToken = await clientAuth.currentUser.getIdToken();
-      await createClassroom(idToken, newClassroomName, newClassroomSubject);
+      await createNewClassroom(idToken, newClassroomName, newClassroomSubject);
       toast({ title: "Success", description: `Classroom "${newClassroomName}" created.` });
       setIsCreateModalOpen(false);
       setNewClassroomName('');
@@ -121,7 +127,7 @@ export default function FacultyClassroomsPage() {
     
     try {
         const idToken = await clientAuth.currentUser.getIdToken();
-        const facultyList = await getAllFacultyUsers(idToken);
+        const facultyList = await getAllFacultyUsersList();
         const ownerId = user?.uid; 
         const alreadyInvitedIds = classroom.invitedFacultyIds || [];
         const eligibleFaculty = facultyList.filter(f => f.uid !== ownerId && !alreadyInvitedIds.includes(f.uid));
@@ -142,7 +148,7 @@ export default function FacultyClassroomsPage() {
     setIsSubmittingInvite(true);
     try {
         const idToken = await clientAuth.currentUser.getIdToken();
-        await addInvitedFacultyToClassroom(idToken, classroomToInviteTo.id, selectedFacultyToInvite);
+        await addFacultyToClassroom(idToken, classroomToInviteTo.id, selectedFacultyToInvite);
         toast({ title: "Success", description: `Faculty invited to ${classroomToInviteTo.name}.` });
         setIsInviteModalOpen(false);
         setSelectedFacultyToInvite(undefined);
@@ -162,7 +168,7 @@ export default function FacultyClassroomsPage() {
     setIsDeleting(true);
     try {
       const idToken = await clientAuth.currentUser.getIdToken();
-      await deleteClassroom(idToken, classroomToDelete.id);
+      await deleteClassroomRecord(idToken, classroomToDelete.id);
       toast({ title: "Classroom Deleted", description: `Classroom "${classroomToDelete.name}" has been deleted.` });
       fetchClassrooms(); // Refresh the list
     } catch (error) {
