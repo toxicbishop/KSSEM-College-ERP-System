@@ -137,15 +137,14 @@ export default function DashboardPage() {
           const gpa = calculateGPA(grades);
 
           // Dummy data injection for Pranavarun26
-          const isDummyUser =
-            profileData.name?.toLowerCase().includes("pranavarun") ||
-            user.email?.includes("pranavarun");
+          const isDummyUser = user.email === "pranavarun26@gmail.com";
 
           setData({
             profile: isDummyUser
               ? {
                   ...profileData,
-                  courseProgram: "Computer Science and Business Systems",
+                  courseProgram:
+                    "B.tech in Computer Science and business Systems",
                 }
               : profileData,
             attendanceRecords: isDummyUser
@@ -213,7 +212,58 @@ export default function DashboardPage() {
                 : [],
               areasForImprovement: isDummyUser ? ["Microcontrollers"] : [],
             },
-            announcements,
+            announcements: isDummyUser
+              ? [
+                  {
+                    id: "n1",
+                    date: new Date().toISOString().split("T")[0],
+                    title: "IA-1 Timetable Released",
+                    content:
+                      "Internal Assessment-I for 4th Semester starts from March 15th. Please check the department notice board for the full schedule.",
+                    category: "Exams",
+                  },
+                  {
+                    id: "n2",
+                    date: new Date(Date.now() - 86400000)
+                      .toISOString()
+                      .split("T")[0],
+                    title: "Fee Payment Reminder",
+                    content:
+                      "Standard tuition fees for the even semester must be cleared by March 20th to avoid late registration penalties.",
+                    category: "Finance",
+                  },
+                  {
+                    id: "n3",
+                    date: new Date(Date.now() - 172800000)
+                      .toISOString()
+                      .split("T")[0],
+                    title: "KREEDA 2026 Registration",
+                    content:
+                      "Annual Sports Day registrations are now open. Log in to the sports portal to sign up for track and field events.",
+                    category: "Sports",
+                  },
+                  {
+                    id: "n4",
+                    date: new Date(Date.now() - 259200000)
+                      .toISOString()
+                      .split("T")[0],
+                    title: "Placement Orientation",
+                    content:
+                      "A mandatory placement training session for 4th and 6th semester students is scheduled for Friday at 2:00 PM in the Auditorium.",
+                    category: "Placements",
+                  },
+                  {
+                    id: "n5",
+                    date: new Date(Date.now() - 345600000)
+                      .toISOString()
+                      .split("T")[0],
+                    title: "Library Books Return",
+                    content:
+                      "Students are requested to return or renew any overdue library books by the end of this week.",
+                    category: "Academics",
+                  },
+                ]
+              : announcements,
             attendancePercentage: isDummyUser ? 92 : attendancePercentage,
             gpa: isDummyUser ? "9.4" : gpa,
             sgpa: isDummyUser ? "9.6" : (parseFloat(gpa) + 0.2).toFixed(1), // Dummy SGPA

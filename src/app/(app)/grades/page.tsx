@@ -118,6 +118,9 @@ function GradesTableLoader() {
 }
 
 export default function GradesPage() {
+  const { user } = useAuth();
+  const isDummyUser = user?.email === "pranavarun26@gmail.com";
+
   return (
     <>
       <MainHeader />
@@ -127,8 +130,10 @@ export default function GradesPage() {
             <h1 className="text-3xl md:text-4xl font-serif font-bold text-kssem-navy mb-2">
               Examination Results
             </h1>
-            <p className="text-kssem-text-muted text-sm">
-              Bachelor of Technology in Computer Science & Engineering
+            <p className="text-kssem-text-muted text-sm italic">
+              {isDummyUser
+                ? "B.tech in Computer Science and business Systems"
+                : "Bachelor of Technology"}
             </p>
           </div>
           <div className="flex items-center gap-3">
