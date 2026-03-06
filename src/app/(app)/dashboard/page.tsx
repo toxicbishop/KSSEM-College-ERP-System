@@ -152,19 +152,19 @@ export default function DashboardPage() {
               ? ([
                   {
                     date: new Date().toISOString(),
-                    lectureName: "Theory of Computation",
+                    lectureName: "Analysis & Design of Algorithms",
                     status: "present",
                     id: "1",
                   },
                   {
                     date: new Date(Date.now() - 86400000).toISOString(),
-                    lectureName: "Database Systems",
+                    lectureName: "Database Management Systems",
                     status: "present",
                     id: "2",
                   },
                   {
                     date: new Date(Date.now() - 172800000).toISOString(),
-                    lectureName: "Computer Networks",
+                    lectureName: "Microcontrollers",
                     status: "absent",
                     id: "3",
                   },
@@ -176,7 +176,7 @@ export default function DashboardPage() {
                   },
                   {
                     date: new Date(Date.now() - 345600000).toISOString(),
-                    lectureName: "Software Engineering",
+                    lectureName: "Data Structures",
                     status: "present",
                     id: "5",
                   },
@@ -186,19 +186,19 @@ export default function DashboardPage() {
               ? ([
                   {
                     id: "1",
-                    courseName: "Theory of Computation",
+                    courseName: "Analysis & Design of Algorithms",
                     grade: "A+",
                     updatedAt: new Date(),
                   },
                   {
                     id: "2",
-                    courseName: "Database Systems",
+                    courseName: "Database Management Systems",
                     grade: "A",
                     updatedAt: new Date(),
                   },
                   {
                     id: "3",
-                    courseName: "Computer Networks",
+                    courseName: "Microcontrollers",
                     grade: "B+",
                     updatedAt: new Date(),
                   },
@@ -206,12 +206,12 @@ export default function DashboardPage() {
               : grades,
             gradeAnalysis: {
               overallSummary: isDummyUser
-                ? "Excellent performance in core theory. Focus slightly more on networking practicals."
+                ? "Excellent performance in algorithmic analysis. Focus on Microcontroller hardware integration."
                 : "Analyzing grades...",
               strengths: isDummyUser
-                ? ["Theoretical Computer Science", "Database Architecture"]
+                ? ["Algorithm Design", "Database Management"]
                 : [],
-              areasForImprovement: isDummyUser ? ["Network Protocols"] : [],
+              areasForImprovement: isDummyUser ? ["Microcontrollers"] : [],
             },
             announcements,
             attendancePercentage: isDummyUser ? 92 : attendancePercentage,
