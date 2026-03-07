@@ -1,5 +1,5 @@
 {
-    "name": "K.S. School of Engineering and Management ERP",
+    "name": "K.S School of Engineering & Management ERP",
     "short_name": "KSSEM ERP",
     "description": "Unified ERP for Smarter Campus Management",
     "start_url": "/",
@@ -8,13 +8,13 @@
     "theme_color": "#2dd4bf",
     "icons": [
         {
-            "src": "/collage-logo.png",
+            "src": "/Assets/collage-logo.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any"
         },
         {
-            "src": "/collage-logo.png",
+            "src": "/Assets/collage-logo.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
