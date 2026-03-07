@@ -257,8 +257,8 @@ export default function LandingPage() {
               <h2 className="text-kssem-navy font-bold tracking-wide text-lg leading-tight">
                 KSSEM
               </h2>
-              <p className="text-kssem-text-muted text-xs uppercase tracking-wider font-semibold">
-                School of Engineering &amp; Management
+              <p className="text-kssem-text-muted text-[10px] uppercase tracking-[0.15em] font-bold">
+                K.S School of Engineering &amp; Management
               </p>
             </div>
           </div>

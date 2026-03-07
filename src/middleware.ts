@@ -97,7 +97,7 @@ export async function middleware(request: NextRequest) {
     !pathname.startsWith("/_next/") && // Next.js internals
     !pathname.startsWith("/api/") && // API routes (already handled if maintenance was on)
     pathname !== "/favicon.ico" &&
-    pathname !== "/collage-logo.png"; // Static assets
+    pathname !== "/Assets/collage-logo.png"; // Static assets
 
   // 1. User is NOT authenticated and tries to access a PROTECTED route
   if (!hasAuthCookie && isProtectedRoute) {
@@ -123,10 +123,10 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - collage-logo.png (college logo file)
+     * - Assets/collage-logo.png (college logo file)
      * It's important that this matcher DOES include /api routes, /signin, /maintenance, etc.,
      * as the middleware logic needs to run for them.
      */
-    "/((?!_next/static|_next/image|favicon.ico|collage-logo.png).*)",
+    "/((?!_next/static|_next/image|favicon.ico|Assets/collage-logo.png).*)",
   ],
 };

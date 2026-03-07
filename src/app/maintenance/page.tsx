@@ -44,7 +44,7 @@ export default function MaintenancePage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-kssem-bg p-6 text-center">
       <div className="card-prestige w-full max-w-lg text-center">
         <Image
-          src="/collage-logo.png"
+          src="/Assets/collage-logo.png"
           alt="Site Logo"
           width={60}
           height={60}
@@ -59,7 +59,7 @@ export default function MaintenancePage() {
         </div>
         <p className="text-kssem-text-muted leading-relaxed mb-6">
           {settings?.applicationName ||
-            "K.S. School of Engineering and Management"}{" "}
+            "K.S School of Engineering & Management"}{" "}
           is currently undergoing scheduled maintenance. We should be back
           online shortly. Thank you for your patience!
         </p>
@@ -80,9 +80,8 @@ export default function MaintenancePage() {
       </div>
       <p className="mt-8 text-xs text-kssem-text-muted">
         &copy; {new Date().getFullYear()}{" "}
-        {settings?.applicationName ||
-          "K.S. School of Engineering and Management"}
-        . All rights reserved.
+        {settings?.applicationName || "K.S School of Engineering & Management"}.
+        All rights reserved.
       </p>
     </div>
   );

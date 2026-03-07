@@ -204,15 +204,20 @@ export default function SignUpPage() {
         <div className="max-w-md mx-auto w-full">
           <Link href="/" className="flex items-center gap-2 mb-10">
             <Image
-              src="/collage-logo.png"
+              src="/Assets/collage-logo.png"
               alt="Logo"
               width={36}
               height={36}
               data-ai-hint="college crest"
             />
-            <span className="font-serif font-bold text-kssem-navy text-xl">
-              KSSEM
-            </span>
+            <div className="flex flex-col">
+              <span className="font-serif font-bold text-kssem-navy text-xl leading-none">
+                KSSEM
+              </span>
+              <span className="text-kssem-text-muted text-[8px] uppercase tracking-wider font-bold mt-1">
+                K.S School of Engineering &amp; Management
+              </span>
+            </div>
           </Link>
 
           <h1 className="font-serif font-bold text-3xl text-kssem-navy mb-1">

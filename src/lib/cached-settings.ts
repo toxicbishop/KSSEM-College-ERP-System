@@ -3,7 +3,7 @@ import { unstable_cache } from "next/cache";
 import { adminDb } from "@/lib/firebase/admin.server";
 import { SystemSettings } from "@/services/system-settings";
 
-const DEFAULT_APP_NAME = "K.S. School of Engineering and Management";
+const DEFAULT_APP_NAME = "K.S School of Engineering & Management";
 
 /**
  * Fetches system settings from Firestore using the Admin SDK.

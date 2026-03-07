@@ -11,6 +11,7 @@ import {
   sendPasswordResetEmail,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase/client";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -225,19 +226,25 @@ export default function SignInPage() {
       <div className="w-full md:w-[40%] bg-white flex flex-col justify-between relative z-10 shadow-prestige h-screen overflow-y-auto">
         {/* Top Branding */}
         <div className="px-8 pt-8 md:px-12 md:pt-12">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-kssem-navy flex items-center justify-center text-white rounded-sm">
-              <GraduationCap className="h-7 w-7" />
+          <Link href="/" className="flex items-center gap-4 group">
+            <div className="bg-white p-1 rounded-sm flex items-center justify-center transition-transform duration-300 shadow-sm border border-gray-100 group-hover:rotate-3">
+              <Image
+                src="/Assets/collage-logo.png"
+                alt="KSSEM Logo"
+                width={40}
+                height={40}
+                className="object-contain"
+              />
             </div>
             <div>
-              <h2 className="text-kssem-navy font-bold tracking-wide text-lg leading-tight">
+              <h2 className="text-kssem-navy font-bold tracking-wide text-lg leading-tight group-hover:text-kssem-gold transition-colors">
                 KSSEM
               </h2>
-              <p className="text-kssem-text-muted text-xs uppercase tracking-wider font-semibold">
-                School of Engineering &amp; Management
+              <p className="text-kssem-text-muted text-[10px] uppercase tracking-[0.15em] font-bold">
+                K.S School of Engineering &amp; Management
               </p>
             </div>
-          </div>
+          </Link>
         </div>
 
         {/* Center Form */}

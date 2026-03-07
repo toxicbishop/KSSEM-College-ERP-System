@@ -12,8 +12,12 @@ import { useAuth } from "@/context/auth-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { usePathname } from "next/navigation";
 import { Bell, Menu, UserCircle, LogOut } from "lucide-react";
-import { db } from "@/lib/firebase/client";
+import { db, auth } from "@/lib/firebase/client";
 import { doc, getDoc } from "firebase/firestore";
+import { signOut } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+import { deleteCookie } from "@/lib/utils";
 
 const getInitials = (name: string) => {
   if (!name) return "U";
@@ -41,6 +45,29 @@ export function MainHeader() {
   const pathname = usePathname();
   const [userName, setUserName] = useState<string | null>(null);
   const [scholarId, setScholarId] = useState<string | null>(null);
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    if (auth) {
+      try {
+        await signOut(auth);
+        deleteCookie("firebaseAuthToken");
+        toast({
+          title: "Logged Out",
+          description: "You have been successfully logged out.",
+        });
+        router.push("/signin");
+      } catch (error) {
+        console.error("Logout failed:", error);
+        toast({
+          title: "Logout Failed",
+          description: "Could not log you out. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
 
   useEffect(() => {
     if (user && db) {
@@ -127,7 +154,7 @@ export function MainHeader() {
           ) : (
             <div className="bg-white p-1 rounded-sm flex items-center justify-center">
               <Image
-                src="/collage-logo.png"
+                src="/Assets/collage-logo.png"
                 alt="KSSEM Logo"
                 width={32}
                 height={32}
@@ -169,6 +196,16 @@ export function MainHeader() {
           <button className="text-slate-300 hover:text-white transition-colors hidden sm:block">
             <Bell className="h-5 w-5" />
           </button>
+          <div className="h-6 w-px bg-white/20 hidden sm:block"></div>
+
+          <button
+            onClick={handleLogout}
+            className="text-slate-300 hover:text-kssem-gold transition-colors flex items-center gap-2 group"
+            title="Logout">
+            <LogOut className="h-5 w-5 group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-medium hidden lg:block">Logout</span>
+          </button>
+
           <div className="h-6 w-px bg-white/20 hidden sm:block"></div>
           <Link href="/profile" className="flex items-center gap-3">
             <div className="text-right hidden sm:block">

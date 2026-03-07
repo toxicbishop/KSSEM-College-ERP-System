@@ -16,7 +16,7 @@ import {
   Send,
 } from "lucide-react";
 import { MobileNav } from "./mobile-nav";
-import { cn } from "@/lib/utils";
+import { cn, deleteCookie } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
 import { auth } from "@/lib/firebase/client";
@@ -59,13 +59,6 @@ const adminMobileNavItems = [
   { href: "/admin/settings", label: "Settings", icon: Settings },
   { href: "/dashboard", label: "Student V", icon: LayoutDashboard },
 ];
-
-function deleteCookie(name: string) {
-  if (typeof document !== "undefined") {
-    document.cookie =
-      name + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-  }
-}
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -220,7 +213,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 isSidebarCollapsed ? "justify-center pt-2" : "space-x-3",
               )}>
               <Image
-                src="/collage-logo.png"
+                src="/Assets/collage-logo.png"
                 alt={`${collegeName} Admin Logo`}
                 width={isSidebarCollapsed ? 32 : 40}
                 height={isSidebarCollapsed ? 32 : 40}
