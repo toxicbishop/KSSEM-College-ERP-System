@@ -8,7 +8,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex flex-col text-center md:text-left">
           <p className="text-slate-400 text-xs tracking-wide">
-            &copy; {new Date().getFullYear()} KSSEM School of Engineering &amp;
+            &copy; {new Date().getFullYear()} K.S School of Engineering &amp;
             Management. All Rights Reserved.
           </p>
           <p className="text-slate-500 text-[10px] mt-1">

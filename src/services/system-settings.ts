@@ -15,8 +15,8 @@ const SETTINGS_DOC_ID = "appConfiguration";
 const defaultSettings: SystemSettings = {
   maintenanceMode: false,
   allowNewUserRegistration: true,
-  applicationName: "K.S. School of Engineering and Management",
-  announcementTitle: "Welcome to K.S. School of Engineering and Management!",
+  applicationName: "K.S School of Engineering & Management",
+  announcementTitle: "Welcome to K.S School of Engineering & Management!",
   announcementContent:
     "Stay tuned for important updates and announcements. You can customize this message in the admin settings.",
   defaultItemsPerPage: 10,

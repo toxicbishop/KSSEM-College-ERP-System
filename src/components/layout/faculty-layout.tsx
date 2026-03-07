@@ -17,7 +17,7 @@ import {
   UserSearch,
 } from "lucide-react";
 import { MobileNav } from "./mobile-nav";
-import { cn } from "@/lib/utils";
+import { cn, deleteCookie } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
 import { auth } from "@/lib/firebase/client";
@@ -65,13 +65,6 @@ const facultyMobileNavItems = [
   { href: "/faculty/classrooms", label: "Classrooms", icon: Users },
   { href: "/faculty/students", label: "Students", icon: UserSearch },
 ];
-
-function deleteCookie(name: string) {
-  if (typeof document !== "undefined") {
-    document.cookie =
-      name + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-  }
-}
 
 export function FacultyLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -226,7 +219,7 @@ export function FacultyLayout({ children }: { children: React.ReactNode }) {
                 isSidebarCollapsed ? "justify-center pt-2" : "space-x-3",
               )}>
               <Image
-                src="/collage-logo.png"
+                src="/Assets/collage-logo.png"
                 alt={`${collegeName} Faculty Logo`}
                 width={isSidebarCollapsed ? 32 : 40}
                 height={isSidebarCollapsed ? 32 : 40}

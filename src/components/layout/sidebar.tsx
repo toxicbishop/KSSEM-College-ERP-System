@@ -22,7 +22,7 @@ import { useAuth } from "@/context/auth-context";
 import { auth } from "@/lib/firebase/client";
 import { signOut } from "firebase/auth";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
+import { cn, deleteCookie } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
 import {
   Tooltip,
@@ -54,13 +54,6 @@ const navigationItems = [
   { href: "/appointments", label: "Appointments", icon: CalendarCheck },
   { href: "/voting", label: "Voting System", icon: Vote },
 ];
-
-function deleteCookie(name: string) {
-  if (typeof document !== "undefined") {
-    document.cookie =
-      name + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-  }
-}
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -183,7 +176,7 @@ export function Sidebar({
               isCollapsed ? "justify-center pt-2" : "space-x-3",
             )}>
             <Image
-              src="/collage-logo.png"
+              src="/Assets/collage-logo.png"
               alt={`${collegeName} Logo`}
               width={isCollapsed ? 32 : 40}
               height={isCollapsed ? 32 : 40}

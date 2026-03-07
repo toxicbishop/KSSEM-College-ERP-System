@@ -5,11 +5,39 @@ import Link from "next/link";
 import { useAuth } from "@/context/auth-context";
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, UserCircle, LogIn } from "lucide-react";
+import { LayoutDashboard, UserCircle, LogIn, LogOut } from "lucide-react";
+import { auth } from "@/lib/firebase/client";
+import { signOut } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+import { deleteCookie } from "@/lib/utils";
 
 export function PublicHeader() {
   const { user, loading } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    if (auth) {
+      try {
+        await signOut(auth);
+        deleteCookie("firebaseAuthToken");
+        toast({
+          title: "Logged Out",
+          description: "You have been successfully logged out.",
+        });
+        router.push("/signin");
+      } catch (error) {
+        console.error("Logout failed:", error);
+        toast({
+          title: "Logout Failed",
+          description: "Could not log you out. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -25,7 +53,7 @@ export function PublicHeader() {
           <Link href="/" className="flex items-center gap-2 group">
             <div className="bg-white p-1 rounded-sm flex items-center justify-center group-hover:rotate-3 transition-transform duration-300 shadow-sm">
               <Image
-                src="/collage-logo.png"
+                src="/Assets/collage-logo.png"
                 alt="KSSEM Logo"
                 width={30}
                 height={30}
@@ -36,8 +64,8 @@ export function PublicHeader() {
               <span className="font-serif font-bold text-white text-lg tracking-tight leading-none group-hover:text-kssem-gold transition-colors">
                 KSSEM
               </span>
-              <span className="text-slate-400 text-[9px] uppercase tracking-[0.2em] mt-0.5 font-bold">
-                Institution
+              <span className="text-slate-400 text-[8px] uppercase tracking-[0.1em] mt-0.5 font-bold">
+                K.S School of Engineering &amp; Management
               </span>
             </div>
           </Link>
@@ -74,6 +102,12 @@ export function PublicHeader() {
                     <LayoutDashboard className="h-4 w-4" />
                     Portal
                   </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-1.5 text-slate-300 text-xs font-bold uppercase tracking-widest hover:text-kssem-gold transition-colors">
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </button>
                   <Link
                     href="/profile"
                     className="flex items-center gap-3 group/profile">
