@@ -2,6 +2,7 @@
   "name": "nextn",
   "version": "0.1.0",
   "private": true,
+  "license": "GPL-3.0-or-later",
   "scripts": {
     "dev": "next dev --turbopack -p 9002 --experimental-https",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",

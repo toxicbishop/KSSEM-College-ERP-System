@@ -413,4 +413,4 @@ After these steps, your application should be connected to the new Firebase proj
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE.txt).
+This project is licensed under the [GNU General Public License v3.0](LICENSE).
