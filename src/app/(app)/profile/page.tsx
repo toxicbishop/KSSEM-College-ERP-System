@@ -63,29 +63,23 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-// Helper function to safely validate URLs before using them in href/src attributes
+// Helper function to safely validate URLs before using them in href/src attributes to prevent XSS
 const isSafeUrl = (url?: string | null): boolean => {
   if (!url) return false;
 
-  try {
-    const baseOrigin =
-      typeof window !== "undefined"
-        ? window.location.origin
-        : "http://localhost";
-    const parsed = new URL(url, baseOrigin);
-    // Allow only http and https protocols to avoid javascript:, data:, etc.
-    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-      return false;
-    }
-    // In the browser, additionally enforce same-origin to avoid navigating to arbitrary domains.
-    if (typeof window !== "undefined") {
-      return parsed.origin === window.location.origin;
-    }
-    // On the server, fall back to protocol-only validation since window is not available.
+  const trimmed = url.trim();
+
+  // Allow absolute URLs with safe protocols
+  if (/^(https?|mailto|tel):/i.test(trimmed)) {
     return true;
-  } catch {
-    return false;
   }
+
+  // Allow relative URLs starting with / (but not // which is protocol-relative)
+  if (trimmed.startsWith("/") && !trimmed.startsWith("//")) {
+    return true;
+  }
+
+  return false;
 };
 
 // Helper function to get initials from a name
@@ -217,7 +211,8 @@ const DocumentOrActionItem = ({
   revalRef?: React.RefObject<HTMLInputElement>;
 }) => {
   const IconComponent = icon;
-  const safeUrl = url && isSafeUrl(url) ? url : undefined;
+  const trimmedUrl = url?.trim();
+  const safeUrl = trimmedUrl && isSafeUrl(trimmedUrl) ? trimmedUrl : undefined;
 
   return (
     <div className="mb-3 flex flex-col items-start gap-2 rounded-sm border border-kssem-border p-3 text-kssem-text sm:flex-row sm:items-center sm:justify-between hover:bg-kssem-bg transition-colors">
