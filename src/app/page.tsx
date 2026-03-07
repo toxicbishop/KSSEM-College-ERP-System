@@ -466,9 +466,11 @@ export default function LandingPage() {
         <div className="relative z-10 max-w-2xl px-12 text-white">
           <div className="mb-12 border-l-4 border-kssem-gold pl-6">
             <h1 className="font-serif text-5xl lg:text-6xl font-bold leading-tight mb-4">
-              Unified ERP for <br />
-              <span className="text-kssem-gold italic">Smarter</span> Campus
-              Management.
+              Streamline Campus Operations <br />
+              with <span className="text-kssem-gold italic">
+                Integrated
+              </span>{" "}
+              ERP.
             </h1>
             <p className="text-gray-300 text-lg font-light tracking-wide max-w-lg">
               Experience seamless academic administration, real-time analytics,
