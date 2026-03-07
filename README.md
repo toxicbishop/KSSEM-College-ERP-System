@@ -2,6 +2,66 @@
 
 This guide will walk you through setting up the KSSEM College ERP System on your computer. This application helps manage student information and provides a dashboard for students, faculty, and administrators.
 
+## 🚀 System Preview
+
+|               Landing Page               |          Portal Dashboard           |
+| :--------------------------------------: | :---------------------------------: |
+| ![Landing Page](/public/LandingPage.png) | ![Dashboard](/public/Dashboard.png) |
+
+|             Fee Management             |          Digital Classroom          |
+| :------------------------------------: | :---------------------------------: |
+| ![Fee Payment](/public/FeePayment.png) | ![Classroom](/public/Classroom.png) |
+
+## 🏗️ System Architecture
+
+The KSSEM ERP follows a modern serverless architecture built on the Next.js and Firebase ecosystems.
+
+```mermaid
+graph TD
+    subgraph Users
+        U1[Student]
+        U2[Faculty]
+        U3[Admin]
+    end
+
+    subgraph "Frontend (Next.js / Vercel)"
+        App[Next.js Web Application]
+        UI[Shadcn UI / Tailwind CSS]
+        Middleware[Auth Middleware]
+    end
+
+    subgraph "Firebase Cloud Infrastructure"
+        Auth[Firebase Authentication]
+        Firestore[(Cloud Firestore Database)]
+        Storage[Cloud Storage]
+    end
+
+    subgraph "Integration Services"
+        Genkit[Google Genkit AI]
+        SMTP[SMTP Email Server]
+        GA[Google Analytics 4]
+    end
+
+    %% Interactions
+    U1 & U2 & U3 --> App
+    App --> Middleware
+    Middleware --> Auth
+    App --> UI
+
+    App <--> Auth
+    App <--> Firestore
+    App <--> Storage
+
+    App --> Genkit
+    App --> SMTP
+    App --> GA
+
+    %% Data Flow
+    Firestore -- Profile Data --> App
+    Genkit -- AI Insights --> Firestore
+    SMTP -- Notifications --> U1 & U2 & U3
+```
+
 ## What You'll Need (Prerequisites)
 
 Before you start, make sure you have the following:
