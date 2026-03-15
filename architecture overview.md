@@ -33,8 +33,8 @@ The KSSEM College ERP System is a modern, full-stack web application built using
 - **Google Analytics 4:** User engagement tracking.
 - **Vercel / Firebase Hosting:** Continuous deployment and hosting.
 
-## System Architecture Diagram
+## System Architecture
 
-![System Architecture](/Assets/system_architecture.drawio)
+![System Architecture](/system_architecture.svg)
 
-You can also download the editable diagram at `/Assets/system_architecture.drawio`.
+Download the editable diagram at `/system_architecture.drawio`.
