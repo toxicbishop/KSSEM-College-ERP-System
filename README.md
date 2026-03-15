@@ -16,9 +16,9 @@ This guide will walk you through setting up the KSSEM College ERP System on your
 
 The KSSEM ERP follows a modern serverless architecture built on the Next.js and Firebase ecosystems.
 
-![System Architecture](/system_architecture.png)
+![System Architecture](/system_architecture.svg)
 
-Download the editable diagram at `/system_architecture.drawio`.
+Download the editable diagram at `/Assets/system_architecture.drawio`.
 
 ## What You'll Need (Prerequisites)
 
