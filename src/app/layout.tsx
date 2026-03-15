@@ -44,7 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${appName}`,
     },
     description: appDescription,
-    manifest: "/manifest.json",
+    manifest: "/pwa/manifest.json",
     appleWebApp: {
       capable: true,
       statusBarStyle: "default",
