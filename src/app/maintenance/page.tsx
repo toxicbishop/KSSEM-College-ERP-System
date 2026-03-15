@@ -44,7 +44,7 @@ export default function MaintenancePage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-kssem-bg p-6 text-center">
       <div className="card-prestige w-full max-w-lg text-center">
         <Image
-          src="/Assets/collage-logo.png"
+          src="/Favicon/collage-logo.png"
           alt="Site Logo"
           width={60}
           height={60}

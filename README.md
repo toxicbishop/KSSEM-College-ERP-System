@@ -1,24 +1,24 @@
-# KSSEM College ERP System (Next.js & Firebase)
+# <img src="public/Favicon/collage-logo.png" width="40" height="40" align="center" style="margin-right: 10px;"> KSSEM College ERP System (Next.js & Firebase)
 
 This guide will walk you through setting up the KSSEM College ERP System on your computer. This application helps manage student information and provides a dashboard for students, faculty, and administrators.
 
-## 🚀 System Preview
+## System Preview
 
-|               Landing Page               |          Portal Dashboard           |
-| :--------------------------------------: | :---------------------------------: |
+|                  Landing Page                  |             Portal Dashboard              |
+| :--------------------------------------------: | :---------------------------------------: |
 | ![Landing Page](public/Assets/LandingPage.png) | ![Dashboard](public/Assets/Dashboard.png) |
 
-|             Fee Management             |          Digital Classroom          |
-| :------------------------------------: | :---------------------------------: |
+|                Fee Management                |             Digital Classroom             |
+| :------------------------------------------: | :---------------------------------------: |
 | ![Fee Payment](public/Assets/FeePayment.png) | ![Classroom](public/Assets/Classroom.png) |
 
-## 🏗️ System Architecture
+## System Architecture
 
 The KSSEM ERP follows a modern serverless architecture built on the Next.js and Firebase ecosystems.
 
-![System Architecture](public/Assets/system_architecture.drawio.svg)
+![System Architecture](public/Assets/system_architecture.svg)
 
-Download the editable diagram at `public/Assets/system_architecture.drawio`.
+Download the editable diagram at [public/Assets/system_architecture.drawio](./public/Assets/system_architecture.drawio).
 
 ## What You'll Need (Prerequisites)
 
