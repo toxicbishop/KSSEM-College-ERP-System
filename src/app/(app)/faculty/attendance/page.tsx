@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { MainHeader } from "@/components/layout/main-header";
 import {
   Card,
@@ -159,6 +159,8 @@ export default function FacultyAttendancePage() {
     new Date(),
   );
   const [lectureSubjectTopic, setLectureSubjectTopic] = useState<string>("");
+  const [lectureTopicSlNo, setLectureTopicSlNo] = useState<string>("");
+  const [lectureDescription, setLectureDescription] = useState<string>("");
   const [attendanceStatus, setAttendanceStatus] =
     useState<StudentAttendanceStatus>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -249,6 +251,8 @@ export default function FacultyAttendancePage() {
         lectures: {
           [lectureKey: string]: {
             lectureName: string;
+            lectureTopicSlNo: string;
+            lectureDescription: string;
             facultyName: string;
             records: LectureAttendanceRecord[];
           };
@@ -269,6 +273,8 @@ export default function FacultyAttendancePage() {
       if (!groupsByDate[dateKey].lectures[lectureKey]) {
         groupsByDate[dateKey].lectures[lectureKey] = {
           lectureName: lectureKey,
+          lectureTopicSlNo: record.lectureTopicSlNo || "N/A",
+          lectureDescription: record.lectureDescription || "",
           facultyName: record.facultyName || "N/A",
           records: [],
         };
@@ -406,6 +412,8 @@ export default function FacultyAttendancePage() {
     ) {
       setIsEditing(false);
       setLectureSubjectTopic("");
+      setLectureTopicSlNo("");
+      setLectureDescription("");
       const initialStatus: StudentAttendanceStatus = {};
       currentStudents.forEach((s) => (initialStatus[s.userId] = false)); // Default to absent
       setAttendanceStatus(initialStatus);
@@ -425,6 +433,8 @@ export default function FacultyAttendancePage() {
       if (previousRecords && previousRecords.length > 0) {
         setIsEditing(true);
         setLectureSubjectTopic(previousRecords[0].lectureName);
+        setLectureTopicSlNo(previousRecords[0].lectureTopicSlNo || "");
+        setLectureDescription(previousRecords[0].lectureDescription || "");
 
         const previousStatus: StudentAttendanceStatus = {};
         currentStudents.forEach((student) => {
@@ -444,6 +454,8 @@ export default function FacultyAttendancePage() {
       } else {
         setIsEditing(false);
         setLectureSubjectTopic("");
+        setLectureTopicSlNo("");
+        setLectureDescription("");
         const initialStatus: StudentAttendanceStatus = {};
         currentStudents.forEach((s) => (initialStatus[s.userId] = false)); // Default to absent
         setAttendanceStatus(initialStatus);
@@ -522,11 +534,12 @@ export default function FacultyAttendancePage() {
     setAttendanceStatus((prev) => ({ ...prev, [studentUserId]: status }));
   };
 
-  const handleSelectAllChange = (checked: boolean) => {
-    setSelectAllChecked(checked);
+  const handleSelectAllChange = (checked: boolean | "indeterminate") => {
+    const isChecked = checked === true;
+    setSelectAllChecked(isChecked);
     const newStatus: StudentAttendanceStatus = { ...attendanceStatus };
     filteredStudentsToDisplay.forEach((student) => {
-      newStatus[student.userId] = checked;
+      newStatus[student.userId] = isChecked;
     });
     setAttendanceStatus(newStatus);
   };
@@ -537,14 +550,14 @@ export default function FacultyAttendancePage() {
 
   const totalPresentStudents = useMemo(() => {
     return filteredStudentsToDisplay.filter(
-      (student) => attendanceStatus[student.userId] === true,
+      (student: ClassroomStudentInfo) => attendanceStatus[student.userId] === true,
     ).length;
   }, [attendanceStatus, filteredStudentsToDisplay]);
 
   const allStudentsHaveDefinedStatus = useMemo(() => {
     if (filteredStudentsToDisplay.length === 0) return true;
     return filteredStudentsToDisplay.every(
-      (student) => typeof attendanceStatus[student.userId] === "boolean",
+      (student: ClassroomStudentInfo) => typeof attendanceStatus[student.userId] === "boolean",
     );
   }, [attendanceStatus, filteredStudentsToDisplay]);
 
@@ -586,13 +599,15 @@ export default function FacultyAttendancePage() {
     const recordsToSubmit: Omit<
       LectureAttendanceRecord,
       "id" | "submittedAt"
-    >[] = filteredStudentsToDisplay.map((student) => ({
+    >[] = filteredStudentsToDisplay.map((student: ClassroomStudentInfo) => ({
       classroomId: selectedClassroomId,
       classroomName: selectedClassroomDetails.name,
       facultyId: user.uid,
       facultyName: user.displayName || "Faculty",
       date: format(selectedDate, "yyyy-MM-dd"),
       lectureName: lectureSubjectTopic,
+      lectureTopicSlNo: lectureTopicSlNo,
+      lectureDescription: lectureDescription,
       studentId: student.userId,
       studentName: student.name,
       studentIdNumber: student.studentIdNumber,
@@ -757,12 +772,12 @@ export default function FacultyAttendancePage() {
 
     const uniqueLectures = Array.from(
       new Map(
-        reportRecords.map((r) => [`${r.date}-${r.lectureName}`, r]),
+        reportRecords.map((r: LectureAttendanceRecord) => [`${r.date}-${r.lectureName}`, r]),
       ).values(),
     ).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     const attendanceMap = new Map<string, "P" | "A">();
-    reportRecords.forEach((r) => {
+    reportRecords.forEach((r: LectureAttendanceRecord) => {
       attendanceMap.set(
         `${r.studentId}-${r.date}-${r.lectureName}`,
         r.status === "present" ? "P" : "A",
@@ -773,7 +788,7 @@ export default function FacultyAttendancePage() {
       .sort((a, b) =>
         (a.studentIdNumber || "").localeCompare(b.studentIdNumber || ""),
       )
-      .map((student, index) => {
+      .map((student: ClassroomStudentInfo, index: number) => {
         const rowData: Record<string, any> = {
           "Sr. No": index + 1,
           USN: student.studentIdNumber,
@@ -787,7 +802,7 @@ export default function FacultyAttendancePage() {
             : "0.00%";
         rowData["% Attendance"] = percentage;
 
-        uniqueLectures.forEach((lecture) => {
+        uniqueLectures.forEach((lecture: LectureAttendanceRecord) => {
           const lectureKey = `${format(new Date(lecture.date), "dd-MM-yy")} - ${lecture.lectureName}`;
           rowData[lectureKey] =
             attendanceMap.get(
@@ -813,7 +828,7 @@ export default function FacultyAttendancePage() {
       return;
     }
 
-    const dataForCsv = lowAttendanceStudents.map((student) => ({
+    const dataForCsv = lowAttendanceStudents.map((student: LowAttendanceStudent) => ({
       "Student ID": student.studentIdNumber,
       Name: student.name,
       "Total Lectures": student.totalLectures,
@@ -909,7 +924,7 @@ export default function FacultyAttendancePage() {
                           />
                         </SelectTrigger>
                         <SelectContent>
-                          {classrooms.map((cr) => (
+                          {classrooms.map((cr: Classroom) => (
                             <SelectItem key={cr.id} value={cr.id}>
                               {cr.name} ({cr.subject})
                             </SelectItem>
@@ -924,7 +939,7 @@ export default function FacultyAttendancePage() {
                       <PopoverTrigger asChild>
                         <Button
                           id="date-mark"
-                          variant={"outline"}
+                          variant="outline"
                           className={cn(
                             "w-full justify-start text-left font-normal",
                             !selectedDate && "text-muted-foreground",
@@ -943,7 +958,7 @@ export default function FacultyAttendancePage() {
                           selected={selectedDate}
                           onSelect={setSelectedDate}
                           initialFocus
-                          disabled={(date) =>
+                          disabled={(date: Date) =>
                             date > new Date() || date < new Date("2000-01-01")
                           }
                         />
@@ -975,13 +990,34 @@ export default function FacultyAttendancePage() {
                         <SelectItem value={WHOLE_CLASS_FILTER_VALUE}>
                           Whole Class
                         </SelectItem>
-                        {uniqueBatchesInClassroom.map((batch) => (
+                        {uniqueBatchesInClassroom.map((batch: string) => (
                           <SelectItem key={batch} value={batch}>
                             Batch {batch}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                  <div>
+                    <Label htmlFor="lectureTopicSlNo">Topic SL. No</Label>
+                    <Input
+                      id="lectureTopicSlNo"
+                      placeholder="e.g., 01"
+                      value={lectureTopicSlNo}
+                      onChange={(e) => setLectureTopicSlNo(e.target.value)}
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <Label htmlFor="lectureDescription">Topic Description</Label>
+                    <Input
+                      id="lectureDescription"
+                      placeholder="Brief description of the topic covered"
+                      value={lectureDescription}
+                      onChange={(e) => setLectureDescription(e.target.value)}
+                    />
                   </div>
                 </div>
               </CardContent>
@@ -1056,7 +1092,7 @@ export default function FacultyAttendancePage() {
                       </div>
                       {isMobile ? (
                         <div className="space-y-2 p-3">
-                          {filteredStudentsToDisplay.map((student) => (
+                          {filteredStudentsToDisplay.map((student: ClassroomStudentInfo) => (
                             <div
                               key={student.userId}
                               className="flex items-center justify-between rounded-md border p-3">
@@ -1071,10 +1107,10 @@ export default function FacultyAttendancePage() {
                                 checked={
                                   attendanceStatus[student.userId] === true
                                 }
-                                onCheckedChange={(checked) =>
+                                onCheckedChange={(checked: boolean | "indeterminate") =>
                                   handleStatusChange(
                                     student.userId,
-                                    checked as boolean,
+                                    checked === true,
                                   )
                                 }
                                 aria-label={`Mark ${student.name} attendance`}
@@ -1104,7 +1140,7 @@ export default function FacultyAttendancePage() {
                             </TableHeader>
                             <TableBody>
                               {filteredStudentsToDisplay.map(
-                                (student, index) => (
+                                (student: ClassroomStudentInfo, index: number) => (
                                   <TableRow key={student.userId}>
                                     <TableCell className="px-3 py-2 text-center border">
                                       {index + 1}
@@ -1123,10 +1159,10 @@ export default function FacultyAttendancePage() {
                                             attendanceStatus[student.userId] ===
                                             true
                                           }
-                                          onCheckedChange={(checked) =>
+                                          onCheckedChange={(checked: boolean | "indeterminate") =>
                                             handleStatusChange(
                                               student.userId,
-                                              checked as boolean,
+                                              checked === true,
                                             )
                                           }
                                           aria-label={`Mark ${student.name} attendance`}
@@ -1401,7 +1437,7 @@ export default function FacultyAttendancePage() {
                                     </h4>
                                     <ul className="list-disc list-inside text-muted-foreground mt-1 space-y-1">
                                       {analysisResult.keyObservations.map(
-                                        (obs, i) => (
+                                        (obs: string, i: number) => (
                                           <li key={`obs-${i}`}>{obs}</li>
                                         ),
                                       )}
@@ -1413,7 +1449,7 @@ export default function FacultyAttendancePage() {
                                     </h4>
                                     <ul className="list-disc list-inside text-muted-foreground mt-1 space-y-1">
                                       {analysisResult.actionableSuggestions.map(
-                                        (sug, i) => (
+                                        (sug: string, i: number) => (
                                           <li key={`sug-${i}`}>{sug}</li>
                                         ),
                                       )}
@@ -1479,7 +1515,7 @@ export default function FacultyAttendancePage() {
                                 max={100}
                                 step={1}
                                 value={[attendanceThreshold]}
-                                onValueChange={(value) =>
+                                onValueChange={(value: number[]) =>
                                   setAttendanceThreshold(value[0])
                                 }
                                 className="flex-1"
@@ -1574,24 +1610,38 @@ export default function FacultyAttendancePage() {
                                 <AccordionContent>
                                   <div className="space-y-4 pt-2">
                                     {dateGroup.lectures.map(
-                                      (lecture, lectureIndex) => (
+                                      (lecture: any, lectureIndex: number) => (
                                         <div
                                           key={
                                             lecture.lectureName + lectureIndex
                                           }
                                           className="border rounded-md p-4 bg-background">
-                                          <div className="mb-2">
-                                            <h4 className="font-semibold">
-                                              {lecture.lectureName}
-                                            </h4>
-                                            <p className="text-sm text-muted-foreground">
-                                              Marked by: {lecture.facultyName}
-                                            </p>
+                                          <div className="mb-4">
+                                            <div className="flex justify-between items-start">
+                                              <div>
+                                                <h4 className="font-semibold text-lg flex items-center gap-2">
+                                                  {lecture.lectureTopicSlNo !== "N/A" && (
+                                                    <span className="bg-kssem-navy text-white text-xs px-2 py-0.5 rounded">
+                                                      SL: {lecture.lectureTopicSlNo}
+                                                    </span>
+                                                  )}
+                                                  {lecture.lectureName}
+                                                </h4>
+                                                {lecture.lectureDescription && (
+                                                  <p className="text-sm text-kssem-text-muted mt-1 italic">
+                                                    {lecture.lectureDescription}
+                                                  </p>
+                                                )}
+                                              </div>
+                                              <p className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+                                                By: {lecture.facultyName}
+                                              </p>
+                                            </div>
                                           </div>
                                           {isMobile ? (
                                             <div className="space-y-2">
                                               {lecture.records
-                                                .sort((a, b) =>
+                                                .sort((a: LectureAttendanceRecord, b: LectureAttendanceRecord) =>
                                                   (
                                                     a.studentName || ""
                                                   ).localeCompare(
@@ -1649,7 +1699,7 @@ export default function FacultyAttendancePage() {
                                                 </TableHeader>
                                                 <TableBody>
                                                   {lecture.records
-                                                    .sort((a, b) =>
+                                                    .sort((a: LectureAttendanceRecord, b: LectureAttendanceRecord) =>
                                                       (
                                                         a.studentName || ""
                                                       ).localeCompare(
