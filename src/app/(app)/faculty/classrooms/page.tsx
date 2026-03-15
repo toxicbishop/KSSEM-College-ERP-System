@@ -57,7 +57,7 @@ export default function FacultyClassroomsPage() {
 
 
   const fetchClassrooms = async () => {
-    if (!user || !clientAuth.currentUser) {
+    if (!user || !clientAuth?.currentUser) {
       console.log("[FacultyClassroomsPage:fetchClassrooms] Attempted to fetch but no user or clientAuth.currentUser.");
       setLoadingClassrooms(false);
       return;
@@ -65,7 +65,12 @@ export default function FacultyClassroomsPage() {
     console.log(`[FacultyClassroomsPage:fetchClassrooms] Fetching classrooms for faculty UID: ${user.uid}`);
     setLoadingClassrooms(true);
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
+      const currentUser = clientAuth?.currentUser;
+      if (!currentUser) {
+        setLoadingClassrooms(false);
+        return;
+      }
+      const idToken = await currentUser.getIdToken();
       const fetchedClassrooms = await fetchFacultyClassroomsList(idToken);
       setClassrooms(fetchedClassrooms);
       console.log(`[FacultyClassroomsPage:fetchClassrooms] Fetched ${fetchedClassrooms.length} classrooms.`);
@@ -91,7 +96,7 @@ export default function FacultyClassroomsPage() {
 
 
   const handleCreateClassroom = async () => {
-    if (!clientAuth.currentUser) {
+    if (!clientAuth?.currentUser) {
       toast({ title: "Authentication Error", description: "You must be logged in.", variant: "destructive" });
       return;
     }
@@ -101,7 +106,9 @@ export default function FacultyClassroomsPage() {
     }
     setIsSubmittingCreate(true);
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
+      const currentUser = clientAuth?.currentUser;
+      if (!currentUser) throw new Error('Not authenticated');
+      const idToken = await currentUser.getIdToken();
       await createNewClassroom(idToken, newClassroomName, newClassroomSubject);
       toast({ title: "Success", description: `Classroom "${newClassroomName}" created.` });
       setIsCreateModalOpen(false);
@@ -117,7 +124,7 @@ export default function FacultyClassroomsPage() {
   };
 
   const openInviteModal = async (classroom: Classroom) => {
-    if (!user || !clientAuth.currentUser) {
+    if (!user || !clientAuth?.currentUser) {
         toast({ title: "Authentication Error", description: "You must be logged in to invite faculty.", variant: "destructive" });
         return;
     }
@@ -126,7 +133,9 @@ export default function FacultyClassroomsPage() {
     setLoadingAllFaculty(true);
     
     try {
-        const idToken = await clientAuth.currentUser.getIdToken();
+      const currentUser = clientAuth?.currentUser;
+      if (!currentUser) throw new Error('Not authenticated');
+      const idToken = await currentUser.getIdToken();
         const facultyList = await getAllFacultyUsersList(idToken);
         const ownerId = user?.uid; 
         const alreadyInvitedIds = classroom.invitedFacultyIds || [];
@@ -141,13 +150,15 @@ export default function FacultyClassroomsPage() {
   };
 
   const handleInviteFaculty = async () => {
-    if (!clientAuth.currentUser || !classroomToInviteTo || !selectedFacultyToInvite) {
+    if (!clientAuth?.currentUser || !classroomToInviteTo || !selectedFacultyToInvite) {
         toast({ title: "Error", description: "Missing information for invite.", variant: "destructive" });
         return;
     }
     setIsSubmittingInvite(true);
     try {
-        const idToken = await clientAuth.currentUser.getIdToken();
+      const currentUser = clientAuth?.currentUser;
+      if (!currentUser) throw new Error('Not authenticated');
+      const idToken = await currentUser.getIdToken();
         await addFacultyToClassroom(idToken, classroomToInviteTo.id, selectedFacultyToInvite);
         toast({ title: "Success", description: `Faculty invited to ${classroomToInviteTo.name}.` });
         setIsInviteModalOpen(false);
@@ -161,13 +172,15 @@ export default function FacultyClassroomsPage() {
   };
 
   const handleDeleteClassroom = async () => {
-    if (!clientAuth.currentUser || !classroomToDelete) {
+    if (!clientAuth?.currentUser || !classroomToDelete) {
       toast({ title: "Error", description: "No classroom selected for deletion or not authenticated.", variant: "destructive" });
       return;
     }
     setIsDeleting(true);
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
+      const currentUser = clientAuth?.currentUser;
+      if (!currentUser) throw new Error('Not authenticated');
+      const idToken = await currentUser.getIdToken();
       await deleteClassroomRecord(idToken, classroomToDelete.id);
       toast({ title: "Classroom Deleted", description: `Classroom "${classroomToDelete.name}" has been deleted.` });
       fetchClassrooms(); // Refresh the list

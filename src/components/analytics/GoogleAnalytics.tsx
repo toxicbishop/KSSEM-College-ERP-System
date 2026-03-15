@@ -26,27 +26,30 @@ export default function GoogleAnalytics() {
     // console.warn("Google Analytics Measurement ID (NEXT_PUBLIC_GA_MEASUREMENT_ID) is not set. Tracking is disabled.");
     return null;
   }
+  // Whitelist simple GA measurement ID formats to avoid injection
+  const sanitizeGid = (gid: string) => {
+    const s = String(gid).trim()
+    // Accept UA-*, G-*, or GA4-like IDs (alphanumeric, dashes, underscores)
+    if (/^(G|UA|MEASUREMENT)\-[A-Z0-9\-_]+$/i.test(s) || /^G\-[A-Z0-9\-_]+$/i.test(s)) {
+      return s
+    }
+    return null
+  }
+
+  const safeId = sanitizeGid(GA_TRACKING_ID)
+  if (!safeId) return null
+
+  const inline = `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', '${safeId}', {page_path: window.location.pathname + window.location.search});`
 
   return (
     <>
       <Script
         strategy="afterInteractive"
-        src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+        src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(safeId)}`}
       />
-      <Script
-        id="gtag-init"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${GA_TRACKING_ID}', {
-              page_path: window.location.pathname + window.location.search,
-            });
-          `,
-        }}
-      />
+      <Script id="gtag-init" strategy="afterInteractive">
+        {inline}
+      </Script>
     </>
-  );
+  )
 }

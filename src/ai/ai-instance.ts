@@ -18,10 +18,5 @@ if (process.env.GOOGLE_GENAI_API_KEY) {
 export const ai = genkit({
   promptDir: './prompts', // This might not be used if prompts are defined inline
   plugins: genkitPlugins,
-  // Explicitly set a default model for ai.generate calls if not specified in the call itself
-  // This ensures ai.generate has a model if the prompt doesn't specify one.
-  // However, for `ai.definePrompt`, the model choice is often more contextual.
-  // For the email generation prompt, gemini-1.5-flash should be good.
-  // Using a specific gemini model. This was the missing piece causing AI analysis to fail.
-  defaultModel: 'googleai/gemini-1.5-flash', 
+  // Plugins provided above. Avoid specifying unknown options not present in GenkitOptions.
 });

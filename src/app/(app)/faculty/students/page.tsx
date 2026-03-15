@@ -53,10 +53,12 @@ export default function FacultyViewStudentsPage() {
 
 
   const fetchFacultyClassrooms = async () => {
-    if (!user || !clientAuth.currentUser) return;
+    if (!user || !clientAuth?.currentUser) return;
     setLoadingClassrooms(true);
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
+      const currentUser = clientAuth?.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken();
       const fetchedClassrooms = await fetchFacultyClassroomsData(idToken);
       setClassrooms(fetchedClassrooms);
     } catch (error) {
@@ -67,11 +69,13 @@ export default function FacultyViewStudentsPage() {
   };
 
   const fetchStudentsForClassroom = async (classroomId: string) => {
-    if (!classroomId || !clientAuth.currentUser) return;
+    if (!classroomId || !clientAuth?.currentUser) return;
     setLoadingStudents(true);
     try {
-        const idToken = await clientAuth.currentUser.getIdToken();
-        const students = await fetchStudentsInClassroomData(idToken, classroomId);
+      const currentUser = clientAuth?.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken();
+      const students = await fetchStudentsInClassroomData(idToken, classroomId);
         const sortedStudents = students.sort((a, b) => 
             (a.studentIdNumber || '').localeCompare(b.studentIdNumber || '', undefined, { numeric: true })
         );

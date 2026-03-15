@@ -1,5 +1,5 @@
 
-import { genkitNextHandler as actualGenkitNextHandler } from '@genkit-ai/next';
+import genkitNextHandler from '@genkit-ai/next';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server'; // Ensure NextResponse is imported
 
@@ -23,9 +23,11 @@ function getInitializedHandler() {
   if (!handlerInstance) {
     try {
       console.log('[Genkit API Route] Attempting to initialize Genkit handler...');
-      handlerInstance = actualGenkitNextHandler();
+      // genkitNextHandler has a complex type signature; cast to any to avoid
+      // mismatches with the local usage here (we validate runtime behavior below).
+      handlerInstance = (genkitNextHandler as any)();
       if (!handlerInstance || typeof handlerInstance.GET !== 'function' || typeof handlerInstance.POST !== 'function') {
-        console.error("[Genkit API Route] actualGenkitNextHandler() did not return a valid handler object.");
+        console.error("[Genkit API Route] genkitNextHandler() did not return a valid handler object.");
         handlerInitializationError = new Error("Genkit handler initialization failed: Invalid handler object returned.");
         throw handlerInitializationError;
       }
@@ -39,7 +41,7 @@ function getInitializedHandler() {
   return handlerInstance;
 }
 
-export async function GET(request: NextRequest, context: { params: { slug: string[] } }): Promise<NextResponse> {
+export async function GET(request: NextRequest, context: any): Promise<NextResponse> {
   try {
     const currentHandler = getInitializedHandler();
     return await currentHandler.GET(request, context);
@@ -52,7 +54,7 @@ export async function GET(request: NextRequest, context: { params: { slug: strin
   }
 }
 
-export async function POST(request: NextRequest, context: { params: { slug: string[] } }): Promise<NextResponse> {
+export async function POST(request: NextRequest, context: any): Promise<NextResponse> {
   try {
     const currentHandler = getInitializedHandler();
     return await currentHandler.POST(request, context);
