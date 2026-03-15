@@ -4,7 +4,9 @@ import withBundleAnalyzer from "@next/bundle-analyzer";
 import withPWAInit from "@ducanh2912/next-pwa";
 
 const withPWA = withPWAInit({
-  dest: "public",
+  dest: "public/pwa",
+  sw: "/sw.js",
+  scope: "/",
   disable: process.env.NODE_ENV === "development",
   register: true,
 });
@@ -82,6 +84,19 @@ const nextConfig: NextConfig = {
       };
     }
     return config;
+  },
+  async headers() {
+    return [
+      {
+        source: "/pwa/sw.js",
+        headers: [
+          {
+            key: "Service-Worker-Allowed",
+            value: "/",
+          },
+        ],
+      },
+    ];
   },
 };
 
