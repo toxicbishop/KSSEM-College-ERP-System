@@ -6,19 +6,19 @@ This guide will walk you through setting up the KSSEM College ERP System on your
 
 |               Landing Page               |          Portal Dashboard           |
 | :--------------------------------------: | :---------------------------------: |
-| ![Landing Page](/Assets/LandingPage.png) | ![Dashboard](/Assets/Dashboard.png) |
+| ![Landing Page](public/Assets/LandingPage.png) | ![Dashboard](public/Assets/Dashboard.png) |
 
 |             Fee Management             |          Digital Classroom          |
 | :------------------------------------: | :---------------------------------: |
-| ![Fee Payment](/Assets/FeePayment.png) | ![Classroom](/Assets/Classroom.png) |
+| ![Fee Payment](public/Assets/FeePayment.png) | ![Classroom](public/Assets/Classroom.png) |
 
 ## 🏗️ System Architecture
 
 The KSSEM ERP follows a modern serverless architecture built on the Next.js and Firebase ecosystems.
 
-![System Architecture](/system_architecture.svg)
+![System Architecture](public/system_architecture.svg)
 
-Download the editable diagram at `/Assets/system_architecture.drawio`.
+Download the editable diagram at `public/Assets/system_architecture.drawio`.
 
 ## What You'll Need (Prerequisites)
 
