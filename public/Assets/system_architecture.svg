@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="740" height="770" viewBox="30 0 740 770">
+<style>text{font-family: Arial, Helvetica, sans-serif; font-size:14px;}</style>
+<rect x="50.0" y="350.0" width="700.0" height="150.0" rx="8" ry="8" fill="#f5f5f5" stroke="#666666" stroke-width="1.5"/>
+<text x="400.0" y="475.0" text-anchor="middle" fill="#111">Integration Services</text>
+<rect x="50.0" y="550.0" width="700.0" height="200.0" rx="8" ry="8" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="400.0" y="725.0" text-anchor="middle" fill="#111">Firebase Cloud Infrastructure</text>
+<rect x="250.0" y="50.0" width="500.0" height="250.0" rx="8" ry="8" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="500.0" y="180.0" text-anchor="middle" fill="#111">Frontend (Next.js / Vercel)</text>
+<rect x="50.0" y="20.0" width="150.0" height="300.0" rx="8" ry="8" fill="#fff2cc" stroke="#d6b656" stroke-width="1.5"/>
+<text x="125.0" y="175.0" text-anchor="middle" fill="#111">Users</text>
+<rect x="75.0" y="50.0" width="100.0" height="40.0" rx="8" ry="8" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+<text x="125.0" y="75.0" text-anchor="middle" fill="#111">Student</text>
+<rect x="75.0" y="110.0" width="100.0" height="40.0" rx="8" ry="8" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+<text x="125.0" y="135.0" text-anchor="middle" fill="#111">Faculty</text>
+<rect x="75.0" y="170.0" width="100.0" height="40.0" rx="8" ry="8" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+<text x="125.0" y="195.0" text-anchor="middle" fill="#111">Admin</text>
+<rect x="350.0" y="80.0" width="200.0" height="60.0" rx="8" ry="8" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+<text x="450.0" y="115.0" text-anchor="middle" fill="#111">Next.js Web Application</text>
+
+<!-- Infrastructure Services -->
+<ellipse cx="160.0" cy="630.0" rx="60.0" ry="30.0" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+<text x="160.0" y="635.0" text-anchor="middle" fill="#111">Firebase Auth</text>
+<rect x="300.0" y="590.0" width="100.0" height="80.0" rx="8" ry="8" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+<text x="350.0" y="635.0" text-anchor="middle" fill="#111">Cloud Firestore</text>
+<rect x="520.0" y="590.0" width="100.0" height="80.0" rx="8" ry="8" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+<text x="570.0" y="635.0" text-anchor="middle" fill="#111">Cloud Storage</text>
+
+<!-- Integration Row -->
+<rect x="100.0" y="380.0" width="150.0" height="50.0" rx="8" ry="8" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+<text x="175.0" y="410.0" text-anchor="middle" fill="#111">Google Genkit AI</text>
+<rect x="300.0" y="380.0" width="150.0" height="50.0" rx="8" ry="8" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+<text x="375.0" y="410.0" text-anchor="middle" fill="#111">SMTP Email</text>
+<rect x="500.0" y="380.0" width="150.0" height="50.0" rx="8" ry="8" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+<text x="575.0" y="410.0" text-anchor="middle" fill="#111">Google Analytics</text>
+
+<!-- Connections -->
+<line x1="450" y1="140" x2="450" y2="380" stroke="#000" stroke-width="1" stroke-dasharray="4"/>
+<line x1="400" y1="140" x2="200" y2="380" stroke="#000" stroke-width="1" stroke-dasharray="4"/>
+<line x1="500" y1="140" x2="575" y2="380" stroke="#000" stroke-width="1" stroke-dasharray="4"/>
+<line x1="450" y1="430" x2="350" y2="590" stroke="#000" stroke-width="1"/>
+<line x1="450" y1="430" x2="160" y2="600" stroke="#000" stroke-width="1"/>
+<line x1="450" y1="430" x2="570" y2="590" stroke="#000" stroke-width="1"/>
+</svg>

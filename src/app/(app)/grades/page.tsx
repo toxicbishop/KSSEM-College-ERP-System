@@ -129,8 +129,8 @@ export default function GradesPage() {
         title="Examination Results"
         description={
           isDummyUser
-            ? "B.tech in Computer Science and business Systems — Official academic record for all semesters. View and download your certified grade reports."
-            : "Bachelor of Technology — Official academic record for all semesters. View and download your certified grade reports."
+            ? "B.E in Computer Science and business Systems — Official academic record for all semesters. View and download your certified grade reports."
+            : "Bachelor of Engineering — Official academic record for all semesters. View and download your certified grade reports."
         }
         actions={
           <>

@@ -97,7 +97,7 @@ export async function middleware(request: NextRequest) {
     !pathname.startsWith("/_next/") && // Next.js internals
     !pathname.startsWith("/api/") && // API routes (already handled if maintenance was on)
     pathname !== "/favicon.ico" &&
-    pathname !== "/Assets/collage-logo.png"; // Static assets
+    pathname !== "/Favicon/collage-logo.png"; // Static assets
 
   // 1. User is NOT authenticated and tries to access a PROTECTED route
   if (!hasAuthCookie && isProtectedRoute) {

@@ -204,7 +204,7 @@ export default function SignUpPage() {
         <div className="max-w-md mx-auto w-full">
           <Link href="/" className="flex items-center gap-2 mb-10">
             <Image
-              src="/Assets/collage-logo.png"
+              src="/Favicon/collage-logo.png"
               alt="Logo"
               width={36}
               height={36}

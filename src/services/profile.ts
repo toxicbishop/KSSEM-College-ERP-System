@@ -30,7 +30,7 @@ export interface StudentProfile {
 
   // 2. Academic Details
   enrollmentNumber?: string; // Could be same as studentId
-  courseProgram?: string; // e.g., B.Tech in AIML (was 'major')
+  courseProgram?: string; // e.g., B.E in AIML (was 'major')
   department?: string;
   currentYear?: number;
   currentSemester?: number;
