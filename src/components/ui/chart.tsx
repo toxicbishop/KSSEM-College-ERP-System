@@ -75,29 +75,44 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   if (!colorConfig.length) {
     return null
   }
+  // Helpers to whitelist and escape CSS values to prevent injection
+  const isValidHex = (v: string) => /^#([0-9a-fA-F]{3,8})$/.test(v)
+  const isValidRgb = (v: string) =>
+    /^rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}(?:\s*,\s*(0|1|0?\.\d+))?\s*\)$/.test(
+      v,
+    )
+  const isValidVar = (v: string) => /^var\(--[a-z0-9-_]+\)$/.test(v)
 
-  return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
-${colorConfig
-  .map(([key, itemConfig]) => {
-    const color =
-      itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-      itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
-  })
-  .join("\n")}
-}
-`
-          )
-          .join("\n"),
-      }}
-    />
-  )
+  const sanitizeColor = (val?: string | null) => {
+    if (!val) return null
+    const s = String(val).trim()
+    if (isValidHex(s) || isValidRgb(s) || isValidVar(s)) return s
+    return null
+  }
+
+  // Build sanitized CSS
+  const css = Object.entries(THEMES)
+    .map(([theme, prefix]) => {
+      const lines = colorConfig
+        .map(([key, itemConfig]) => {
+          const rawColor =
+            (itemConfig.theme && itemConfig.theme[theme as keyof typeof itemConfig.theme]) ||
+            (itemConfig as any).color
+          const color = sanitizeColor(rawColor)
+          return color ? `  --color-${key}: ${color};` : null
+        })
+        .filter(Boolean)
+        .join("\n")
+
+      if (!lines) return null
+      return `${prefix} [data-chart=${CSS.escape(id)}] {\n${lines}\n}`
+    })
+    .filter(Boolean)
+    .join("\n")
+
+  if (!css) return null
+
+  return <style dangerouslySetInnerHTML={{ __html: css }} />
 }
 
 const ChartTooltip = RechartsPrimitive.Tooltip

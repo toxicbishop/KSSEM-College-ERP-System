@@ -93,18 +93,20 @@ export default function ManageGradesPage() {
 
   useEffect(() => {
     if (user && !authLoading) {
-      fetchFacultyClassrooms();
+      loadFacultyClassrooms();
       fetchUniqueCourses();
     }
   }, [user, authLoading]);
 
-  const fetchFacultyClassrooms = async () => {
-    if (!user || !clientAuth.currentUser) return;
+  const loadFacultyClassrooms = async () => {
+    if (!user || !clientAuth?.currentUser) return;
     setLoadingClassrooms(true);
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
+      const currentUser = clientAuth?.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken();
       const fetchedClassrooms = await fetchFacultyClassrooms(idToken);
-      setClassrooms(fetchedClassrooms);
+      setClassrooms(fetchedClassrooms as unknown as Classroom[]);
     } catch (error) {
       toast({
         title: "Error",
@@ -117,9 +119,11 @@ export default function ManageGradesPage() {
   };
 
   const fetchUniqueCourses = async () => {
-    if (!user || !clientAuth.currentUser) return;
+    if (!user || !clientAuth?.currentUser) return;
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
+      const currentUser = clientAuth?.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken();
       const courses = await getUniqueCoursesForFaculty(idToken);
       setUniqueCourses(courses);
     } catch (error) {
@@ -138,11 +142,13 @@ export default function ManageGradesPage() {
     setStudentGrades([]);
     setClassroomGrades([]);
 
-    if (!classroomId || !clientAuth.currentUser) return;
+    if (!classroomId || !clientAuth?.currentUser) return;
 
     setLoadingStudents(true);
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
+      const currentUser = clientAuth?.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken();
       const students = await fetchStudentsForClassroom(idToken, classroomId);
       const sortedStudents = students.sort((a, b) =>
         (a.studentIdNumber || "").localeCompare(
@@ -187,7 +193,7 @@ export default function ManageGradesPage() {
     grade: string,
     maxMarks: number | undefined,
   ) => {
-    if (!user || !clientAuth.currentUser) return;
+    if (!user || !clientAuth?.currentUser) return;
     if (!courseName.trim() || !grade.trim()) {
       toast({
         title: "Validation Error",
@@ -199,7 +205,9 @@ export default function ManageGradesPage() {
 
     setIsSubmitting(true);
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
+      const currentUser = clientAuth?.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken();
       await updateGradeForStudent(idToken, {
         studentId,
         courseName: courseName.trim(),
@@ -232,11 +240,13 @@ export default function ManageGradesPage() {
   };
 
   const handleDeleteGrade = async (gradeId: string) => {
-    if (!user || !clientAuth.currentUser || !selectedStudent) return;
+    if (!user || !clientAuth?.currentUser || !selectedStudent) return;
 
     setIsSubmitting(true);
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
+      const currentUser = clientAuth?.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken();
       await deleteGradeRecord(idToken, gradeId);
       toast({
         title: "Grade Deleted",
@@ -255,14 +265,12 @@ export default function ManageGradesPage() {
   };
 
   const handleTabChange = async (value: string) => {
-    if (
-      value === "report" &&
-      studentsInClassroom.length > 0 &&
-      clientAuth.currentUser
-    ) {
+    if (value === "report" && studentsInClassroom.length > 0 && clientAuth?.currentUser) {
       setLoadingClassroomGrades(true);
       try {
-        const idToken = await clientAuth.currentUser.getIdToken();
+        const currentUser = clientAuth?.currentUser;
+        if (!currentUser) return;
+        const idToken = await currentUser.getIdToken();
         const studentUids = studentsInClassroom.map((s) => s.userId);
         const grades = await fetchGradesForClassroom(idToken, studentUids);
         setClassroomGrades(grades);
