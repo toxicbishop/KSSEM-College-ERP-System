@@ -82,6 +82,12 @@ const isSafeUrl = (url?: string | null): boolean => {
   return false;
 };
 
+// Helper to sanitize any user-provided text for safe insertion into the DOM
+const sanitizeForText = (input?: string | null): string => {
+  if (!input) return "";
+  // Strip HTML tags and trim whitespace to avoid any chance of reinterpretation
+  return String(input).replace(/<[^>]*>/g, "").trim();
+};
 // Helper function to get initials from a name
 const getInitials = (name: string) => {
   if (!name) return "U";
@@ -213,6 +219,10 @@ const DocumentOrActionItem = ({
   const IconComponent = icon;
   const trimmedUrl = url?.trim();
   const safeUrl = trimmedUrl && isSafeUrl(trimmedUrl) ? trimmedUrl : undefined;
+  const safeLabel = sanitizeForText(label);
+  const safeActionLabel = sanitizeForText(
+    actionLabel || (isDownloadable ? "Download" : "View"),
+  );
 
   return (
     <div className="mb-3 flex flex-col items-start gap-2 rounded-sm border border-kssem-border p-3 text-kssem-text sm:flex-row sm:items-center sm:justify-between hover:bg-kssem-bg transition-colors">
@@ -220,7 +230,7 @@ const DocumentOrActionItem = ({
         {IconComponent && (
           <IconComponent className="mr-2 h-4 w-4 text-kssem-navy" />
         )}
-        <span className="text-sm font-medium text-kssem-text">{label}</span>
+        <span className="text-sm font-medium text-kssem-text">{safeLabel}</span>
       </div>
       <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
         {safeUrl ? (
@@ -238,8 +248,8 @@ const DocumentOrActionItem = ({
                 <Download className="mr-2 h-4 w-4" />
               ) : (
                 <Eye className="mr-2 h-4 w-4" />
-              )}{" "}
-              {actionLabel || (isDownloadable ? "Download" : "View")}
+              )}
+              <span className="ml-1">{safeActionLabel}</span>
             </a>
           </Button>
         ) : actionType === "button" && actionLabel ? (
@@ -247,12 +257,12 @@ const DocumentOrActionItem = ({
             variant="outline"
             size="sm"
             className="w-full sm:w-auto bg-white border-kssem-border text-kssem-navy hover:bg-kssem-navy hover:text-white transition-all shadow-sm">
-            {IconComponent && <IconComponent className="mr-2 h-4 w-4" />}{" "}
-            {actionLabel}
+            {IconComponent && <IconComponent className="mr-2 h-4 w-4" />}
+            <span className="ml-1">{safeActionLabel}</span>
           </Button>
         ) : (
           <span className="text-sm text-kssem-text-muted">
-            {actionLabel || "Not Available"}
+            {safeActionLabel || "Not Available"}
           </span>
         )}
       </div>
