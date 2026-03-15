@@ -22,6 +22,7 @@ import type {
 } from "@/services/classroom";
 import { fetchStudentClassrooms, fetchClassmates } from "../classrooms/actions";
 import Image from "next/image";
+import sanitizeHtml from 'sanitize-html';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -85,8 +86,14 @@ const isSafeUrl = (url?: string | null): boolean => {
 // Helper to sanitize any user-provided text for safe insertion into the DOM
 const sanitizeForText = (input?: string | null): string => {
   if (!input) return "";
-  // Strip HTML tags and trim whitespace to avoid any chance of reinterpretation
-  return String(input).replace(/<[^>]*>/g, "").trim();
+  // Use a well-tested sanitizer to remove all markup and attributes, returning
+  // plain text. This avoids regex-based multi-character reconstruction issues.
+  const cleaned = sanitizeHtml(String(input), {
+    allowedTags: [],
+    allowedAttributes: {},
+    // Do not allow any HTML; return only text.
+  });
+  return cleaned.trim();
 };
 // Helper function to get initials from a name
 const getInitials = (name: string) => {
