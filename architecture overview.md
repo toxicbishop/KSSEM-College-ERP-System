@@ -35,6 +35,6 @@ The KSSEM College ERP System is a modern, full-stack web application built using
 
 ## System Architecture
 
-![System Architecture](/system_architecture.svg)
+![System Architecture](public/system_architecture.svg)
 
-Download the editable diagram at `/Assets/system_architecture.drawio`.
+Download the editable diagram at `public/Assets/system_architecture.drawio`.
