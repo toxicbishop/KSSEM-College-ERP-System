@@ -633,7 +633,7 @@ export default function AdminPage() {
           name="courseProgram"
           value={data.courseProgram || ""}
           onChange={onChange}
-          placeholder="B.Tech in Computer Science"
+          placeholder="B.E in Computer Science"
         />
       </div>
       <div>
