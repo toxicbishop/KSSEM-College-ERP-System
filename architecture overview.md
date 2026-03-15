@@ -33,50 +33,8 @@ The KSSEM College ERP System is a modern, full-stack web application built using
 - **Google Analytics 4:** User engagement tracking.
 - **Vercel / Firebase Hosting:** Continuous deployment and hosting.
 
-## System Architecture Diagram (Mermaid)
+## System Architecture Diagram
 
-```mermaid
-graph TD
-    subgraph Users
-        U1[Student]
-        U2[Faculty]
-        U3[Admin]
-    end
+![System Architecture](/Assets/system_architecture.drawio)
 
-    subgraph "Frontend (Next.js / Vercel)"
-        App[Next.js Web Application]
-        UI[Shadcn UI / Tailwind CSS]
-        Middleware[Auth Middleware]
-    end
-
-    subgraph "Firebase Cloud Infrastructure"
-        Auth[Firebase Authentication]
-        Firestore[(Cloud Firestore Database)]
-        Storage[Cloud Storage]
-    end
-
-    subgraph "Integration Services"
-        Genkit[Google Genkit AI]
-        SMTP[SMTP Email Server]
-        GA[Google Analytics 4]
-    end
-
-    %% Interactions
-    U1 & U2 & U3 --> App
-    App --> Middleware
-    Middleware --> Auth
-    App --> UI
-
-    App <--> Auth
-    App <--> Firestore
-    App <--> Storage
-
-    App --> Genkit
-    App --> SMTP
-    App --> GA
-
-    %% Data Flow
-    Firestore -- Profile Data --> App
-    Genkit -- AI Insights --> Firestore
-    SMTP -- Notifications --> U1 & U2 & U3
-```
+You can also download the editable diagram at `/Assets/system_architecture.drawio`.
