@@ -154,7 +154,7 @@ export function MainHeader() {
           ) : (
             <div className="bg-white p-1 rounded-sm flex items-center justify-center">
               <Image
-                src="/Assets/collage-logo.png"
+                src="/Favicon/collage-logo.png"
                 alt="KSSEM Logo"
                 width={32}
                 height={32}

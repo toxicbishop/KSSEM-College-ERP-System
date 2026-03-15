@@ -229,7 +229,7 @@ export default function SignInPage() {
           <Link href="/" className="flex items-center gap-4 group">
             <div className="bg-white p-1 rounded-sm flex items-center justify-center transition-transform duration-300 shadow-sm border border-gray-100 group-hover:rotate-3">
               <Image
-                src="/Assets/collage-logo.png"
+                src="/Favicon/collage-logo.png"
                 alt="KSSEM Logo"
                 width={40}
                 height={40}
