@@ -59,6 +59,8 @@ export interface LectureAttendanceRecord {
   facultyName?: string; // Denormalized name of the faculty for display
   date: string; // YYYY-MM-DD
   lectureName: string; // This will now represent the Subject/Topic of the lecture
+  lectureTopicSlNo?: string; // Serial number or identification for the topic/lesson
+  lectureDescription?: string; // Detailed description of what was covered
   studentId: string; // UID of the student
   studentName: string; // Denormalized for easier querying/display
   studentIdNumber?: string; // The official student ID/roll number
@@ -74,6 +76,8 @@ export interface AttendanceRecord {
   date: string; // YYYY-MM-DD
   status: "present" | "absent";
   lectureName?: string;
+  lectureTopicSlNo?: string;
+  lectureDescription?: string;
   classroomName?: string;
   facultyName?: string;
 }
@@ -132,7 +136,7 @@ export async function getAttendanceRecords(
       return [];
     }
 
-    return snapshot.docs.map((docSnap) => {
+    return snapshot.docs.map((docSnap: any) => {
       const data = docSnap.data();
       let dateStr = data.date; // Expects YYYY-MM-DD string
 
@@ -145,6 +149,8 @@ export async function getAttendanceRecords(
         date: dateStr,
         status: data.status as "present" | "absent",
         lectureName: data.lectureName,
+        lectureTopicSlNo: data.lectureTopicSlNo,
+        lectureDescription: data.lectureDescription,
         classroomName: data.classroomName,
         facultyName: data.facultyName,
       };
@@ -208,7 +214,7 @@ export async function getLectureAttendanceForDate(
       return [];
     }
 
-    return snapshot.docs.map((docSnap) => {
+    return snapshot.docs.map((docSnap: any) => {
       const data = docSnap.data();
       const submittedAt = data.submittedAt as AdminTimestamp | undefined;
       return {
@@ -219,6 +225,8 @@ export async function getLectureAttendanceForDate(
         facultyName: data.facultyName,
         date: data.date,
         lectureName: data.lectureName,
+        lectureTopicSlNo: data.lectureTopicSlNo,
+        lectureDescription: data.lectureDescription,
         studentId: data.studentId,
         studentName: data.studentName,
         studentIdNumber: data.studentIdNumber,
@@ -291,7 +299,7 @@ export async function getLectureAttendanceForDateRange(
       return [];
     }
 
-    return snapshot.docs.map((docSnap) => {
+    return snapshot.docs.map((docSnap: any) => {
       const data = docSnap.data();
       const submittedAt = data.submittedAt as AdminTimestamp | undefined;
       return {
@@ -302,6 +310,8 @@ export async function getLectureAttendanceForDateRange(
         facultyName: data.facultyName,
         date: data.date,
         lectureName: data.lectureName,
+        lectureTopicSlNo: data.lectureTopicSlNo,
+        lectureDescription: data.lectureDescription,
         studentId: data.studentId,
         studentName: data.studentName,
         studentIdNumber: data.studentIdNumber,
@@ -370,7 +380,7 @@ export async function submitLectureAttendance(
       console.log(
         `submitLectureAttendance SA: Found ${snapshot.docs.length} existing records for classroom ${classroomId} on ${date}. Deleting them.`,
       );
-      snapshot.docs.forEach((doc) => {
+      snapshot.docs.forEach((doc: any) => {
         batch.delete(doc.ref);
       });
     }
@@ -468,7 +478,7 @@ export async function deleteLectureAttendance(
     console.log(
       `deleteLectureAttendance SA: Found ${snapshot.docs.length} records to delete for classroom ${classroomId} on ${date}.`,
     );
-    snapshot.docs.forEach((doc) => {
+    snapshot.docs.forEach((doc: any) => {
       batch.delete(doc.ref);
     });
 

@@ -53,7 +53,7 @@ export function PublicHeader() {
           <Link href="/" className="flex items-center gap-2 group">
             <div className="bg-white p-1 rounded-sm flex items-center justify-center group-hover:rotate-3 transition-transform duration-300 shadow-sm">
               <Image
-                src="/Assets/collage-logo.png"
+                src="/Favicon/collage-logo.png"
                 alt="KSSEM Logo"
                 width={30}
                 height={30}

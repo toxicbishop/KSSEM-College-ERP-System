@@ -213,7 +213,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 isSidebarCollapsed ? "justify-center pt-2" : "space-x-3",
               )}>
               <Image
-                src="/Assets/collage-logo.png"
+                src="/Favicon/collage-logo.png"
                 alt={`${collegeName} Admin Logo`}
                 width={isSidebarCollapsed ? 32 : 40}
                 height={isSidebarCollapsed ? 32 : 40}

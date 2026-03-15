@@ -8,13 +8,13 @@
     "theme_color": "#2dd4bf",
     "icons": [
         {
-            "src": "/Assets/collage-logo.png",
+            "src": "/Favicon/collage-logo.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any"
         },
         {
-            "src": "/Assets/collage-logo.png",
+            "src": "/Favicon/collage-logo.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"

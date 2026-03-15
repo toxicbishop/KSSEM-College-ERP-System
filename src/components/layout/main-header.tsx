@@ -6,7 +6,7 @@ import Link from "next/link";
 import { getSystemSettings } from "@/services/system-settings";
 import { useEffect, useState } from "react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Sidebar } from "./sidebar";
 import { useAuth } from "@/context/auth-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -144,6 +144,9 @@ export function MainHeader() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="p-0 w-64">
+                <SheetHeader className="sr-only">
+                  <SheetTitle>Navigation Menu</SheetTitle>
+                </SheetHeader>
                 <Sidebar
                   isCollapsed={false}
                   toggleCollapse={() => {}}
@@ -154,7 +157,7 @@ export function MainHeader() {
           ) : (
             <div className="bg-white p-1 rounded-sm flex items-center justify-center">
               <Image
-                src="/Assets/collage-logo.png"
+                src="/Favicon/collage-logo.png"
                 alt="KSSEM Logo"
                 width={32}
                 height={32}

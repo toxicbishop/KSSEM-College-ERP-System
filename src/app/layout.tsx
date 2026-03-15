@@ -51,8 +51,8 @@ export async function generateMetadata(): Promise<Metadata> {
       title: appName,
     },
     icons: {
-      icon: "/Assets/collage-logo.png",
-      apple: "/Assets/collage-logo.png",
+      icon: "/Favicon/collage-logo.png",
+      apple: "/Favicon/collage-logo.png",
     },
   };
 }

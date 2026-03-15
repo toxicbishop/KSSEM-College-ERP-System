@@ -146,7 +146,7 @@ export default function DashboardPage() {
               ? {
                   ...profileData,
                   courseProgram:
-                    "B.tech in Computer Science and business Systems",
+                    "B.E in Computer Science and business Systems",
                 }
               : profileData,
             attendanceRecords: isDummyUser
@@ -395,7 +395,7 @@ export default function DashboardPage() {
       <MainHeader />
       <PageHeader
         title={`Welcome back, ${data.profile.name?.split(" ")[0]}.`}
-        description={`${data.profile.courseProgram || "B.Tech CSE"} • Section ${data.profile.sectionOrBatch || "N/A"} • Year ${data.profile.currentYear || "3"}`}
+        description={`${data.profile.courseProgram || "B.E CSE"} • Section ${data.profile.sectionOrBatch || "N/A"} • Year ${data.profile.currentYear || "3"}`}
         breadcrumbs={`Academic Session ${today.getFullYear()}-${today.getFullYear() + 1}`}
         actions={
           <div className="flex items-center gap-2 bg-kssem-bg border border-kssem-border px-4 py-2 rounded-sm shadow-sm">
