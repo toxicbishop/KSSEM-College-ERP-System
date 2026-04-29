@@ -46,8 +46,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { StudentProfile } from "@/services/profile";
 
-const ADMIN_EMAIL = "admin@gmail.com";
-
 export default function AdminRequestsPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -70,9 +68,7 @@ export default function AdminRequestsPage() {
     const checkAdminAccess = async () => {
       setCheckingRole(true);
       let userIsCurrentlyAdmin = false;
-      if (user.email === ADMIN_EMAIL) {
-        userIsCurrentlyAdmin = true;
-      } else if (clientDb) {
+      if (clientDb) {
         try {
           const userDocRef = doc(clientDb, "users", user.uid);
           const userDocSnap = await getDoc(userDocRef);
@@ -87,6 +83,12 @@ export default function AdminRequestsPage() {
             variant: "destructive",
           });
         }
+      } else {
+        toast({
+          title: "Database Error",
+          description: "Firestore is not available. Cannot verify admin role.",
+          variant: "destructive",
+        });
       }
       if (userIsCurrentlyAdmin) setIsAdmin(true);
       else {
