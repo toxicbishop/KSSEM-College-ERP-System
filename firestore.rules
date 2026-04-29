@@ -23,12 +23,12 @@ service cloud.firestore {
 
     // Rules for the 'users' collection
     match /users/{userId} {
-      // Allow anyone to read user data for the Student ID uniqueness check on the signup page
-      allow read: if true; 
-      // Allow users to create their own document on signup
-      allow create: if isOwner(userId);
-      // Allow users to update their own document
-      allow update: if isOwner(userId);
+      // Users can read their own profile; admins can read and list all profiles.
+      allow read: if isOwner(userId) || isAdmin();
+      // Users can create their own student profile on signup; admins can create managed profiles.
+      allow create: if isAdmin() || (isOwner(userId) && request.resource.data.role == 'student');
+      // Users can update their own profile, but cannot promote themselves by changing role.
+      allow update: if isAdmin() || (isOwner(userId) && request.resource.data.role == resource.data.role);
       // Only admins should be able to delete user documents
       allow delete: if isAdmin();
     }
