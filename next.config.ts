@@ -1,6 +1,5 @@
 import type { NextConfig } from "next";
 import withBundleAnalyzer from "@next/bundle-analyzer";
-// @ts-ignore
 import withPWAInit from "@ducanh2912/next-pwa";
 
 const withPWA = withPWAInit({
@@ -13,12 +12,6 @@ const withPWA = withPWAInit({
 
 const nextConfig: NextConfig = {
   devIndicators: false,
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   images: {
     remotePatterns: [
       {
@@ -32,10 +25,6 @@ const nextConfig: NextConfig = {
         hostname: "placehold.co",
         port: "",
         pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "**",
       },
     ],
   },
