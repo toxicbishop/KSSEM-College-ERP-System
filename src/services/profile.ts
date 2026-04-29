@@ -232,14 +232,14 @@ export async function updateStudentProfile(
       if (
         existingData.name &&
         existingData.name !== "N/A" &&
-        decodedToken.email !== "admin@gmail.com"
+        existingData.role !== "admin"
       ) {
         delete sanitizedData.name;
       }
       if (
         existingData.email &&
         existingData.email !== "N/A" &&
-        decodedToken.email !== "admin@gmail.com"
+        existingData.role !== "admin"
       ) {
         delete sanitizedData.email;
       }
