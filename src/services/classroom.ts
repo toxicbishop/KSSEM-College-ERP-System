@@ -46,12 +46,7 @@ export interface Classroom {
  * Represents a student in a classroom, for UI display purposes when listing students.
  * This is often derived from ClassroomStudentInfo.
  */
-export interface ClassroomStudent extends ClassroomStudentInfo {
-  // Inherits all fields from ClassroomStudentInfo
-  // id is equivalent to userId from ClassroomStudentInfo
-  // This type might be more for UI components if they expect an 'id' field specifically.
-  // For service layer, ClassroomStudentInfo might be sufficient.
-}
+export type ClassroomStudent = ClassroomStudentInfo;
 
 /**
  * Simplified representation of a faculty member, used in selection components.

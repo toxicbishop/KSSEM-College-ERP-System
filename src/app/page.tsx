@@ -143,19 +143,13 @@ export default function LandingPage() {
       setCookie("firebaseAuthToken", idToken, 1);
 
       let userRole = "student";
-      const ADMIN_EMAIL = "admin@gmail.com";
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
 
-      if (user.email === ADMIN_EMAIL) {
-        userRole = "admin";
-      } else {
-        const userDocRef = doc(db, "users", user.uid);
-        const userDocSnap = await getDoc(userDocRef);
-
-        if (userDocSnap.exists()) {
-          const userData = userDocSnap.data();
-          if (userData.role === "admin") userRole = "admin";
-          else if (userData.role === "faculty") userRole = "faculty";
-        }
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        if (userData.role === "admin") userRole = "admin";
+        else if (userData.role === "faculty") userRole = "faculty";
       }
 
       toast({

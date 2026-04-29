@@ -1,7 +1,15 @@
 
 // src/lib/firebase/admin.server.ts
-console.log("[AdminServer] TOP: admin.server.ts is being loaded/executed.");
-console.log(`[AdminServer] NEXT_RUNTIME: ${process.env.NEXT_RUNTIME || 'undefined'}, VERCEL_ENV: ${process.env.VERCEL_ENV || 'undefined'}`);
+const debugAdmin = process.env.DEBUG_FIREBASE_ADMIN === "true";
+const debugLog = (...args: unknown[]) => {
+    if (debugAdmin) console.log(...args);
+};
+const debugWarn = (...args: unknown[]) => {
+    if (debugAdmin) console.warn(...args);
+};
+
+debugLog("[AdminServer] TOP: admin.server.ts is being loaded/executed.");
+debugLog(`[AdminServer] NEXT_RUNTIME: ${process.env.NEXT_RUNTIME || 'undefined'}, VERCEL_ENV: ${process.env.VERCEL_ENV || 'undefined'}`);
 
 import type { App } from 'firebase-admin/app';
 import type { Auth } from 'firebase-admin/auth';
@@ -23,7 +31,7 @@ const serviceAccountB64String = process.env.GOOGLE_APPLICATION_CREDENTIALS_B64;
 
 
 if (!_getApps().length) {
-    console.log("[AdminServer] No Firebase admin apps initialized yet. Attempting initialization.");
+    debugLog("[AdminServer] No Firebase admin apps initialized yet. Attempting initialization.");
     let credentials;
     let credSource = "unknown";
 
@@ -33,7 +41,7 @@ if (!_getApps().length) {
         // Priority 1: Base64 encoded credentials
         if (serviceAccountB64String) {
             credSource = "GOOGLE_APPLICATION_CREDENTIALS_B64";
-            console.log(`[AdminServer] Found ${credSource}. Attempting to decode and parse.`);
+            debugLog(`[AdminServer] Found ${credSource}. Attempting to decode and parse.`);
             try {
                 serviceAccountContent = Buffer.from(serviceAccountB64String, 'base64').toString('utf8');
             } catch (e: any) {
@@ -44,13 +52,13 @@ if (!_getApps().length) {
         // Priority 2: Raw JSON string credentials
         else if (serviceAccountJsonString) {
             credSource = "GOOGLE_APPLICATION_CREDENTIALS_JSON";
-            console.log(`[AdminServer] Found ${credSource}. Attempting to parse.`);
+            debugLog(`[AdminServer] Found ${credSource}. Attempting to parse.`);
             serviceAccountContent = serviceAccountJsonString;
         } 
         // Priority 3: Fallback to Application Default Credentials
         else {
             credSource = "Application Default Credentials (ADC)";
-            console.log(`[AdminServer] No specific credentials found. Falling back to ${credSource}.`);
+            debugLog(`[AdminServer] No specific credentials found. Falling back to ${credSource}.`);
         }
 
         // If we have content (from B64 or JSON string), parse it.
@@ -68,7 +76,7 @@ if (!_getApps().length) {
                         adminInitializationErrorInstance = validationError;
                     } else {
                         credentials = _cert(serviceAccount);
-                        console.log(`[AdminServer] Credentials parsed successfully from ${credSource}. Project ID: ${serviceAccount.project_id}`);
+                        debugLog(`[AdminServer] Credentials parsed successfully from ${credSource}. Project ID: ${serviceAccount.project_id}`);
                     }
                  } catch (e: any) {
                     adminInitializationErrorInstance = new Error(`[AdminServer] Failed to parse JSON content from ${credSource}. Content is likely malformed. JSON.parse error: ${e.message}`);
@@ -79,7 +87,7 @@ if (!_getApps().length) {
         
         // Initialize app if no errors so far
         if (!adminInitializationErrorInstance) {
-            console.log(`[AdminServer] Initializing Firebase Admin App using ${credSource}...`);
+            debugLog(`[AdminServer] Initializing Firebase Admin App using ${credSource}...`);
             const appOptions = credentials ? { credential: credentials } : undefined;
             adminAppInstance = _initializeApp(appOptions);
             
@@ -89,9 +97,9 @@ if (!_getApps().length) {
                     adminDbInstance = _getFirestore(adminAppInstance);
                     const projectIdFromAppOptions = adminAppInstance.options?.projectId;
                     if (projectIdFromAppOptions) {
-                         console.log(`[AdminServer] Firebase Admin App initialized successfully. App Name: ${adminAppInstance.name}, Project ID: ${projectIdFromAppOptions}`);
+                         debugLog(`[AdminServer] Firebase Admin App initialized successfully. App Name: ${adminAppInstance.name}, Project ID: ${projectIdFromAppOptions}`);
                     } else {
-                        console.warn(`[AdminServer] Firebase Admin App initialized successfully, but Project ID is MISSING from app options.`);
+                        debugWarn(`[AdminServer] Firebase Admin App initialized successfully, but Project ID is MISSING from app options.`);
                     }
                 } catch (serviceError: any) {
                     const serviceFailureMsg = `[AdminServer] initializeApp() via ${credSource} seemed to succeed, but failed to get Auth/Firestore services. Error: ${serviceError.message}`;
@@ -113,7 +121,7 @@ if (!_getApps().length) {
     }
 
 } else {
-    console.log("[AdminServer] Firebase admin app already initialized. Getting existing instance.");
+    debugLog("[AdminServer] Firebase admin app already initialized. Getting existing instance.");
     adminAppInstance = _getApps()[0];
     if (adminAppInstance) {
         try {
@@ -138,7 +146,7 @@ if (adminInitializationErrorInstance) {
     adminDbInstance = null;
 } else if (adminAppInstance && adminDbInstance && adminAuthInstance) {
     const finalProjectId = adminAppInstance.options?.projectId;
-    console.log(`[AdminServer] FINAL STATUS: Successfully initialized/retrieved Firebase Admin SDK. Project ID: ${finalProjectId || 'N/A'}`);
+    debugLog(`[AdminServer] FINAL STATUS: Successfully initialized/retrieved Firebase Admin SDK. Project ID: ${finalProjectId || 'N/A'}`);
 } else {
     const unknownErrorMsg = "[AdminServer] FINAL STATUS: Initialization state UNKNOWN or INCOMPLETE. No explicit error was caught, but instances are not set.";
     console.error(unknownErrorMsg);

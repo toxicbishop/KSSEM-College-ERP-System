@@ -36,9 +36,6 @@ import {
 } from "@/services/system-settings"; // Import service functions
 import { Textarea } from "@/components/ui/textarea";
 
-// Define the specific admin email address
-const ADMIN_EMAIL = "admin@gmail.com";
-
 // Debounce utility function
 function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
   let timeout: ReturnType<typeof setTimeout> | null = null;
@@ -81,38 +78,30 @@ export default function AdminSettingsPage() {
     const checkAdminAccess = async () => {
       setCheckingRole(true);
       let userIsCurrentlyAdmin = false;
-      if (user.email === ADMIN_EMAIL) {
-        // First check hardcoded admin email
-        userIsCurrentlyAdmin = true;
-      } else {
-        if (db) {
-          // Check Firestore role only if db is available
-          try {
-            const userDocRef = doc(db, "users", user.uid);
-            const userDocSnap = await getDoc(userDocRef);
-            if (userDocSnap.exists() && userDocSnap.data().role === "admin") {
-              userIsCurrentlyAdmin = true;
-            }
-          } catch (error) {
-            console.error(
-              "Error fetching user role for admin settings:",
-              error,
-            );
-            toast({
-              title: "Error",
-              description:
-                "Could not verify admin role. Check Firestore permissions.",
-              variant: "destructive",
-            });
+      if (db) {
+        // Check Firestore role only if db is available
+        try {
+          const userDocRef = doc(db, "users", user.uid);
+          const userDocSnap = await getDoc(userDocRef);
+          if (userDocSnap.exists() && userDocSnap.data().role === "admin") {
+            userIsCurrentlyAdmin = true;
           }
-        } else {
+        } catch (error) {
+          console.error("Error fetching user role for admin settings:", error);
           toast({
-            title: "Database Error",
+            title: "Error",
             description:
-              "Firestore is not available. Cannot verify admin role.",
+              "Could not verify admin role. Check Firestore permissions.",
             variant: "destructive",
           });
         }
+      } else {
+        toast({
+          title: "Database Error",
+          description:
+            "Firestore is not available. Cannot verify admin role.",
+          variant: "destructive",
+        });
       }
 
       if (userIsCurrentlyAdmin) {

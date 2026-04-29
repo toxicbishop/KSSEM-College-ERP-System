@@ -32,8 +32,6 @@ import { sendBulkEmail } from "@/ai/flows/send-bulk-email-flow";
 import { ShieldAlert, Send, Users, Loader2 } from "lucide-react";
 import type { StudentProfile } from "@/services/profile";
 
-const ADMIN_EMAIL = "admin@gmail.com";
-
 interface UserRecipient extends Partial<StudentProfile> {
   id: string;
   email: string;
@@ -62,12 +60,6 @@ export default function AdminNotificationsPage() {
     }
     const checkAdminAccess = async () => {
       setCheckingRole(true);
-      if (user.email === ADMIN_EMAIL) {
-        setIsAdmin(true);
-        fetchRecipients();
-        setCheckingRole(false);
-        return;
-      }
       if (!db) {
         toast({ title: "Access Denied", variant: "destructive" });
         router.push("/");

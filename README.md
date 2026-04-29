@@ -297,25 +297,25 @@ The dev server supports HTTPS via locally-trusted certificates. This is useful i
     - **Full Name:** "Admin User"
     - **Student ID:** "admin001"
     - **Major:** "Administration"
-    - **Email:** **`admin@gmail.com`** (This is pre-set as an admin identifier)
+    - **Email:** use the email address you want for the first administrator
     - **Password:** Choose a strong password.
     - **Parent's Email:** `parent@example.com` (dummy)
 2.  Click **Sign Up**.
 
 ### Step 20: Manually Set Admin Role in Firestore
 
-1.  Go to the Firebase console > **Authentication**. Copy the **User UID** for `admin@gmail.com`.
+1.  Go to the Firebase console > **Authentication**. Copy the **User UID** for the administrator account you just created.
 2.  Go to **Firestore Database**. Click the `users` collection.
 3.  Find the document whose ID matches the User UID. Click it.
 4.  On the right, find/add the field `role`.
     - If `role` exists, click the pencil icon, change its value from `student` to `admin`. Click **Update**.
     - If `role` does **not** exist: Click **+ Add field**. Field name: `role`, Type: `string`, Value: `admin`. Click **Add**.
-5.  The `admin@gmail.com` user is now an admin.
+5.  That user is now an admin.
 
 ### Step 21: Sign In as Admin
 
 1.  Go back to your app. Logout if logged in.
-2.  Sign in with `admin@gmail.com` and your password.
+2.  Sign in with the administrator email and password.
 3.  You should see the Admin Dashboard or admin features.
 4.  If using Brave browser and HTTPS is not set up, you may need to disable Brave Shields for localhost.
 
@@ -360,7 +360,7 @@ If you need to switch the application to a different Firebase project (e.g., fro
       ```
 9.  **Recreate Admin User (if necessary):**
     - The users from your old Firebase project will not automatically be in the new one.
-    - You will likely need to sign up the `admin@gmail.com` user again in the application (which now points to the new project) and then manually set their role to `admin` in the _new_ project's Firestore database (as described in **Steps 18 & 19**).
+    - You will likely need to sign up an administrator account again in the application (which now points to the new project) and then manually set its role to `admin` in the _new_ project's Firestore database (as described in **Steps 18 & 19**).
 10. **Check Other API Keys:**
     - Update any other keys in your `.env.local` file (like `GOOGLE_GENAI_API_KEY` or `SMTP_...` credentials) if they are tied to the old project or need to be different for the new environment.
 11. **Restart Your Application:**
