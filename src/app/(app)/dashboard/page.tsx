@@ -100,9 +100,7 @@ export default function DashboardPage() {
           if (userDocSnap.exists()) {
             profileData = { ...userDocSnap.data() } as StudentProfile;
             if (!profileData.studentId) profileData.studentId = user.uid;
-            const userRole =
-              profileData.role ||
-              (user.email === "admin@gmail.com" ? "admin" : "student");
+            const userRole = profileData.role || "student";
             const fallbackName =
               userRole === "admin"
                 ? "Admin"
@@ -113,10 +111,8 @@ export default function DashboardPage() {
               profileData.name = user.displayName || fallbackName;
             if (!profileData.email) profileData.email = user.email || "N/A";
           } else {
-            const fallbackName =
-              user.email === "admin@gmail.com" ? "Admin" : "Student";
             profileData = {
-              name: user.displayName || fallbackName,
+              name: user.displayName || "Student",
               studentId: user.uid,
               courseProgram: "Unknown",
               email: user.email || "N/A",

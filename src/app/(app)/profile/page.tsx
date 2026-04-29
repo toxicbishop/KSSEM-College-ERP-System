@@ -290,8 +290,7 @@ function ProfileDetailsLoader() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Admin users can directly edit all fields without requesting changes
-  const isAdmin =
-    user?.email === "admin@gmail.com" || profile?.role === "admin";
+  const isAdmin = profile?.role === "admin";
 
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [requestFieldInfo, setRequestFieldInfo] = useState<{

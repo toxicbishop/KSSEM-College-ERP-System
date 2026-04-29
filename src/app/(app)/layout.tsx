@@ -63,10 +63,7 @@ export default function AppLayout({
     }
 
     setCheckingRole(true);
-    if (user.email === "admin@gmail.com") {
-      setUserRole("admin");
-      setCheckingRole(false);
-    } else if (db) {
+    if (db) {
       const userDocRef = doc(db, "users", user.uid);
       getDoc(userDocRef)
         .then((userDocSnap) => {
