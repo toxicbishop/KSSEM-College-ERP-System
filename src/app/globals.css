@@ -7,6 +7,9 @@
 @layer base {
   :root,
   .light {
+    --font-sans: Lato, Arial, Helvetica, sans-serif;
+    --font-serif: "Playfair Display", Georgia, "Times New Roman", serif;
+
     /* ── Core Palette ── */
     --background: 210 14% 97%; /* #F8F9FA — off-white */
     --foreground: 215 47% 11%; /* #0F172A — near-black */

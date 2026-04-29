@@ -58,7 +58,6 @@ import {
 } from "@/components/ui/select";
 import type { StudentProfile } from "@/services/profile";
 
-const ADMIN_EMAIL = "admin@gmail.com";
 const ALL_ROLES_VALUE = "__ALL_ROLES__";
 const ALL_COURSES_VALUE = "__ALL_COURSES__";
 
@@ -142,37 +141,33 @@ export default function AdminPage() {
       setCheckingRole(true);
       let userIsCurrentlyAdmin = false;
 
-      if (user.email === ADMIN_EMAIL) {
-        userIsCurrentlyAdmin = true;
-      } else {
-        if (db) {
-          try {
-            const userDocRef = doc(db, "users", user.uid);
-            const userDocSnap = await getDoc(userDocRef);
+      if (db) {
+        try {
+          const userDocRef = doc(db, "users", user.uid);
+          const userDocSnap = await getDoc(userDocRef);
 
-            if (userDocSnap.exists()) {
-              const userDataFromDb = userDocSnap.data();
-              if (userDataFromDb.role === "admin") {
-                userIsCurrentlyAdmin = true;
-              }
+          if (userDocSnap.exists()) {
+            const userDataFromDb = userDocSnap.data();
+            if (userDataFromDb.role === "admin") {
+              userIsCurrentlyAdmin = true;
             }
-          } catch (error) {
-            console.error("Error fetching user role:", error);
-            toast({
-              title: "Error",
-              description:
-                "Could not verify admin role. Please check Firestore permissions.",
-              variant: "destructive",
-            });
           }
-        } else {
+        } catch (error) {
+          console.error("Error fetching user role:", error);
           toast({
-            title: "Database Error",
+            title: "Error",
             description:
-              "Firestore is not available. Cannot verify admin role.",
+              "Could not verify admin role. Please check Firestore permissions.",
             variant: "destructive",
           });
         }
+      } else {
+        toast({
+          title: "Database Error",
+          description:
+            "Firestore is not available. Cannot verify admin role.",
+          variant: "destructive",
+        });
       }
 
       if (userIsCurrentlyAdmin) {
