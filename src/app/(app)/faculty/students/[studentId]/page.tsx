@@ -8,7 +8,6 @@ import { MainHeader } from "@/components/layout/main-header";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -17,11 +16,7 @@ import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
   UserSquare,
-  BarChart,
-  CheckSquare,
-  GraduationCap,
   AlertTriangle,
-  Lightbulb,
 } from "lucide-react";
 import { auth as clientAuth } from "@/lib/firebase/client";
 import { getStudentProfile } from "@/services/profile";
@@ -34,17 +29,6 @@ import {
   fetchGradesForStudent,
   analyzeStudentGradesData,
 } from "./actions";
-import Image from "next/image";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { format, parseISO } from "date-fns";
-import { cn } from "@/lib/utils";
 import { GradesChartCard } from "@/components/dashboard/grades-chart-card";
 import { AttendanceCalendarCard } from "@/components/profile/attendance-calendar-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -91,6 +75,7 @@ export default function FacultyStudentDetailPage() {
     if (user && !authLoading && studentId) {
       fetchStudentData();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, studentId]);
 
   const fetchStudentData = async () => {

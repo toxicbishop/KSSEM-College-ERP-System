@@ -1,7 +1,6 @@
 ﻿"use client";
 
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { MainHeader } from "@/components/layout/main-header";
@@ -31,9 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Loader2,
   Save,
-  UserSearch,
   PlusCircle,
   Trash2,
   Users,
@@ -58,7 +55,6 @@ import { format } from "date-fns";
 
 export default function ManageGradesPage() {
   const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
   const { toast } = useToast();
 
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
@@ -96,6 +92,7 @@ export default function ManageGradesPage() {
       loadFacultyClassrooms();
       fetchUniqueCourses();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading]);
 
   const loadFacultyClassrooms = async () => {
@@ -107,7 +104,7 @@ export default function ManageGradesPage() {
       const idToken = await currentUser.getIdToken();
       const fetchedClassrooms = await fetchFacultyClassrooms(idToken);
       setClassrooms(fetchedClassrooms as unknown as Classroom[]);
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Could not load your classrooms.",
@@ -126,7 +123,7 @@ export default function ManageGradesPage() {
       const idToken = await currentUser.getIdToken();
       const courses = await getUniqueCoursesForFaculty(idToken);
       setUniqueCourses(courses);
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Could not fetch existing course names.",
@@ -158,7 +155,7 @@ export default function ManageGradesPage() {
         ),
       );
       setStudentsInClassroom(sortedStudents);
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Could not load students for this classroom.",
@@ -175,7 +172,7 @@ export default function ManageGradesPage() {
     try {
       const fetchedGrades = await fetchStudentGradesForFaculty(student.userId);
       setStudentGrades(fetchedGrades);
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: `Could not fetch grades for ${student.name}.`,
@@ -274,7 +271,7 @@ export default function ManageGradesPage() {
         const studentUids = studentsInClassroom.map((s) => s.userId);
         const grades = await fetchGradesForClassroom(idToken, studentUids);
         setClassroomGrades(grades);
-      } catch (error) {
+      } catch {
         toast({
           title: "Error",
           description: "Could not fetch classroom grade report.",

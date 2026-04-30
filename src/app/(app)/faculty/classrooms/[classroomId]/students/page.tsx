@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { useToast } from "@/hooks/use-toast";
@@ -32,11 +32,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
 import {
-  PlusCircle,
   Trash2,
   Search,
   UserPlus,
@@ -135,6 +133,7 @@ export default function ManageClassroomStudentsPage() {
     if (user && !authLoading && classroomId) {
       fetchClassroomDetailsAndStudents();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, classroomId]);
 
   const handleSearchStudents = async () => {
