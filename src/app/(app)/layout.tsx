@@ -128,8 +128,8 @@ export default function AppLayout({
 
     // Student layout — header-first, no sidebar on desktop
     return (
-      <div className="flex flex-col min-h-screen bg-kssem-bg">
-        <main className="flex-grow max-w-7xl mx-auto w-full px-6 py-8 pb-20 md:pb-8">
+      <div className="flex min-h-screen flex-col overflow-x-hidden bg-kssem-bg">
+        <main className="mx-auto w-full max-w-7xl flex-grow px-4 py-5 pb-20 sm:px-6 md:py-8 md:pb-8">
           {children}
         </main>
         <Footer />
