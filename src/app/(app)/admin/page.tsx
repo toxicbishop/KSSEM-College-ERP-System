@@ -4,15 +4,12 @@ import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { db } from "@/lib/firebase/client";
+import { auth as clientAuth } from "@/lib/firebase/client";
 import {
   doc,
   getDoc,
   collection,
   getDocs,
-  addDoc,
-  deleteDoc,
-  serverTimestamp,
-  updateDoc,
 } from "firebase/firestore";
 import {
   Card,
@@ -57,6 +54,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { StudentProfile } from "@/services/profile";
+import {
+  createManagedUser,
+  deleteManagedUser,
+  updateManagedUser,
+} from "@/services/admin-users";
 
 const ALL_ROLES_VALUE = "__ALL_ROLES__";
 const ALL_COURSES_VALUE = "__ALL_COURSES__";
@@ -117,6 +119,7 @@ export default function AdminPage() {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [newUser, setNewUser] =
     useState<Omit<UserData, "id" | "createdAt">>(initialNewUserState);
+  const [newUserPassword, setNewUserPassword] = useState("");
   const [editingUser, setEditingUser] = useState<UserData | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -274,26 +277,37 @@ export default function AdminPage() {
     if (
       !profile.name ||
       !profile.studentId ||
-      !profile.courseProgram ||
       !profile.email ||
-      !profile.parentEmail ||
       !profile.role
     ) {
       toast({
         title: "Validation Error",
         description:
-          "Please fill in all required fields (Name, Student ID, Course / Program, Email, Parent's Email, Role).",
+          "Please fill in all required fields (Name, Student/Staff ID, Email, Role).",
         variant: "destructive",
       });
       return false;
     }
-    if (
-      !/\S+@\S+\.\S+/.test(profile.email) ||
-      (profile.parentEmail && !/\S+@\S+\.\S+/.test(profile.parentEmail))
-    ) {
+    if (profile.role === "student" && !profile.parentEmail) {
       toast({
         title: "Validation Error",
-        description: "Please enter valid email addresses.",
+        description: "Parent's email is required for student accounts.",
+        variant: "destructive",
+      });
+      return false;
+    }
+    if (!/\S+@\S+\.\S+/.test(profile.email)) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return false;
+    }
+    if (profile.parentEmail && !/\S+@\S+\.\S+/.test(profile.parentEmail)) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter a valid parent's email address.",
         variant: "destructive",
       });
       return false;
@@ -302,30 +316,53 @@ export default function AdminPage() {
   };
 
   const handleCreateUser = async () => {
-    if (!db || !isAdmin) return;
+    if (!db || !isAdmin || !clientAuth?.currentUser) return;
     if (!validateUserProfile(newUser)) return;
+    if (newUserPassword.length < 6) {
+      toast({
+        title: "Validation Error",
+        description: "Temporary password must be at least 6 characters.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
-      const usersCollection = collection(db, "users");
-      await addDoc(usersCollection, {
-        ...newUser,
-        currentYear: Number(newUser.currentYear) || 0,
-        currentSemester: Number(newUser.currentSemester) || 0,
-        createdAt: serverTimestamp(),
-      });
+      const idToken = await clientAuth.currentUser.getIdToken();
+      const result = await createManagedUser(
+        idToken,
+        {
+          ...newUser,
+          name: newUser.name,
+          studentId: newUser.studentId,
+          email: newUser.email || "",
+          parentEmail: newUser.parentEmail || "",
+          role:
+            newUser.role === "admin" ||
+            newUser.role === "faculty" ||
+            newUser.role === "student"
+              ? newUser.role
+              : "student",
+        },
+        newUserPassword,
+      );
 
       toast({
-        title: "Success",
-        description: "User profile created successfully in Firestore.",
+        title: result.authUserCreated ? "User Created" : "Profile Linked",
+        description: result.authUserCreated
+          ? "Firebase Auth account and user profile were created."
+          : "An existing Auth account was found and linked to this profile.",
       });
       fetchUsers();
       setNewUser(initialNewUserState);
+      setNewUserPassword("");
     } catch (error) {
       console.error("Error creating user profile:", error);
       toast({
         title: "Error Creating User",
         description:
-          "Could not create user profile. Ensure Firestore rules allow 'create' on 'users' for admins.",
+          (error as Error).message ||
+          "Could not create the Firebase Auth account and profile.",
         variant: "destructive",
       });
     }
@@ -337,16 +374,25 @@ export default function AdminPage() {
   };
 
   const handleUpdateUser = async () => {
-    if (!db || !isAdmin || !editingUser || !editingUser.id) return;
+    if (!db || !isAdmin || !editingUser || !editingUser.id || !clientAuth?.currentUser) return;
     if (!validateUserProfile(editingUser)) return;
 
     try {
-      const userDocRef = doc(db, "users", editingUser.id);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id, createdAt, ...userDataToUpdate } = editingUser;
+      const idToken = await clientAuth.currentUser.getIdToken();
 
-      await updateDoc(userDocRef, {
+      await updateManagedUser(idToken, editingUser.id, {
         ...userDataToUpdate,
+        email: editingUser.email || "",
+        name: editingUser.name,
+        studentId: editingUser.studentId,
+        role:
+          editingUser.role === "admin" ||
+          editingUser.role === "faculty" ||
+          editingUser.role === "student"
+            ? editingUser.role
+            : "student",
         currentYear: Number(editingUser.currentYear) || 0,
         currentSemester: Number(editingUser.currentSemester) || 0,
       });
@@ -363,21 +409,21 @@ export default function AdminPage() {
       toast({
         title: "Error Updating User",
         description:
-          "Could not update user. Ensure Firestore rules allow 'update' on 'users' for admins.",
+          (error as Error).message || "Could not update user.",
         variant: "destructive",
       });
     }
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (!db || !isAdmin) return;
+    if (!db || !isAdmin || !clientAuth?.currentUser) return;
     try {
-      const userDocRef = doc(db, "users", userId);
-      await deleteDoc(userDocRef);
+      const idToken = await clientAuth.currentUser.getIdToken();
+      await deleteManagedUser(idToken, userId);
 
       toast({
         title: "Success",
-        description: "User profile deleted successfully from Firestore.",
+        description: "User account and profile deleted successfully.",
       });
       fetchUsers();
     } catch (error) {
@@ -385,7 +431,7 @@ export default function AdminPage() {
       toast({
         title: "Error Deleting User",
         description:
-          "Could not delete user profile. Ensure Firestore rules allow 'delete' on 'users' for admins.",
+          (error as Error).message || "Could not delete user.",
         variant: "destructive",
       });
     }
@@ -1176,6 +1222,20 @@ export default function AdminPage() {
                       value={newUser.email}
                       onChange={handleInputChange}
                       placeholder="user@example.com"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-kssem-text-muted text-xs font-bold uppercase tracking-wider mb-1.5 block">
+                      Temporary Password<span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      type="password"
+                      className="bg-white border-kssem-border text-kssem-text rounded-sm focus-visible:ring-kssem-navy"
+                      value={newUserPassword}
+                      onChange={(event) =>
+                        setNewUserPassword(event.target.value)
+                      }
+                      placeholder="Minimum 6 characters"
                     />
                   </div>
                   <div>
