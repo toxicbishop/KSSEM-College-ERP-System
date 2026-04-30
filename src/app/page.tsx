@@ -87,6 +87,12 @@ const featureGrid = [
   { icon: Bell, title: "Alerts", subtitle: "Real-time Notices" },
 ];
 
+function navigateAfterSignIn(path: string) {
+  if (typeof window !== "undefined") {
+    window.location.assign(path);
+  }
+}
+
 export default function LandingPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -157,9 +163,9 @@ export default function LandingPage() {
         description: "Welcome back!",
       });
 
-      if (userRole === "admin") router.push("/admin");
-      else if (userRole === "faculty") router.push("/faculty");
-      else router.push("/dashboard");
+      if (userRole === "admin") navigateAfterSignIn("/admin");
+      else if (userRole === "faculty") navigateAfterSignIn("/faculty");
+      else navigateAfterSignIn("/dashboard");
     } catch (error: any) {
       console.error("Sign in error:", error);
       let description = "An unexpected error occurred. Please try again.";
