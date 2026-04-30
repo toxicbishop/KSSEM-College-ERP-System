@@ -14,6 +14,7 @@ import {
   ChevronsRight,
   LayoutDashboard,
   Send,
+  ClipboardList,
 } from "lucide-react";
 import { MobileNav } from "./mobile-nav";
 import { cn, deleteCookie } from "@/lib/utils";
@@ -50,14 +51,15 @@ const adminNavigationItems = [
   { href: "/admin/settings", label: "System Settings", icon: Settings },
   { href: "/admin/requests", label: "Change Requests", icon: Edit },
   { href: "/admin/notifications", label: "Notifications", icon: Send },
+  { href: "/admin/audit-logs", label: "Audit Logs", icon: ClipboardList },
 ];
 
 const adminMobileNavItems = [
   { href: "/admin", label: "Users", icon: Users },
   { href: "/admin/requests", label: "Requests", icon: Edit },
+  { href: "/admin/audit-logs", label: "Logs", icon: ClipboardList },
   { href: "/admin/notifications", label: "Notifs", icon: Send },
   { href: "/admin/settings", label: "Settings", icon: Settings },
-  { href: "/dashboard", label: "Student V", icon: LayoutDashboard },
 ];
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -237,7 +239,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                     pathname.startsWith("/admin") &&
                     !pathname.includes("/settings") &&
                     !pathname.includes("/requests") &&
-                    !pathname.includes("/notifications")) ||
+                    !pathname.includes("/notifications") &&
+                    !pathname.includes("/audit-logs")) ||
                   pathname === item.href;
                 const finalIsActive =
                   item.href === "/dashboard"
