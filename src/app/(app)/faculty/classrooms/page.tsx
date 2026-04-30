@@ -2,7 +2,7 @@
 'use client';
 
 import { MainHeader } from '@/components/layout/main-header';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose 
@@ -13,7 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { PlusCircle, Users, Edit, UserPlus, LinkIcon, Trash2, Loader2, MessageSquare } from 'lucide-react'; // Added MessageSquare
+import { PlusCircle, Users, LinkIcon, Trash2, Loader2, MessageSquare } from 'lucide-react'; // Added MessageSquare
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { useToast } from '@/hooks/use-toast';
@@ -92,6 +92,7 @@ export default function FacultyClassroomsPage() {
       setLoadingClassrooms(false); 
       setClassrooms([]); 
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading]);
 
 
@@ -141,7 +142,7 @@ export default function FacultyClassroomsPage() {
         const alreadyInvitedIds = classroom.invitedFacultyIds || [];
         const eligibleFaculty = facultyList.filter(f => f.uid !== ownerId && !alreadyInvitedIds.includes(f.uid));
         setAllFaculty(eligibleFaculty);
-    } catch (error) {
+    } catch {
         toast({ title: "Error", description: "Could not load faculty list for inviting.", variant: "destructive" });
         setAllFaculty([]);
     } finally {

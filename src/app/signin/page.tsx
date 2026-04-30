@@ -40,7 +40,6 @@ import {
   ArrowRight,
   GraduationCap,
   LayoutDashboard,
-  BookOpen,
   Wallet,
   Clock,
   Bell,

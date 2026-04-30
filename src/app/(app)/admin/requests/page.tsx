@@ -22,7 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { ShieldAlert, CheckCircle, XCircle, Edit, Info } from "lucide-react";
+import { ShieldAlert, CheckCircle, XCircle, Edit } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import type { ProfileChangeRequest } from "@/services/profile-change-request";
@@ -127,6 +127,7 @@ export default function AdminRequestsPage() {
     if (isAdmin && !authLoading && !checkingRole && clientAuth?.currentUser) {
       fetchRequests();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdmin, authLoading, checkingRole, user]); // Added user dependency for clientAuth.currentUser re-check
 
   const handleApprove = async (request: ProfileChangeRequest) => {
