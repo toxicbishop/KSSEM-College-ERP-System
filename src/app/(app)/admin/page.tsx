@@ -900,7 +900,7 @@ export default function AdminPage() {
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Page Header */}
       <div className="flex flex-row justify-between items-center mb-6">
-        <h1 className="text-3xl md:text-4xl font-serif font-bold text-kssem-navy tracking-tight">
+        <h1 className="text-3xl md:text-4xl font-serif font-bold text-white tracking-tight">
           Admin Panel
         </h1>
         <Button
