@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   signInWithEmailAndPassword,
@@ -85,8 +84,13 @@ const featureGrid = [
   { icon: Bell, title: "Alerts", subtitle: "Real-time Notices" },
 ];
 
+function navigateAfterSignIn(path: string) {
+  if (typeof window !== "undefined") {
+    window.location.assign(path);
+  }
+}
+
 export default function SignInPage() {
-  const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] =
@@ -148,9 +152,9 @@ export default function SignInPage() {
         description: "Welcome back!",
       });
 
-      if (userRole === "admin") router.push("/admin");
-      else if (userRole === "faculty") router.push("/faculty");
-      else router.push("/dashboard");
+      if (userRole === "admin") navigateAfterSignIn("/admin");
+      else if (userRole === "faculty") navigateAfterSignIn("/faculty");
+      else navigateAfterSignIn("/dashboard");
     } catch (error: any) {
       console.error("Sign in error:", error);
       let description = "An unexpected error occurred. Please try again.";
