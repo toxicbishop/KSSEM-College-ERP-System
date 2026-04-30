@@ -346,7 +346,7 @@ export async function getStudentsInClassroom(
   try {
     const decodedToken = await adminAuth.verifyIdToken(idToken);
     facultyId = decodedToken.uid;
-  } catch (error) {
+  } catch {
     throw new Error("Authentication failed. Invalid ID token.");
   }
 
@@ -383,7 +383,7 @@ export async function addStudentsToClassroom(
   let facultyId: string;
   try {
     facultyId = (await adminAuth.verifyIdToken(idToken)).uid;
-  } catch (error) {
+  } catch {
     throw new Error("Authentication failed. Invalid ID token.");
   }
 
@@ -453,7 +453,7 @@ export async function removeStudentFromClassroom(
   let facultyId: string;
   try {
     facultyId = (await adminAuth.verifyIdToken(idToken)).uid;
-  } catch (error) {
+  } catch {
     throw new Error("Authentication failed. Invalid ID token.");
   }
 
@@ -506,7 +506,7 @@ export async function searchStudents(
   let facultyId: string;
   try {
     facultyId = (await adminAuth.verifyIdToken(idToken)).uid;
-  } catch (error) {
+  } catch {
     throw new Error("Authentication failed. Invalid ID token.");
   }
 
@@ -588,7 +588,7 @@ export async function addInvitedFacultyToClassroom(
   let currentFacultyId: string;
   try {
     currentFacultyId = (await adminAuth.verifyIdToken(idToken)).uid;
-  } catch (error) {
+  } catch {
     throw new Error("Authentication failed. Invalid ID token.");
   }
 
@@ -651,7 +651,7 @@ export async function deleteClassroom(
   let facultyId: string;
   try {
     facultyId = (await adminAuth.verifyIdToken(idToken)).uid;
-  } catch (error) {
+  } catch {
     throw new Error("Authentication failed. Invalid ID token.");
   }
 

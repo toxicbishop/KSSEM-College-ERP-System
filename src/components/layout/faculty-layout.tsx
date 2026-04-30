@@ -9,10 +9,8 @@ import {
   Users,
   CheckSquare,
   Eye,
-  LogOut,
   ChevronsLeft,
   ChevronsRight,
-  Settings,
   GraduationCap,
   UserSearch,
 } from "lucide-react";
