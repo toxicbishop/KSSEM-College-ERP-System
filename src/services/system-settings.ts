@@ -71,8 +71,6 @@ export async function getSystemSettings(): Promise<SystemSettings> {
       const {
         doc: clientDocFn,
         getDoc: getClientDocFn,
-        setDoc: setClientDocFn,
-        serverTimestamp: clientServerTimestampFn,
         Timestamp: ClientTimestamp,
       } = await import("firebase/firestore");
 

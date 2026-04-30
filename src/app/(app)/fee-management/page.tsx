@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { MainHeader } from "@/components/layout/main-header";
 import { PageHeader } from "@/components/layout/page-header";
 import {

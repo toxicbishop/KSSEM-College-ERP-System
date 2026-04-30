@@ -1,7 +1,5 @@
 "use server";
 
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase/client";
 import {
   adminDb,
   adminAuth,

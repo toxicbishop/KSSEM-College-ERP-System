@@ -3,7 +3,6 @@
 import { MainHeader } from "@/components/layout/main-header";
 import Link from "next/link";
 import { useAuth } from "@/context/auth-context";
-import { useRouter } from "next/navigation";
 import {
   UserSearch,
   GraduationCap,
@@ -42,8 +41,7 @@ const quickActions = [
 ];
 
 export default function FacultyDashboardPage() {
-  const { user, loading } = useAuth();
-  const router = useRouter();
+  const { user } = useAuth();
 
   return (
     <>
