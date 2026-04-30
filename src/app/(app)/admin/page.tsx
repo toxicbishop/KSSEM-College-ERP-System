@@ -17,19 +17,15 @@ import {
   CardTitle,
   CardContent,
   CardDescription,
-  CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   UserPlus,
-  Users,
   Settings,
   ShieldAlert,
   Edit,
   Trash2,
-  CheckCircle,
   Filter as FilterIcon,
-  XCircle,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
@@ -236,6 +232,7 @@ export default function AdminPage() {
     if (isAdmin && !authLoading && !checkingRole) {
       fetchUsers();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdmin, authLoading, checkingRole]);
 
   const handleInputChange = (
@@ -457,12 +454,6 @@ export default function AdminPage() {
         }),
       );
   }, [usersData, searchTerm, filterRole, filterCourse]);
-
-  const clearFilters = () => {
-    setSearchTerm("");
-    setFilterRole("");
-    setFilterCourse("");
-  };
 
   if (authLoading || checkingRole) {
     return (
@@ -945,12 +936,12 @@ export default function AdminPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Page Header */}
-      <div className="flex flex-row justify-between items-center mb-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
         <h1 className="text-3xl md:text-4xl font-serif font-bold text-white tracking-tight">
           Admin Panel
         </h1>
         <Button
-          className="bg-kssem-gold hover:bg-[#c4a030] text-kssem-navy font-bold rounded-sm flex items-center gap-2 uppercase tracking-wider text-sm"
+          className="bg-kssem-gold hover:bg-[#c4a030] text-kssem-navy font-bold rounded-sm flex items-center gap-2 uppercase tracking-wider text-sm sm:self-auto self-start"
           onClick={() => {
             document
               .getElementById("add-user-section")
@@ -962,13 +953,13 @@ export default function AdminPage() {
 
       {/* Outer Content Card */}
       <div className="bg-white rounded-sm border border-kssem-border shadow-prestige overflow-hidden">
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {/* Filter Section */}
-          <div className="flex flex-col md:flex-row gap-4 items-end mb-6">
-            <div className="flex items-center text-kssem-text-muted font-bold uppercase tracking-wider text-xs mr-2 mb-2 md:mb-0">
+          <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-end mb-6">
+            <div className="flex items-center text-kssem-text-muted font-bold uppercase tracking-wider text-xs mr-2 mb-1 md:mb-0">
               Filter By
             </div>
-            <div>
+            <div className="w-full md:w-auto">
               <Label className="text-kssem-text-muted text-xs font-bold uppercase tracking-wider mb-1 block">
                 Role
               </Label>
@@ -989,7 +980,7 @@ export default function AdminPage() {
               </Select>
             </div>
 
-            <div>
+            <div className="w-full md:w-auto">
               <Label className="text-kssem-text-muted text-xs font-bold uppercase tracking-wider mb-1 block">
                 Department/Course
               </Label>
@@ -1050,7 +1041,7 @@ export default function AdminPage() {
             <>
               {filteredUsers.length > 0 ? (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm whitespace-nowrap">
+                  <table className="w-full min-w-[760px] text-left text-sm whitespace-nowrap">
                     <thead className="text-xs text-kssem-text-muted font-bold uppercase tracking-wider border-b-2 border-kssem-navy">
                       <tr>
                         <th className="px-4 py-3 pb-4">Name</th>
@@ -1168,7 +1159,7 @@ export default function AdminPage() {
           <div
             id="add-user-section"
             className="bg-white rounded-sm border border-kssem-border shadow-prestige overflow-hidden mt-6">
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               <div className="flex justify-between items-center mb-6 border-b border-kssem-border pb-4">
                 <h2 className="text-lg font-serif font-bold text-kssem-navy">
                   Add New User

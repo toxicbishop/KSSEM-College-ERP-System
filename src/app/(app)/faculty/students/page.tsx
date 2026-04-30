@@ -14,7 +14,6 @@ import { Users, Eye, Search } from 'lucide-react';
 import { auth as clientAuth } from '@/lib/firebase/client';
 import type { Classroom, ClassroomStudentInfo } from '@/services/classroom';
 import { fetchFacultyClassroomsData, fetchStudentsInClassroomData } from './actions';
-import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 
@@ -38,6 +37,7 @@ export default function FacultyViewStudentsPage() {
     if (user && !authLoading) {
       fetchFacultyClassrooms();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading]);
 
   useEffect(() => {
@@ -49,6 +49,7 @@ export default function FacultyViewStudentsPage() {
             setSelectedClassroomId(undefined);
           }
       }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClassroomId, classrooms]);
 
 
@@ -61,7 +62,7 @@ export default function FacultyViewStudentsPage() {
       const idToken = await currentUser.getIdToken();
       const fetchedClassrooms = await fetchFacultyClassroomsData(idToken);
       setClassrooms(fetchedClassrooms);
-    } catch (error) {
+    } catch {
       toast({ title: "Error", description: "Could not load your classrooms.", variant: "destructive" });
     } finally {
       setLoadingClassrooms(false);
@@ -80,7 +81,7 @@ export default function FacultyViewStudentsPage() {
             (a.studentIdNumber || '').localeCompare(b.studentIdNumber || '', undefined, { numeric: true })
         );
         setStudentsInClassroom(sortedStudents);
-    } catch (error) {
+    } catch {
         toast({ title: "Error", description: "Could not load students for this classroom.", variant: "destructive" });
     } finally {
         setLoadingStudents(false);

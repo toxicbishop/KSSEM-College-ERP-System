@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
-import { db, auth as clientAuth } from "@/lib/firebase/client";
+import { db } from "@/lib/firebase/client";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import {
   Card,
@@ -78,6 +78,7 @@ export default function AdminNotificationsPage() {
       setCheckingRole(false);
     };
     checkAdminAccess();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, router, toast]);
 
   const fetchRecipients = async () => {

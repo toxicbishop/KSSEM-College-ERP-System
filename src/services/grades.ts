@@ -155,7 +155,7 @@ export async function getGradesForClassroom(
   }
   try {
     await adminAuth.verifyIdToken(idToken);
-  } catch (error) {
+  } catch {
     throw new Error("Authentication failed.");
   }
 
@@ -208,7 +208,7 @@ export async function getUniqueCourseNames(idToken: string): Promise<string[]> {
   }
   try {
     await adminAuth.verifyIdToken(idToken);
-  } catch (error) {
+  } catch {
     throw new Error("Authentication failed.");
   }
   try {
@@ -251,7 +251,7 @@ export async function updateStudentGrade(
   let facultyId: string;
   try {
     facultyId = (await adminAuth.verifyIdToken(idToken)).uid;
-  } catch (error) {
+  } catch {
     throw new Error("Authentication failed.");
   }
 
@@ -300,7 +300,7 @@ export async function deleteStudentGrade(
   }
   try {
     await adminAuth.verifyIdToken(idToken);
-  } catch (error) {
+  } catch {
     throw new Error("Authentication failed.");
   }
   try {

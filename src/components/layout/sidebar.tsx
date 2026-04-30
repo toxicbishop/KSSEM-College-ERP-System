@@ -12,7 +12,6 @@ import {
   CalendarCheck,
   Vote,
   LogIn,
-  LogOut,
   ChevronsLeft,
   ChevronsRight,
   Network,

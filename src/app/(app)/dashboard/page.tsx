@@ -1,6 +1,5 @@
 "use client";
 
-import { getStudentProfile } from "@/services/profile";
 import { getAnnouncements } from "@/services/announcements";
 import { AttendanceOverviewCard } from "@/components/dashboard/attendance-overview-card";
 import { GradesChartCard } from "@/components/dashboard/grades-chart-card";

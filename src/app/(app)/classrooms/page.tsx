@@ -19,7 +19,6 @@ import {
   Network,
   MessageSquare,
   BookOpen,
-  ChevronRight,
 } from "lucide-react";
 import {
   Dialog,

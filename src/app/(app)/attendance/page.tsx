@@ -23,7 +23,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { AlertTriangle, Download } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { fetchAttendanceRecords } from "./actions";
 
 function AttendanceTableLoader() {

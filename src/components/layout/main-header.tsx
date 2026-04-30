@@ -6,7 +6,13 @@ import Link from "next/link";
 import { getSystemSettings } from "@/services/system-settings";
 import { useEffect, useState } from "react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Sidebar } from "./sidebar";
 import { useAuth } from "@/context/auth-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -129,9 +135,9 @@ export function MainHeader() {
 
   return (
     <header className="sticky top-0 z-40 bg-kssem-navy shadow-md border-b border-kssem-navy-light/20">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-3 px-3 py-2 sm:px-6 md:h-16 md:py-0">
         {/* Brand */}
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
           {isMobile ? (
             <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
               <SheetTrigger asChild>
@@ -165,8 +171,8 @@ export function MainHeader() {
               />
             </div>
           )}
-          <div className="flex flex-col">
-            <span className="text-white font-serif font-bold text-lg leading-none tracking-wide">
+          <div className="flex min-w-0 flex-col">
+            <span className="truncate text-sm font-bold leading-tight tracking-wide text-white sm:text-lg md:font-serif">
               {appNameLoading ? "..." : collegeName}
             </span>
             <span className="text-slate-300 text-[10px] uppercase tracking-wider font-medium">
@@ -195,7 +201,7 @@ export function MainHeader() {
         </nav>
 
         {/* User Profile & Actions */}
-        <div className="flex items-center gap-6">
+        <div className="flex shrink-0 items-center gap-3 sm:gap-6">
           <button className="text-slate-300 hover:text-white transition-colors hidden sm:block">
             <Bell className="h-5 w-5" />
           </button>

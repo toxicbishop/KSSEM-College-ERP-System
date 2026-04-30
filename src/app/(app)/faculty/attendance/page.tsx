@@ -46,9 +46,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   CalendarIcon,
-  CheckCircle,
   User,
-  Users,
   BookOpen,
   Loader2,
   Search,
@@ -319,6 +317,7 @@ export default function FacultyAttendancePage() {
     if (user && !authLoading) {
       fetchFacultyClassrooms();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading]);
 
   const fetchFacultyClassrooms = async () => {
@@ -401,6 +400,7 @@ export default function FacultyAttendancePage() {
       setSelectAllChecked(false);
       setReportRecords([]);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClassroomId, user]);
 
   const fetchPreviousAttendance = useCallback(async () => {
@@ -511,6 +511,7 @@ export default function FacultyAttendancePage() {
       newStatus[s.userId] = attendanceStatus[s.userId] || false;
     });
     setAttendanceStatus(newStatus);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filteredStudentsToDisplay, loadingStudents, isEditing]);
 
   useEffect(() => {
@@ -816,6 +817,7 @@ export default function FacultyAttendancePage() {
     const classroomName = selectedClassroomDetails?.name || "Classroom";
     const filename = `Attendance_Report_${classroomName}_${format(new Date(), "yyyy-MM-dd")}.csv`;
     exportDataToCsv(dataForCsv, filename);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reportRecords, studentStats, currentStudents, selectedClassroomDetails]);
 
   const handleDownloadDefaulterReport = useCallback(() => {
@@ -839,6 +841,7 @@ export default function FacultyAttendancePage() {
     const classroomName = selectedClassroomDetails?.name || "Classroom";
     const filename = `Low_Attendance_Report_${classroomName}_${format(new Date(), "yyyy-MM-dd")}.csv`;
     exportDataToCsv(dataForCsv, filename);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lowAttendanceStudents, selectedClassroomDetails]);
 
   const handleThresholdInputChange = (

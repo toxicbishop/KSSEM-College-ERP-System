@@ -23,7 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getSystemSettings } from "@/services/system-settings";
 import type { SystemSettings } from "@/services/system-settings";
 import { Skeleton } from "@/components/ui/skeleton";
-import { GraduationCap, Users, ShieldCheck, ArrowRight } from "lucide-react";
+import { GraduationCap, Users, ShieldCheck } from "lucide-react";
 
 const signUpSchema = z.object({
   name: z.string().regex(/^[a-zA-Z\s]{2,50}$/, {

@@ -5,7 +5,6 @@ import {
   CalendarClock,
   Clock,
   User,
-  FileText,
 } from "lucide-react";
 
 const upcomingAppointments = [
