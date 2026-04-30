@@ -7,12 +7,11 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-  CardDescription,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect, useState, Suspense, useRef } from "react";
 import { useAuth } from "@/context/auth-context";
-import { db, auth as clientAuth } from "@/lib/firebase/client";
+import { auth as clientAuth } from "@/lib/firebase/client";
 import type { StudentProfile } from "@/services/profile";
 import { getStudentProfile, updateStudentProfile } from "@/services/profile";
 import { createProfileChangeRequest } from "@/services/profile-change-request";
@@ -51,7 +50,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
 import {
@@ -207,12 +205,10 @@ const InfoItem = ({
 const DocumentOrActionItem = ({
   label,
   url,
-  fieldName,
   actionLabel,
   icon,
   isDownloadable = false,
   actionType = "link",
-  revalRef,
 }: {
   label: string;
   url?: string;

@@ -5,8 +5,6 @@ import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/layout/admin-layout";
 import { FacultyLayout } from "@/components/layout/faculty-layout";
 import { useRouter, usePathname } from "next/navigation";
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import {
@@ -94,7 +92,7 @@ export default function AppLayout({
       setUserRole("student");
       setCheckingRole(false);
     }
-  }, [user, loading, router, pathname, db]);
+  }, [user, loading, router, pathname]);
 
   if (loading || checkingRole || isMobile === undefined) {
     return (

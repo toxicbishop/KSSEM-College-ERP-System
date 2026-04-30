@@ -17,19 +17,15 @@ import {
   CardTitle,
   CardContent,
   CardDescription,
-  CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   UserPlus,
-  Users,
   Settings,
   ShieldAlert,
   Edit,
   Trash2,
-  CheckCircle,
   Filter as FilterIcon,
-  XCircle,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
@@ -236,6 +232,7 @@ export default function AdminPage() {
     if (isAdmin && !authLoading && !checkingRole) {
       fetchUsers();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdmin, authLoading, checkingRole]);
 
   const handleInputChange = (
@@ -457,12 +454,6 @@ export default function AdminPage() {
         }),
       );
   }, [usersData, searchTerm, filterRole, filterCourse]);
-
-  const clearFilters = () => {
-    setSearchTerm("");
-    setFilterRole("");
-    setFilterCourse("");
-  };
 
   if (authLoading || checkingRole) {
     return (

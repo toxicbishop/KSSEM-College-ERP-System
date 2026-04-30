@@ -9,7 +9,6 @@ import {
   ShieldAlert,
   Settings,
   AlertTriangle,
-  CheckCircle,
   UserPlus,
   Type,
   ListFilter,
@@ -224,6 +223,7 @@ export default function AdminSettingsPage() {
     );
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedUpdateApplicationName = useCallback(
     debounce((newName: string) => {
       handleSettingUpdate(
@@ -234,6 +234,7 @@ export default function AdminSettingsPage() {
     }, 1000),
     [settings, isAdmin], // Recreate if settings or isAdmin changes
   );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedUpdateAnnouncementTitle = useCallback(
     debounce((newTitle: string) => {
       handleSettingUpdate(
@@ -245,6 +246,7 @@ export default function AdminSettingsPage() {
     [settings, isAdmin],
   );
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedUpdateAnnouncementContent = useCallback(
     debounce((newContent: string) => {
       handleSettingUpdate(

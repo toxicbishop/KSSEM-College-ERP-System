@@ -273,10 +273,8 @@ export async function denyProfileChangeRequest(
     throw new Error("Server error: Admin services not initialized.");
   }
 
-  let adminEmail = "Unknown Admin";
   try {
-    const adminDecodedToken = await adminAuth.verifyIdToken(idToken);
-    adminEmail = adminDecodedToken.email || adminDecodedToken.uid;
+    await adminAuth.verifyIdToken(idToken);
   } catch (error) {
     console.error(
       "denyProfileChangeRequest SA Error: Invalid ID token for admin",

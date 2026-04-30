@@ -8,7 +8,6 @@ import {
   Home,
   Users,
   Settings,
-  LogOut,
   Edit,
   ChevronsLeft,
   ChevronsRight,
@@ -36,7 +35,6 @@ const getInitials = (name: string) => {
     .toUpperCase();
 };
 
-import { ThemeToggle } from "./theme-toggle";
 import {
   Tooltip,
   TooltipContent,
