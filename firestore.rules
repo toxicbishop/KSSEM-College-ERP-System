@@ -33,6 +33,12 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Rules for immutable server-written admin audit logs.
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
     // Rules for 'systemSettings' collection
     match /systemSettings/appConfiguration {
       // Allow anyone to read system settings (e.g., for maintenance mode checks)
