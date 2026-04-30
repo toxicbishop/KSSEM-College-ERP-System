@@ -159,7 +159,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       <div className="flex h-screen">
         <aside
           className={cn(
-            "bg-sidebar-background h-full p-6 flex flex-col justify-between shadow-lg border-r border-sidebar-border transition-all duration-300 ease-in-out",
+            "hidden bg-sidebar-background h-full p-6 md:flex flex-col justify-between shadow-lg border-r border-sidebar-border transition-all duration-300 ease-in-out",
             initialSkeletonCollapse ? "w-20" : "w-64",
           )}>
           <div>
@@ -193,7 +193,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               initialSkeletonCollapse ? "w-10 mx-auto" : "w-full",
             )}></div>
         </aside>
-        <main className="flex-1 overflow-auto bg-background p-6">
+        <main className="w-full flex-1 overflow-auto bg-background p-4 md:p-6">
           <div className="h-full w-full bg-muted rounded-md animate-pulse"></div>
         </main>
       </div>
@@ -202,10 +202,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="flex h-screen">
+      <div className="flex h-screen overflow-x-hidden">
         <aside
           className={cn(
-            "bg-[#1A222C] text-[#8A99BB] h-screen p-4 flex flex-col justify-between shadow-lg border-r border-[#1e293b] transition-all duration-300 ease-in-out",
+            "hidden bg-[#1A222C] text-[#8A99BB] h-screen p-4 md:flex flex-col justify-between shadow-lg border-r border-[#1e293b] transition-all duration-300 ease-in-out",
             isSidebarCollapsed ? "w-20 items-center" : "w-64",
           )}>
           <div>
@@ -358,8 +358,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </div>
         </aside>
 
-        <main className="flex-1 overflow-auto bg-[#0F172A] pb-16 md:pb-0 text-slate-200">
-          <div className="p-4 md:p-6">{children}</div>
+        <main className="w-full flex-1 overflow-auto bg-[#0F172A] pb-16 md:pb-0 text-slate-200">
+          <div className="p-3 sm:p-4 md:p-6">{children}</div>
         </main>
         {isMobile && <MobileNav items={adminMobileNavItems} />}
       </div>
