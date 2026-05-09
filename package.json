@@ -45,7 +45,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
-    "firebase": "^11.3.0",
+    "firebase": "^12.13.0",
     "firebase-admin": "^13.9.0",
     "framer-motion": "^11.2.12",
     "genkit": "^1.33.0",
