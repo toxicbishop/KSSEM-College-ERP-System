@@ -65,7 +65,7 @@
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/nodemailer": "^6.4.15",
+    "@types/nodemailer": "^8.0.0",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/sanitize-html": "^2.16.1",
