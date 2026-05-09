@@ -1,14 +1,5 @@
 import type { NextConfig } from "next";
 import withBundleAnalyzer from "@next/bundle-analyzer";
-import withPWAInit from "@ducanh2912/next-pwa";
-
-const withPWA = withPWAInit({
-  dest: "public/pwa",
-  sw: "/sw.js",
-  scope: "/",
-  disable: process.env.NODE_ENV === "development",
-  register: true,
-});
 
 const nextConfig: NextConfig = {
   devIndicators: false,
@@ -74,23 +65,8 @@ const nextConfig: NextConfig = {
     }
     return config;
   },
-  async headers() {
-    return [
-      {
-        source: "/pwa/sw.js",
-        headers: [
-          {
-            key: "Service-Worker-Allowed",
-            value: "/",
-          },
-        ],
-      },
-    ];
-  },
 };
 
-export default withPWA(
-  withBundleAnalyzer({
-    enabled: process.env.ANALYZE === "true",
-  })(nextConfig),
-);
+export default withBundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+})(nextConfig);
