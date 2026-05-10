@@ -9,6 +9,7 @@ import {
   FieldValue as AdminFieldValue,
   Timestamp as AdminTimestamp,
 } from "firebase-admin/firestore";
+import type { QueryDocumentSnapshot } from "firebase-admin/firestore";
 
 export type ProfileChangeRequestStatus = "pending" | "approved" | "denied";
 
@@ -153,7 +154,7 @@ export async function getProfileChangeRequests(
     const q = requestsCollectionRef.orderBy("requestedAt", "desc");
     const snapshot = await q.get();
 
-    return snapshot.docs.map((docSnap) => {
+    return snapshot.docs.map((docSnap: QueryDocumentSnapshot) => {
       const data = docSnap.data();
       const requestedAt = data.requestedAt as AdminTimestamp | undefined;
       const resolvedAt = data.resolvedAt as AdminTimestamp | undefined;
