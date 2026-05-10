@@ -7,6 +7,7 @@ import {
   FieldValue as AdminFieldValue,
   Timestamp as AdminTimestamp,
 } from "firebase-admin/firestore";
+import type { QueryDocumentSnapshot } from "firebase-admin/firestore";
 import { z } from "zod";
 
 // Input schema for the flow, expecting an array of grades.
@@ -83,7 +84,7 @@ export async function getGrades(studentId: string): Promise<Grade[]> {
       return [];
     }
 
-    return snapshot.docs.map((docSnap) => {
+    return snapshot.docs.map((docSnap: QueryDocumentSnapshot) => {
       const data = docSnap.data();
       return {
         id: docSnap.id,
@@ -176,7 +177,7 @@ export async function getGradesForClassroom(
     for (const chunk of chunks) {
       const q = gradesCollectionRef.where("studentId", "in", chunk);
       const snapshot = await q.get();
-      snapshot.forEach((docSnap) => {
+      snapshot.forEach((docSnap: QueryDocumentSnapshot) => {
         const data = docSnap.data();
         allGrades.push({
           id: docSnap.id,
@@ -217,7 +218,7 @@ export async function getUniqueCourseNames(idToken: string): Promise<string[]> {
       .select("courseName")
       .get();
     const courseNames = new Set<string>();
-    snapshot.forEach((doc) => {
+    snapshot.forEach((doc: QueryDocumentSnapshot) => {
       courseNames.add(doc.data().courseName);
     });
     return Array.from(courseNames).sort();
