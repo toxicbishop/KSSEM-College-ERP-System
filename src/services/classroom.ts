@@ -9,6 +9,10 @@ import {
   FieldValue as AdminFieldValue,
   Timestamp as AdminTimestamp,
 } from "firebase-admin/firestore";
+import type {
+  QueryDocumentSnapshot,
+  QuerySnapshot,
+} from "firebase-admin/firestore";
 
 /**
  * Represents a student enrolled in a classroom, including their assigned batch.
@@ -230,8 +234,8 @@ export async function getClassroomsByFaculty(
 
     const classroomsMap = new Map<string, Classroom>();
 
-    const processSnapshot = (snapshot: FirebaseFirestore.QuerySnapshot) => {
-      snapshot.docs.forEach((docSnap) => {
+    const processSnapshot = (snapshot: QuerySnapshot) => {
+      snapshot.docs.forEach((docSnap: QueryDocumentSnapshot) => {
         if (!classroomsMap.has(docSnap.id)) {
           const data = docSnap.data();
           const createdAtAdmin = data.createdAt as AdminTimestamp | undefined;
@@ -306,7 +310,7 @@ export async function getAllFacultyUsers(
     const q = usersCollectionRef.where("role", "==", "faculty");
     const snapshot = await q.get();
 
-    return snapshot.docs.map((docSnap) => {
+    return snapshot.docs.map((docSnap: QueryDocumentSnapshot) => {
       const data = docSnap.data();
       return {
         uid: docSnap.id,
@@ -533,7 +537,7 @@ export async function searchStudents(
     const lowerSearchTerm = searchTerm.toLowerCase();
     const results: StudentSearchResultItem[] = [];
 
-    snapshot.docs.forEach((docSnap) => {
+    snapshot.docs.forEach((docSnap: QueryDocumentSnapshot) => {
       const data = docSnap.data() as StudentProfile;
       const studentUid = docSnap.id;
 
@@ -797,7 +801,7 @@ export async function getStudentClassroomsWithBatchInfo(
       return [];
     }
 
-    classroomsSnapshot.forEach((docSnap) => {
+    classroomsSnapshot.forEach((docSnap: QueryDocumentSnapshot) => {
       const classroomData = docSnap.data() as Omit<Classroom, "id">; // Type assertion
       const studentEntry = (classroomData.students || []).find(
         (s) => s.userId === studentUid,
