@@ -78,6 +78,8 @@
   },
   "overrides": {
     "postcss": "^8.5.14",
-    "@tootallnate/once": "^3.0.1"
+    "@tootallnate/once": "^3.0.1",
+    "@opentelemetry/sdk-node": "^0.218.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.76.0"
   }
 }
