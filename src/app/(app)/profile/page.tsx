@@ -89,6 +89,7 @@ const sanitizeForText = (input?: string | null): string => {
   const cleaned = sanitizeHtml(String(input), {
     allowedTags: [],
     allowedAttributes: {},
+    nonTextTags: ["script", "style", "textarea", "option", "xmp"],
     // Do not allow any HTML; return only text.
   });
   return cleaned.trim();
