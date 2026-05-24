@@ -1,0 +1,5 @@
+{
+  "json.schemaDownload.trustedDomains": {
+    "https://ui.shadcn.com": true
+  }
+}
