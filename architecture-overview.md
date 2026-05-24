@@ -1,4 +1,4 @@
-# Case Study: KSSEM College ERP System Architecture
+# KSSEM College ERP System Architecture
 
 ## Overview
 
