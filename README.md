@@ -1,4 +1,4 @@
-# <img src="public/Favicon/collage-logo.png" width="40" height="40" align="center" style="margin-right: 10px;"> KSSEM College ERP System (Next.js & Firebase)
+# <img src="public/Favicon/collage-logo.png" width="40" height="40" align="center" style="margin-right: 10px;"> KSSEM College ERP System
 
 This guide will walk you through setting up the KSSEM College ERP System on your computer. This application helps manage student information and provides a dashboard for students, faculty, and administrators.
 
