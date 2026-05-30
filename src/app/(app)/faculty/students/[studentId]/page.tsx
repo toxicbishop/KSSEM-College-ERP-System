@@ -71,13 +71,6 @@ export default function FacultyStudentDetailPage() {
   const [loadingData, setLoadingData] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (user && !authLoading && studentId) {
-      fetchStudentData();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, authLoading, studentId]);
-
   const fetchStudentData = async () => {
     if (!user || !clientAuth || !clientAuth.currentUser) return;
     setLoadingData(true);
@@ -127,6 +120,13 @@ export default function FacultyStudentDetailPage() {
       setLoadingData(false);
     }
   };
+
+  useEffect(() => {
+    if (user && !authLoading && studentId) {
+      fetchStudentData();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading, studentId]);
 
   const handleGoBack = () => {
     const backUrl = classroomIdFromUrl

@@ -52,6 +52,30 @@ export default function AdminNotificationsPage() {
   const [emailBody, setEmailBody] = useState("");
   const [isSending, setIsSending] = useState(false);
 
+  const fetchRecipients = async () => {
+    if (!db) return;
+    setLoadingRecipients(true);
+    try {
+      const usersCollection = collection(db, "users");
+      const usersSnapshot = await getDocs(usersCollection);
+      const usersList = usersSnapshot.docs
+        .map(
+          (docSnap) =>
+            ({
+              id: docSnap.id,
+              ...docSnap.data(),
+            }) as UserRecipient,
+        )
+        .filter((u) => u.email); // Ensure user has an email
+      setRecipients(usersList);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      toast({ title: "Error Fetching Recipients", variant: "destructive" });
+    } finally {
+      setLoadingRecipients(false);
+    }
+  };
+
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
@@ -80,30 +104,6 @@ export default function AdminNotificationsPage() {
     checkAdminAccess();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, router, toast]);
-
-  const fetchRecipients = async () => {
-    if (!db) return;
-    setLoadingRecipients(true);
-    try {
-      const usersCollection = collection(db, "users");
-      const usersSnapshot = await getDocs(usersCollection);
-      const usersList = usersSnapshot.docs
-        .map(
-          (docSnap) =>
-            ({
-              id: docSnap.id,
-              ...docSnap.data(),
-            }) as UserRecipient,
-        )
-        .filter((u) => u.email); // Ensure user has an email
-      setRecipients(usersList);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-      toast({ title: "Error Fetching Recipients", variant: "destructive" });
-    } finally {
-      setLoadingRecipients(false);
-    }
-  };
 
   const handleSendNotification = async () => {
     if (!emailSubject.trim() || !emailBody.trim()) {
