@@ -313,13 +313,6 @@ export default function FacultyAttendancePage() {
     ];
   }, [reportRecords]);
 
-  useEffect(() => {
-    if (user && !authLoading) {
-      fetchFacultyClassrooms();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, authLoading]);
-
   const fetchFacultyClassrooms = async () => {
     if (!user || !clientAuth?.currentUser) {
       toast({
@@ -346,6 +339,13 @@ export default function FacultyAttendancePage() {
       setLoadingClassrooms(false);
     }
   };
+
+  useEffect(() => {
+    if (user && !authLoading) {
+      fetchFacultyClassrooms();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading]);
 
   const fetchStudentsForClassroom = async (classroomId: string) => {
     if (!user || !clientAuth?.currentUser) {

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useAuth } from "@/context/auth-context";
@@ -87,14 +87,6 @@ export default function ManageGradesPage() {
   const [classroomGrades, setClassroomGrades] = useState<Grade[]>([]);
   const [loadingClassroomGrades, setLoadingClassroomGrades] = useState(false);
 
-  useEffect(() => {
-    if (user && !authLoading) {
-      loadFacultyClassrooms();
-      fetchUniqueCourses();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, authLoading]);
-
   const loadFacultyClassrooms = async () => {
     if (!user || !clientAuth?.currentUser) return;
     setLoadingClassrooms(true);
@@ -131,6 +123,14 @@ export default function ManageGradesPage() {
       });
     }
   };
+
+  useEffect(() => {
+    if (user && !authLoading) {
+      loadFacultyClassrooms();
+      fetchUniqueCourses();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading]);
 
   const handleClassroomSelect = async (classroomId: string) => {
     setSelectedClassroomId(classroomId);

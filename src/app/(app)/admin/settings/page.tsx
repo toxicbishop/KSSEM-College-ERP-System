@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { doc, getDoc } from "firebase/firestore";
@@ -223,38 +223,41 @@ export default function AdminSettingsPage() {
     );
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const debouncedUpdateApplicationName = useCallback(
-    debounce((newName: string) => {
-      handleSettingUpdate(
-        "applicationName",
-        newName,
-        `Application name updated to "${newName}".`,
-      );
-    }, 1000),
+  const debouncedUpdateApplicationName = useMemo(
+    () =>
+      debounce((newName: string) => {
+        handleSettingUpdate(
+          "applicationName",
+          newName,
+          `Application name updated to "${newName}".`,
+        );
+      }, 1000),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [settings, isAdmin], // Recreate if settings or isAdmin changes
   );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const debouncedUpdateAnnouncementTitle = useCallback(
-    debounce((newTitle: string) => {
-      handleSettingUpdate(
-        "announcementTitle",
-        newTitle,
-        `Announcement title updated to "${newTitle}".`,
-      );
-    }, 1000),
+  const debouncedUpdateAnnouncementTitle = useMemo(
+    () =>
+      debounce((newTitle: string) => {
+        handleSettingUpdate(
+          "announcementTitle",
+          newTitle,
+          `Announcement title updated to "${newTitle}".`,
+        );
+      }, 1000),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [settings, isAdmin],
   );
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const debouncedUpdateAnnouncementContent = useCallback(
-    debounce((newContent: string) => {
-      handleSettingUpdate(
-        "announcementContent",
-        newContent,
-        "Announcement content updated.",
-      );
-    }, 1000),
+  const debouncedUpdateAnnouncementContent = useMemo(
+    () =>
+      debounce((newContent: string) => {
+        handleSettingUpdate(
+          "announcementContent",
+          newContent,
+          "Announcement content updated.",
+        );
+      }, 1000),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [settings, isAdmin],
   );
 
