@@ -50,7 +50,7 @@
     "firebase-admin": "^13.9.0",
     "framer-motion": "^11.2.12",
     "genkit": "^1.33.0",
-    "lucide-react": "^0.475.0",
+    "lucide-react": "^1.17.0",
     "next": "^15.5.18",
     "nodemailer": "^8.0.7",
     "patch-package": "^8.0.0",
