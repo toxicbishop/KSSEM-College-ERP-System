@@ -13,7 +13,7 @@ Currently, the following versions of the KSSEM College ERP System receive securi
 
 We take the security of this project seriously. If you find a security vulnerability, please do not report it publicly via GitHub issues. Instead, please follow the steps below:
 
-1. **Email the Maintainer**: Send a detailed email to the project administrator/owner at [pranavarun19@gmail.com](mailto:pranavarun19@gmail.com).
+1. **Email the Maintainer**: Send a detailed email to the project administrator/owner at [Pranav](https://github.com/toxicbishop).
 2. **Details to Include**:
    - A description of the vulnerability.
    - The steps required to reproduce it (including a Proof of Concept if possible).
