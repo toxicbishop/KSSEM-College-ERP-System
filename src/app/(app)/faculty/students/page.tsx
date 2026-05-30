@@ -1,4 +1,4 @@
-﻿
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -32,26 +32,6 @@ export default function FacultyViewStudentsPage() {
   const [studentsInClassroom, setStudentsInClassroom] = useState<ClassroomStudentInfo[]>([]);
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    if (user && !authLoading) {
-      fetchFacultyClassrooms();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, authLoading]);
-
-  useEffect(() => {
-      if (selectedClassroomId && classrooms.length > 0) {
-          if(classrooms.some(c => c.id === selectedClassroomId)) {
-            fetchStudentsForClassroom(selectedClassroomId);
-          } else {
-            updateUrlWithClassroomId(undefined);
-            setSelectedClassroomId(undefined);
-          }
-      }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedClassroomId, classrooms]);
-
 
   const fetchFacultyClassrooms = async () => {
     if (!user || !clientAuth?.currentUser) return;
@@ -99,6 +79,25 @@ export default function FacultyViewStudentsPage() {
     const query = search ? `?${search}` : "";
     router.replace(`${pathname}${query}`);
   };
+
+  useEffect(() => {
+    if (user && !authLoading) {
+      fetchFacultyClassrooms();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading]);
+
+  useEffect(() => {
+      if (selectedClassroomId && classrooms.length > 0) {
+          if(classrooms.some(c => c.id === selectedClassroomId)) {
+            fetchStudentsForClassroom(selectedClassroomId);
+          } else {
+            updateUrlWithClassroomId(undefined);
+            setSelectedClassroomId(undefined);
+          }
+      }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedClassroomId, classrooms]);
 
 
   const handleClassroomSelect = (classroomId: string) => {
