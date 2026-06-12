@@ -1,0 +1,284 @@
+type StudentProfile {
+  uid: ID!
+  email: String!
+  name: String!
+  photoUrl: String
+  phoneNumber: String
+  address: String
+  dateOfBirth: String
+  gender: String
+  nationality: String
+  emergencyContactName: String
+  emergencyContactNumber: String
+  enrollmentNumber: String
+  courseProgram: String
+  department: String
+  currentYear: Int
+  currentSemester: Int
+  academicAdvisorName: String
+  sectionOrBatch: String
+  admissionDate: String
+  modeOfAdmission: String
+  idCardUrl: String
+  admissionLetterUrl: String
+  marksheet10thUrl: String
+  marksheet12thUrl: String
+  migrationCertificateUrl: String
+  bonafideCertificateUrl: String
+  uploadedPhotoUrl: String
+  uploadedSignatureUrl: String
+  examRegistrationStatus: String
+  admitCardUrl: String
+  internalExamTimetableUrl: String
+  externalExamTimetableUrl: String
+  resultsAndGradeCardsUrl: String
+  revaluationRequestStatus: String
+  revaluationRequestLink: String
+  role: String!
+  parentEmail: String
+}
+
+type Announcement {
+  id: ID!
+  title: String!
+  content: String!
+  authorId: String!
+  authorName: String
+  timestamp: String!
+  targetAudience: [String!]
+  attachments: [String!]
+  isImportant: Boolean
+  expiresAt: String
+}
+
+type AcademicEvent {
+  id: ID!
+  title: String!
+  description: String
+  date: String!
+  startTime: String
+  endTime: String
+  location: String
+  type: String
+  audience: [String!]
+  organizer: String
+  link: String
+}
+
+type AttendanceRecord {
+  id: ID!
+  studentId: String!
+  lectureId: String!
+  courseId: String!
+  date: String!
+  status: String!
+  timestamp: String!
+}
+
+type LectureAttendanceRecord {
+  lectureId: ID!
+  courseId: String!
+  date: String!
+  totalStudents: Int!
+  presentStudents: Int!
+  absentStudents: Int!
+  attendance: [AttendanceRecord!]
+}
+
+type AuditLog {
+  id: ID!
+  timestamp: String!
+  action: String!
+  actorId: String!
+  actorName: String
+  targetId: String
+  targetType: String
+  description: String
+  ipAddress: String
+}
+
+type ChatMessage {
+  id: ID!
+  senderId: String!
+  senderName: String
+  receiverId: String!
+  message: String!
+  timestamp: String!
+  read: Boolean
+}
+
+type ClassroomStudentInfo {
+  uid: ID!
+  name: String!
+  email: String!
+  enrollmentNumber: String
+  sectionOrBatch: String
+}
+
+type FacultyUser {
+  uid: ID!
+  name: String!
+  email: String!
+}
+
+type Classroom {
+  id: ID!
+  name: String!
+  courseCode: String!
+  facultyId: String!
+  facultyName: String!
+  academicYear: String!
+  semester: String!
+  students: [ClassroomStudentInfo!]
+  invitedFaculty: [FacultyUser!]
+}
+
+type Grade {
+  id: ID!
+  studentId: String!
+  courseId: String!
+  courseName: String!
+  grade: String!
+  score: Float
+  maxScore: Float
+  semester: String
+  academicYear: String
+  timestamp: String!
+}
+
+type ProfileChangeRequest {
+  id: ID!
+  userId: String!
+  requestDate: String!
+  status: String!
+  requestedChanges: String!
+  reviewedBy: String
+  reviewDate: String
+  adminComments: String
+}
+
+type SystemSettings {
+  maintenanceMode: Boolean!
+  announcementBanner: String
+  registrationOpen: Boolean!
+  contactEmail: String!
+  lastUpdated: String!
+}
+
+type Query {
+  getStudentProfile(uid: String!): StudentProfile
+  getAllAnnouncements: [Announcement!]
+  getAcademicCalendarEvents: [AcademicEvent!]
+  getAttendanceRecords(studentId: String!): [AttendanceRecord!]
+  getLectureAttendanceForDate(date: String!, courseId: String!): LectureAttendanceRecord
+  getAuditLogs: [AuditLog!]
+  getChatMessages(senderId: String!, receiverId: String!): [ChatMessage!]
+  getClassroomsByFaculty(facultyId: String!): [Classroom!]
+  getStudentsInClassroom(classroomId: String!): [ClassroomStudentInfo!]
+  getGrades(studentId: String!): [Grade!]
+  getGradesForClassroom(classroomId: String!, courseName: String!): [Grade!]
+  getProfileChangeRequests: [ProfileChangeRequest!]
+  getSystemSettings: SystemSettings
+}
+
+type Mutation {
+  updateStudentProfile(uid: String!, profileData: StudentProfileInput!): StudentProfile
+  createAnnouncement(announcement: AnnouncementInput!): Announcement
+  updateAnnouncement(id: String!, announcement: AnnouncementInput!): Announcement
+  deleteAnnouncement(id: String!): Boolean
+  submitLectureAttendance(studentId: String!, lectureId: String!, courseId: String!, date: String!, status: String!): AttendanceRecord
+  createClassroom(classroom: ClassroomInput!): Classroom
+  addStudentsToClassroom(classroomId: String!, studentIds: [String!]!): Classroom
+  removeStudentFromClassroom(classroomId: String!, studentId: String!): Classroom
+  updateStudentGrade(grade: GradeInput!): Grade
+  deleteStudentGrade(id: String!): Boolean
+  createProfileChangeRequest(request: ProfileChangeRequestInput!): ProfileChangeRequest
+  approveProfileChangeRequest(id: String!, adminComments: String): ProfileChangeRequest
+  denyProfileChangeRequest(id: String!, adminComments: String): ProfileChangeRequest
+  updateSystemSettings(settings: SystemSettingsInput!): SystemSettings
+}
+
+input StudentProfileInput {
+  email: String
+  name: String
+  photoUrl: String
+  phoneNumber: String
+  address: String
+  dateOfBirth: String
+  gender: String
+  nationality: String
+  emergencyContactName: String
+  emergencyContactNumber: String
+  enrollmentNumber: String
+  courseProgram: String
+  department: String
+  currentYear: Int
+  currentSemester: Int
+  academicAdvisorName: String
+  sectionOrBatch: String
+  admissionDate: String
+  modeOfAdmission: String
+  idCardUrl: String
+  admissionLetterUrl: String
+  marksheet10thUrl: String
+  marksheet12thUrl: String
+  migrationCertificateUrl: String
+  bonafideCertificateUrl: String
+  uploadedPhotoUrl: String
+  uploadedSignatureUrl: String
+  examRegistrationStatus: String
+  admitCardUrl: String
+  internalExamTimetableUrl: String
+  externalExamTimetableUrl: String
+  resultsAndGradeCardsUrl: String
+  revaluationRequestStatus: String
+  revaluationRequestLink: String
+  role: String
+  parentEmail: String
+}
+
+input AnnouncementInput {
+  title: String!
+  content: String!
+  authorId: String!
+  authorName: String
+  timestamp: String
+  targetAudience: [String!]
+  attachments: [String!]
+  isImportant: Boolean
+  expiresAt: String
+}
+
+input ClassroomInput {
+  name: String!
+  courseCode: String!
+  facultyId: String!
+  facultyName: String!
+  academicYear: String!
+  semester: String!
+  studentIds: [String!]
+  invitedFacultyIds: [String!]
+}
+
+input GradeInput {
+  studentId: String!
+  courseId: String!
+  courseName: String!
+  grade: String!
+  score: Float
+  maxScore: Float
+  semester: String
+  academicYear: String
+}
+
+input ProfileChangeRequestInput {
+  userId: String!
+  requestedChanges: String!
+}
+
+input SystemSettingsInput {
+  maintenanceMode: Boolean
+  announcementBanner: String
+  registrationOpen: Boolean
+  contactEmail: String
+}
