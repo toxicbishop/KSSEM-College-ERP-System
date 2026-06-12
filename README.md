@@ -379,6 +379,21 @@ If you need to switch the application to a different Firebase project (e.g., fro
 
 After these steps, your application should be connected to the new Firebase project.
 
+## GraphQL API
+
+The backend has been upgraded with a GraphQL API.
+
+- **Endpoint**: `/api/graphql`
+- **Schema**: Defined in `schema.graphql` at the project root.
+- **Resolvers**: Route handlers at `src/app/api/graphql/resolvers.ts` connect GraphQL queries/mutations to existing services.
+- **Client**: A lightweight `graphql-request` client is available at `src/lib/graphql-client.ts` to call the endpoint from frontend pages.
+
+### Authentication
+Include the Firebase ID Token in the `Authorization` header as a Bearer token:
+```http
+Authorization: Bearer <firebase_id_token>
+```
+
 ## License
 
 This project is licensed under the [GNU General Public License v3.0](LICENSE).
