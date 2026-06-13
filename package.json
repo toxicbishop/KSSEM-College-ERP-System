@@ -50,7 +50,7 @@
     "date-fns": "^3.6.0",
     "firebase": "^12.14.0",
     "firebase-admin": "^13.9.0",
-    "framer-motion": "^11.2.12",
+    "framer-motion": "^12.40.0",
     "genkit": "^1.33.0",
     "graphql": "^16.14.2",
     "graphql-request": "^7.4.0",
