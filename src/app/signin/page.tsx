@@ -155,13 +155,14 @@ export default function SignInPage() {
       else if (userRole === "faculty") navigateAfterSignIn("/faculty");
       else navigateAfterSignIn("/dashboard");
     } catch (error: any) {
-      console.error("Sign in error:", error);
+      console.warn("Sign in error:", error);
       let description = "An unexpected error occurred. Please try again.";
       if (
         error.code === "auth/user-not-found" ||
-        error.code === "auth/wrong-password" ||
-        error.code === "auth/invalid-credential"
+        error.code === "auth/wrong-password"
       ) {
+        description = "Invalid email or password.";
+      } else if (error.code === "auth/invalid-credential" || (error.message && error.message.includes('auth/invalid-credential'))) {
         description = "Invalid email or password.";
       } else if (error.code === "auth/invalid-email") {
         description = "Please enter a valid email address.";
