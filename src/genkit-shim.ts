@@ -33,6 +33,7 @@ export function genkit(options: GenkitOptions = {}): any {
   });
   // Stub for defineFlow – returns a callable flow that executes the provided implementation
   base.defineFlow = (cfg: any, impl: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const flowFunc = async (input: any) => {
       try {
         return await impl(input);
@@ -56,13 +57,16 @@ export function genkit(options: GenkitOptions = {}): any {
  */
 export function genkitNextHandler() {
   return {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
     async GET(_request: Request, _context: any) {
       return NextResponse.json({ message: 'Genkit shim GET response' });
     },
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
     async POST(request: Request, _context: any) {
       try {
         const body = await request.json();
         return NextResponse.json({ message: 'Genkit shim POST response', body });
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (e) {
         return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
       }
