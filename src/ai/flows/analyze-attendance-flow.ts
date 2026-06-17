@@ -71,7 +71,7 @@ const analyzeAttendanceFlow = ai.defineFlow(
     inputSchema: AttendanceAnalysisInputSchema,
     outputSchema: AttendanceAnalysisOutputSchema,
   },
-  async (input) => {
+  async (input: AttendanceAnalysisInput) => {
     // If there are no records, return a default empty state.
     if (input.length === 0) {
       return {
