@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "license": "GPL-3.0-or-later",
+  "packageManager": "pnpm@11.6.0",
   "scripts": {
     "dev": "next dev --turbopack -p 9002 --experimental-https",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
