@@ -65,13 +65,13 @@ Here are the attendance records:
 });
 
 // Define the Genkit flow.
-const analyzeAttendanceFlow = ai.defineFlow<AttendanceAnalysisInput, AttendanceAnalysisOutput>(
+const analyzeAttendanceFlow = ai.defineFlow(
   {
     name: "analyzeAttendanceFlow",
     inputSchema: AttendanceAnalysisInputSchema,
     outputSchema: AttendanceAnalysisOutputSchema,
   },
-  async (input) => {
+  async (input: AttendanceAnalysisInput) => {
     // If there are no records, return a default empty state.
     if (input.length === 0) {
       return {
