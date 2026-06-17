@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
   serverExternalPackages: [
     "firebase-admin",
     "google-auth-library",
-    "@genkit-ai/googleai",
+
     "@genkit-ai/next",
     "genkit",
     "@grpc/grpc-js",

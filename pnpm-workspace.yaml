@@ -1,6 +1,7 @@
 allowBuilds:
   '@apollo/protobufjs': true
   '@firebase/util': true
+  '@google/genai': true
   protobufjs: true
   sharp: true
   unrs-resolver: true
