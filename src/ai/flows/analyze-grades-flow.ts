@@ -57,7 +57,7 @@ const analyzeGradesFlow = ai.defineFlow(
     inputSchema: GradeAnalysisInputSchema,
     outputSchema: GradeAnalysisOutputSchema,
   },
-  async (input) => {
+  async (input: GradeAnalysisInput) => {
     // If there are no grades, return a default empty state.
     if (input.length === 0) {
       return {
