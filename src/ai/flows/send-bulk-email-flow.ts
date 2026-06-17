@@ -31,7 +31,7 @@ const sendBulkEmailFlow = ai.defineFlow(
     inputSchema: SendBulkEmailInputSchema,
     outputSchema: SendBulkEmailOutputSchema,
   },
-  async (input) => {
+  async (input: SendBulkEmailInput) => {
     console.log(
       `[Flow: sendBulkEmailFlow] Received request to send email titled "${input.subject}" to ${input.recipients.length} recipients.`,
     );
