@@ -1,5 +1,5 @@
 
-import genkitNextHandler from '@genkit-ai/next';
+import { genkitNextHandler } from '@/genkit-shim';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server'; // Ensure NextResponse is imported
 
