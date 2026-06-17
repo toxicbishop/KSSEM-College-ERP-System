@@ -45,7 +45,8 @@ export const resolvers = {
       await profileService.updateStudentProfile(idToken, profileData);
       return await profileService.getStudentProfile(idToken, uid);
     },
-    submitLectureAttendance: async (_: any, args: any, { idToken }: { idToken: string }) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    submitLectureAttendance: async (_root: unknown, _args: unknown, _ctx: unknown) => {
       // submitLectureAttendance(idToken, attendanceData) - need to check signature
       return null;
     },
