@@ -1,22 +1,19 @@
+// Minimal AI instance using Genkit shim and Google Vertex AI client
+import { genkit } from '@/genkit-shim';
+// Import the Vertex AI client (if needed for custom usage)
+import { VertexAI } from '@google-cloud/vertexai';
 
-import {genkit} from 'genkit';
-import {googleAI} from '@genkit-ai/googleai';
-
-const genkitPlugins = [];
-
+// Example: initialize VertexAI client (optional, depends on your usage)
+let vertexClient: VertexAI | null = null;
 if (process.env.GOOGLE_GENAI_API_KEY) {
-  genkitPlugins.push(googleAI({
-    apiKey: process.env.GOOGLE_GENAI_API_KEY,
-    // You can specify a default model for text generation here if desired
-    // defaultModel: 'gemini-1.5-flash-latest',
-  }));
-  console.log('[ai-instance] Google AI plugin configured with API key.');
+  vertexClient = new VertexAI({ apiKey: process.env.GOOGLE_GENAI_API_KEY });
+  console.log('[ai-instance] VertexAI client initialized.');
 } else {
-  console.warn('[ai-instance] GOOGLE_GENAI_API_KEY is not set. Google AI plugin will not be available. Genkit features requiring this plugin may fail if called.');
+  console.warn('[ai-instance] GOOGLE_GENAI_API_KEY is not set. VertexAI client will not be available.');
 }
 
+// Export the AI instance using the shim's genkit function (no plugins required for now)
 export const ai = genkit({
-  promptDir: './prompts', // This might not be used if prompts are defined inline
-  plugins: genkitPlugins,
-  // Plugins provided above. Avoid specifying unknown options not present in GenkitOptions.
+  promptDir: './prompts',
+  plugins: [],
 });
