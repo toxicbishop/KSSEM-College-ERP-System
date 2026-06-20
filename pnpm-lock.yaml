@@ -35,7 +35,7 @@ importers:
         version: 1.14.4
       '@hookform/resolvers':
         specifier: ^5.4.0
-        version: 5.4.0(react-hook-form@7.79.0(react@18.3.1))
+        version: 5.4.0(react-hook-form@7.80.0(react@18.3.1))
       '@next/bundle-analyzer':
         specifier: ^16.2.9
         version: 16.2.9
@@ -163,8 +163,8 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
       react-hook-form:
-        specifier: ^7.79.0
-        version: 7.79.0(react@18.3.1)
+        specifier: ^7.80.0
+        version: 7.80.0(react@18.3.1)
       recharts:
         specifier: ^2.15.4
         version: 2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -4491,8 +4491,8 @@ packages:
     peerDependencies:
       react: ^18.3.1
 
-  react-hook-form@7.79.0:
-    resolution: {integrity: sha512-mhYp/MTmXvzYX6AJcJVko0rktoIhhmRnEouObj4wF5i/tCttgJvnp1+9wRkpITZjDTqpo4IOSJqu0dBlPlV/Lw==}
+  react-hook-form@7.80.0:
+    resolution: {integrity: sha512-4P+fk6oXsxY+6xSj7Euhc2sumQD8zQqCuVHoJwoyp9EchP+IUW9OESB7uHFJOKsIBQ4MQqYE84INJFqUCYNoOg==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18 || ^19
@@ -6165,10 +6165,10 @@ snapshots:
       protobufjs: 7.6.4
       yargs: 17.7.2
 
-  '@hookform/resolvers@5.4.0(react-hook-form@7.79.0(react@18.3.1))':
+  '@hookform/resolvers@5.4.0(react-hook-form@7.80.0(react@18.3.1))':
     dependencies:
       '@standard-schema/utils': 0.3.0
-      react-hook-form: 7.79.0(react@18.3.1)
+      react-hook-form: 7.80.0(react@18.3.1)
 
   '@humanfs/core@0.19.2':
     dependencies:
@@ -10336,7 +10336,7 @@ snapshots:
       react: 18.3.1
       scheduler: 0.23.2
 
-  react-hook-form@7.79.0(react@18.3.1):
+  react-hook-form@7.80.0(react@18.3.1):
     dependencies:
       react: 18.3.1
 
