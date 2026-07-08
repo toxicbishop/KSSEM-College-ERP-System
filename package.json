@@ -49,7 +49,7 @@
     "@vercel/speed-insights": "^2.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "date-fns": "^3.6.0",
+    "date-fns": "^4.4.0",
     "firebase": "^12.15.0",
     "firebase-admin": "^14.1.0",
     "framer-motion": "^12.42.2",
