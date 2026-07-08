@@ -20,8 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase/client";
+import { getStudentProfile } from "@/services/profile";
 import {
   Dialog,
   DialogContent,
@@ -114,7 +113,7 @@ export default function SignInPage() {
   const onSubmit = async (data: SignInFormValues) => {
     setLoading(true);
 
-    if (!auth || !db) {
+    if (!auth) {
       toast({
         title: "Initialization Error",
         description:
@@ -137,13 +136,10 @@ export default function SignInPage() {
       setCookie("firebaseAuthToken", idToken, 1);
 
       let userRole = "student";
-      const userDocRef = doc(db, "users", user.uid);
-      const userDocSnap = await getDoc(userDocRef);
-
-      if (userDocSnap.exists()) {
-        const userData = userDocSnap.data();
-        if (userData.role === "admin") userRole = "admin";
-        else if (userData.role === "faculty") userRole = "faculty";
+      const profile = await getStudentProfile(user.uid);
+      if (profile && profile.role) {
+        if (profile.role === "admin") userRole = "admin";
+        else if (profile.role === "faculty") userRole = "faculty";
       }
 
       toast({

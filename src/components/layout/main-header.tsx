@@ -18,9 +18,9 @@ import { useAuth } from "@/context/auth-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { usePathname } from "next/navigation";
 import { Bell, Menu, UserCircle, LogOut } from "lucide-react";
-import { db, auth } from "@/lib/firebase/client";
-import { doc, getDoc } from "firebase/firestore";
+import { auth } from "@/lib/firebase/client";
 import { signOut } from "firebase/auth";
+import { getStudentProfile } from "@/services/profile";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { deleteCookie } from "@/lib/utils";
@@ -55,10 +55,11 @@ export function MainHeader() {
   const { toast } = useToast();
 
   const handleLogout = async () => {
-    if (auth) {
-      try {
+    try {
+      if (auth) {
         await signOut(auth);
-        deleteCookie("firebaseAuthToken");
+      }
+      deleteCookie("firebaseAuthToken");
         toast({
           title: "Logged Out",
           description: "You have been successfully logged out.",
@@ -72,18 +73,16 @@ export function MainHeader() {
           variant: "destructive",
         });
       }
-    }
   };
 
   useEffect(() => {
-    if (user && db) {
+    if (user) {
       const fetchProfile = async () => {
         try {
-          const userDoc = await getDoc(doc(db!, "users", user.uid));
-          if (userDoc.exists()) {
-            const data = userDoc.data();
+          const profile = await getStudentProfile(user.uid);
+          if (profile) {
             setUserName(
-              data.name ||
+              profile.name ||
                 user.displayName ||
                 user.email?.split("@")[0] ||
                 "Student",
@@ -91,7 +90,7 @@ export function MainHeader() {
             setScholarId(
               user.email === "pranavarun26@gmail.com"
                 ? "1MTCG900"
-                : data.studentId || user.uid.substring(0, 8),
+                : profile.studentId || user.uid.substring(0, 8),
             );
           } else {
             setUserName(
@@ -102,6 +101,7 @@ export function MainHeader() {
         } catch (error) {
           console.error("Error fetching header profile:", error);
           setUserName(user.displayName || "Student");
+          setScholarId(user.uid.substring(0, 8));
         }
       };
       fetchProfile();

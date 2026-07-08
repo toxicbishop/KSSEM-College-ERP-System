@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase/client"; // Import db
+import { db, auth as clientAuth } from "@/lib/firebase/client"; // Import db and auth
 import {
   ShieldAlert,
   Settings,
@@ -77,12 +77,10 @@ export default function AdminSettingsPage() {
     const checkAdminAccess = async () => {
       setCheckingRole(true);
       let userIsCurrentlyAdmin = false;
-      if (db) {
-        // Check Firestore role only if db is available
+      if (clientAuth?.currentUser) {
         try {
-          const userDocRef = doc(db, "users", user.uid);
-          const userDocSnap = await getDoc(userDocRef);
-          if (userDocSnap.exists() && userDocSnap.data().role === "admin") {
+          const tokenResult = await clientAuth.currentUser.getIdTokenResult();
+          if (tokenResult.claims.role === "admin") {
             userIsCurrentlyAdmin = true;
           }
         } catch (error) {
@@ -90,17 +88,10 @@ export default function AdminSettingsPage() {
           toast({
             title: "Error",
             description:
-              "Could not verify admin role. Check Firestore permissions.",
+              "Could not verify admin role.",
             variant: "destructive",
           });
         }
-      } else {
-        toast({
-          title: "Database Error",
-          description:
-            "Firestore is not available. Cannot verify admin role.",
-          variant: "destructive",
-        });
       }
 
       if (userIsCurrentlyAdmin) {

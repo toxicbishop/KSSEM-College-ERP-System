@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
-import { db } from "@/lib/firebase/client";
-import { doc, getDoc, collection, getDocs } from "firebase/firestore";
+import { db, auth as clientAuth } from "@/lib/firebase/client";
+import { getAllUsers } from "@/services/admin-users";
 import {
   Card,
   CardHeader,
@@ -53,21 +53,16 @@ export default function AdminNotificationsPage() {
   const [isSending, setIsSending] = useState(false);
 
   const fetchRecipients = async () => {
-    if (!db) return;
     setLoadingRecipients(true);
     try {
-      const usersCollection = collection(db, "users");
-      const usersSnapshot = await getDocs(usersCollection);
-      const usersList = usersSnapshot.docs
-        .map(
-          (docSnap) =>
-            ({
-              id: docSnap.id,
-              ...docSnap.data(),
-            }) as UserRecipient,
-        )
-        .filter((u) => u.email); // Ensure user has an email
-      setRecipients(usersList);
+      const usersList = await getAllUsers();
+      const recipientsList = usersList
+        .filter((u: any) => u.email)
+        .map((u: any) => ({
+          ...u,
+          id: u.id || u.uid,
+        })) as UserRecipient[];
+      setRecipients(recipientsList);
     } catch (error) {
       console.error("Error fetching users:", error);
       toast({ title: "Error Fetching Recipients", variant: "destructive" });
@@ -84,20 +79,21 @@ export default function AdminNotificationsPage() {
     }
     const checkAdminAccess = async () => {
       setCheckingRole(true);
-      if (!db) {
-        toast({ title: "Access Denied", variant: "destructive" });
-        router.push("/");
-        setCheckingRole(false);
-        return;
-      }
-      const userDocRef = doc(db, "users", user.uid);
-      const userDocSnap = await getDoc(userDocRef);
-      if (userDocSnap.exists() && userDocSnap.data().role === "admin") {
-        setIsAdmin(true);
-        fetchRecipients();
-      } else {
-        toast({ title: "Access Denied", variant: "destructive" });
-        router.push("/");
+      if (clientAuth?.currentUser) {
+        try {
+          const tokenResult = await clientAuth.currentUser.getIdTokenResult();
+          if (tokenResult.claims.role === "admin") {
+            setIsAdmin(true);
+            fetchRecipients();
+          } else {
+            toast({ title: "Access Denied", variant: "destructive" });
+            router.push("/");
+          }
+        } catch (error) {
+          console.error("Error verifying admin role:", error);
+          toast({ title: "Access Denied", variant: "destructive" });
+          router.push("/");
+        }
       }
       setCheckingRole(false);
     };
