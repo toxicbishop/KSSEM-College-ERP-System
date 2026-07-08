@@ -1,0 +1,1196 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "proto/academic/v1/academic.proto",
+    "version": "version not set"
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/academic/attendance": {
+      "post": {
+        "operationId": "AcademicService_SubmitLectureAttendance",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AttendanceRecord"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SubmitLectureAttendanceRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AcademicService"
+        ]
+      }
+    },
+    "/api/academic/attendance/lecture": {
+      "get": {
+        "operationId": "AcademicService_GetLectureAttendanceForDate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1LectureAttendanceRecord"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "classroom_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AcademicService"
+        ]
+      }
+    },
+    "/api/academic/attendance/lecture/range": {
+      "get": {
+        "operationId": "AcademicService_GetLectureAttendanceForDateRange",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListLectureAttendanceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "classroom_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AcademicService"
+        ]
+      }
+    },
+    "/api/academic/attendance/{student_id}": {
+      "get": {
+        "operationId": "AcademicService_GetAttendanceRecords",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListAttendanceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "student_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AcademicService"
+        ]
+      }
+    },
+    "/api/academic/classrooms": {
+      "get": {
+        "operationId": "AcademicService_GetClassroomsByFaculty",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListClassroomsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "faculty_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AcademicService"
+        ]
+      },
+      "post": {
+        "operationId": "AcademicService_CreateClassroom",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Classroom"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ClassroomInput"
+            }
+          }
+        ],
+        "tags": [
+          "AcademicService"
+        ]
+      }
+    },
+    "/api/academic/classrooms/{classroom_id}/students": {
+      "get": {
+        "operationId": "AcademicService_GetStudentsInClassroom",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListStudentsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "classroom_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AcademicService"
+        ]
+      },
+      "post": {
+        "operationId": "AcademicService_AddStudentsToClassroom",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Classroom"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "classroom_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1AddStudentsToClassroomRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AcademicService"
+        ]
+      }
+    },
+    "/api/academic/classrooms/{classroom_id}/students/{student_id}": {
+      "delete": {
+        "operationId": "AcademicService_RemoveStudentFromClassroom",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Classroom"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "classroom_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "student_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AcademicService"
+        ]
+      }
+    },
+    "/api/academic/events": {
+      "get": {
+        "operationId": "AcademicService_GetAcademicCalendarEvents",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListEventsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "AcademicService"
+        ]
+      }
+    },
+    "/api/academic/grades": {
+      "post": {
+        "operationId": "AcademicService_UpdateStudentGrade",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Grade"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GradeInput"
+            }
+          }
+        ],
+        "tags": [
+          "AcademicService"
+        ]
+      }
+    },
+    "/api/academic/grades/classroom": {
+      "post": {
+        "operationId": "AcademicService_GetGradesForClassroom",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListGradesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GetGradesForClassroomRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AcademicService"
+        ]
+      }
+    },
+    "/api/academic/grades/{id}": {
+      "delete": {
+        "operationId": "AcademicService_DeleteStudentGrade",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AcademicService"
+        ]
+      }
+    },
+    "/api/academic/grades/{student_id}": {
+      "get": {
+        "operationId": "AcademicService_GetGrades",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListGradesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "student_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AcademicService"
+        ]
+      }
+    },
+    "/api/academic/profile/{uid}": {
+      "get": {
+        "operationId": "AcademicService_GetStudentProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1StudentProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AcademicService"
+        ]
+      },
+      "patch": {
+        "operationId": "AcademicService_UpdateStudentProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1StudentProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1StudentProfileInput"
+            }
+          }
+        ],
+        "tags": [
+          "AcademicService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1AcademicEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "audience": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "organizer": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        }
+      }
+    },
+    "v1AddStudentsToClassroomRequest": {
+      "type": "object",
+      "properties": {
+        "classroom_id": {
+          "type": "string"
+        },
+        "student_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1AttendanceRecord": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "student_id": {
+          "type": "string"
+        },
+        "lecture_id": {
+          "type": "string"
+        },
+        "course_id": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Classroom": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "course_code": {
+          "type": "string"
+        },
+        "faculty_id": {
+          "type": "string"
+        },
+        "faculty_name": {
+          "type": "string"
+        },
+        "academic_year": {
+          "type": "string"
+        },
+        "semester": {
+          "type": "string"
+        },
+        "students": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ClassroomStudentInfo"
+          }
+        },
+        "invited_faculty": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1FacultyUser"
+          }
+        }
+      }
+    },
+    "v1ClassroomInput": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "course_code": {
+          "type": "string"
+        },
+        "faculty_id": {
+          "type": "string"
+        },
+        "faculty_name": {
+          "type": "string"
+        },
+        "academic_year": {
+          "type": "string"
+        },
+        "semester": {
+          "type": "string"
+        },
+        "student_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "invited_faculty_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1ClassroomStudentInfo": {
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "enrollment_number": {
+          "type": "string"
+        },
+        "section_or_batch": {
+          "type": "string"
+        }
+      }
+    },
+    "v1FacultyUser": {
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetGradesForClassroomRequest": {
+      "type": "object",
+      "properties": {
+        "classroom_id": {
+          "type": "string"
+        },
+        "course_name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Grade": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "student_id": {
+          "type": "string"
+        },
+        "course_id": {
+          "type": "string"
+        },
+        "course_name": {
+          "type": "string"
+        },
+        "grade": {
+          "type": "string"
+        },
+        "score": {
+          "type": "number",
+          "format": "float"
+        },
+        "max_score": {
+          "type": "number",
+          "format": "float"
+        },
+        "semester": {
+          "type": "string"
+        },
+        "academic_year": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GradeInput": {
+      "type": "object",
+      "properties": {
+        "student_id": {
+          "type": "string"
+        },
+        "course_id": {
+          "type": "string"
+        },
+        "course_name": {
+          "type": "string"
+        },
+        "grade": {
+          "type": "string"
+        },
+        "score": {
+          "type": "number",
+          "format": "float"
+        },
+        "max_score": {
+          "type": "number",
+          "format": "float"
+        },
+        "semester": {
+          "type": "string"
+        },
+        "academic_year": {
+          "type": "string"
+        }
+      }
+    },
+    "v1LectureAttendanceRecord": {
+      "type": "object",
+      "properties": {
+        "lecture_id": {
+          "type": "string"
+        },
+        "course_id": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "total_students": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "present_students": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "absent_students": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "attendance": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1AttendanceRecord"
+          }
+        }
+      }
+    },
+    "v1ListAttendanceResponse": {
+      "type": "object",
+      "properties": {
+        "records": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1AttendanceRecord"
+          }
+        }
+      }
+    },
+    "v1ListClassroomsResponse": {
+      "type": "object",
+      "properties": {
+        "classrooms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Classroom"
+          }
+        }
+      }
+    },
+    "v1ListEventsResponse": {
+      "type": "object",
+      "properties": {
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1AcademicEvent"
+          }
+        }
+      }
+    },
+    "v1ListGradesResponse": {
+      "type": "object",
+      "properties": {
+        "grades": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Grade"
+          }
+        }
+      }
+    },
+    "v1ListLectureAttendanceResponse": {
+      "type": "object",
+      "properties": {
+        "records": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1LectureAttendanceRecord"
+          }
+        }
+      }
+    },
+    "v1ListStudentProfilesResponse": {
+      "type": "object",
+      "properties": {
+        "profiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1StudentProfile"
+          }
+        }
+      }
+    },
+    "v1ListStudentsResponse": {
+      "type": "object",
+      "properties": {
+        "students": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ClassroomStudentInfo"
+          }
+        }
+      }
+    },
+    "v1StudentProfile": {
+      "type": "object",
+      "properties": {
+        "student_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "profile_photo_url": {
+          "type": "string"
+        },
+        "date_of_birth": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string"
+        },
+        "contact_number": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "permanent_address": {
+          "type": "string"
+        },
+        "current_address": {
+          "type": "string"
+        },
+        "blood_group": {
+          "type": "string"
+        },
+        "emergency_contact_name": {
+          "type": "string"
+        },
+        "emergency_contact_number": {
+          "type": "string"
+        },
+        "enrollment_number": {
+          "type": "string"
+        },
+        "course_program": {
+          "type": "string"
+        },
+        "department": {
+          "type": "string"
+        },
+        "current_year": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "current_semester": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "academic_advisor_name": {
+          "type": "string"
+        },
+        "section_or_batch": {
+          "type": "string"
+        },
+        "admission_date": {
+          "type": "string"
+        },
+        "mode_of_admission": {
+          "type": "string"
+        },
+        "id_card_url": {
+          "type": "string"
+        },
+        "admission_letter_url": {
+          "type": "string"
+        },
+        "marksheet10th_url": {
+          "type": "string"
+        },
+        "marksheet12th_url": {
+          "type": "string"
+        },
+        "migration_certificate_url": {
+          "type": "string"
+        },
+        "bonafide_certificate_url": {
+          "type": "string"
+        },
+        "uploaded_photo_url": {
+          "type": "string"
+        },
+        "uploaded_signature_url": {
+          "type": "string"
+        },
+        "exam_registration_status": {
+          "type": "string"
+        },
+        "admit_card_url": {
+          "type": "string"
+        },
+        "internal_exam_timetable_url": {
+          "type": "string"
+        },
+        "external_exam_timetable_url": {
+          "type": "string"
+        },
+        "results_and_grade_cards_url": {
+          "type": "string"
+        },
+        "revaluation_request_status": {
+          "type": "string"
+        },
+        "revaluation_request_link": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "parent_email": {
+          "type": "string"
+        }
+      }
+    },
+    "v1StudentProfileInput": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "profile_photo_url": {
+          "type": "string"
+        },
+        "date_of_birth": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string"
+        },
+        "contact_number": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "permanent_address": {
+          "type": "string"
+        },
+        "current_address": {
+          "type": "string"
+        },
+        "blood_group": {
+          "type": "string"
+        },
+        "emergency_contact_name": {
+          "type": "string"
+        },
+        "emergency_contact_number": {
+          "type": "string"
+        },
+        "enrollment_number": {
+          "type": "string"
+        },
+        "course_program": {
+          "type": "string"
+        },
+        "department": {
+          "type": "string"
+        },
+        "current_year": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "current_semester": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "academic_advisor_name": {
+          "type": "string"
+        },
+        "section_or_batch": {
+          "type": "string"
+        },
+        "admission_date": {
+          "type": "string"
+        },
+        "mode_of_admission": {
+          "type": "string"
+        },
+        "id_card_url": {
+          "type": "string"
+        },
+        "admission_letter_url": {
+          "type": "string"
+        },
+        "marksheet10th_url": {
+          "type": "string"
+        },
+        "marksheet12th_url": {
+          "type": "string"
+        },
+        "migration_certificate_url": {
+          "type": "string"
+        },
+        "bonafide_certificate_url": {
+          "type": "string"
+        },
+        "uploaded_photo_url": {
+          "type": "string"
+        },
+        "uploaded_signature_url": {
+          "type": "string"
+        },
+        "exam_registration_status": {
+          "type": "string"
+        },
+        "admit_card_url": {
+          "type": "string"
+        },
+        "internal_exam_timetable_url": {
+          "type": "string"
+        },
+        "external_exam_timetable_url": {
+          "type": "string"
+        },
+        "results_and_grade_cards_url": {
+          "type": "string"
+        },
+        "revaluation_request_status": {
+          "type": "string"
+        },
+        "revaluation_request_link": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "parent_email": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SubmitLectureAttendanceRequest": {
+      "type": "object",
+      "properties": {
+        "student_id": {
+          "type": "string"
+        },
+        "lecture_id": {
+          "type": "string"
+        },
+        "course_id": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
