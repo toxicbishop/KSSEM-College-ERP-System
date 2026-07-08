@@ -10,7 +10,7 @@ import {
   getLectureAttendanceForDateRange,
   deleteLectureAttendance,
 } from "@/services/attendance";
-import { analyzeAttendance } from "@/ai/flows/analyze-attendance-flow";
+
 import type { Classroom, ClassroomStudentInfo } from "@/services/classroom";
 import type {
   LectureAttendanceRecord,
@@ -121,7 +121,15 @@ export async function analyzeAttendanceData(
   records: LectureAttendanceRecord[]
 ): Promise<AttendanceAnalysisOutput> {
   try {
-    return await analyzeAttendance(records);
+    const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080') + '/api/ai/analyze-attendance', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ records }),
+    });
+    if (!res.ok) throw new Error('Failed to analyze');
+    return await res.json();
   } catch (error) {
     console.error("Attendance analysis error:", error);
     return {
