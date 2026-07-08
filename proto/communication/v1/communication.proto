@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package communication.v1;
+
+option go_package = "github.com/toxicbishop/kssem-college-erp-system/proto/communication/v1;communicationv1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service CommunicationService {
+  rpc GetNotifications(GetNotificationsRequest) returns (ListNotificationsResponse) {
+    option (google.api.http) = {
+      get: "/api/communication/notifications"
+    };
+  }
+
+  rpc MarkNotificationRead(MarkNotificationReadRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      patch: "/api/communication/notifications/{id}/read"
+    };
+  }
+}
+
+// ---------------------------------------------------------
+// Messages
+// ---------------------------------------------------------
+
+message GetNotificationsRequest {
+  string user_id = 1;
+}
+
+message MarkNotificationReadRequest {
+  string id = 1;
+}
+
+message Notification {
+  string id = 1;
+  string title = 2;
+  string message = 3;
+  string type = 4;
+  string timestamp = 5;
+  bool read = 6;
+  string link = 7;
+}
+
+message ListNotificationsResponse {
+  repeated Notification notifications = 1;
+}
