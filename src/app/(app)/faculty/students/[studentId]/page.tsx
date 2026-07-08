@@ -79,7 +79,7 @@ export default function FacultyStudentDetailPage() {
       const idToken = await clientAuth!.currentUser!.getIdToken();
 
       const attendancePromise = fetchAttendanceForStudent(idToken, studentId);
-      const profilePromise = getStudentProfile(idToken, studentId);
+      const profilePromise = getStudentProfile(studentId);
       const gradesPromise = fetchGradesForStudent(idToken, studentId);
 
       const [profile, attendance, grades] = await Promise.all([
