@@ -45,3 +45,5 @@ firebase-service-account.json
 certificates
 
 .claude
+.vercel
+.env*
