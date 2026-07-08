@@ -11,7 +11,7 @@ WORKDIR /app
 
 # Install dependencies based on the preferred package manager
 COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install
+RUN pnpm install --no-frozen-lockfile
 
 # Rebuild the source code only when needed
 FROM base AS builder
