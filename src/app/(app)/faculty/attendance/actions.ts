@@ -10,7 +10,7 @@ import {
   getLectureAttendanceForDateRange,
   deleteLectureAttendance,
 } from "@/services/attendance";
-import { analyzeAttendance } from "@/ai/flows/analyze-attendance-flow";
+
 import type { Classroom, ClassroomStudentInfo } from "@/services/classroom";
 import type {
   LectureAttendanceRecord,
@@ -20,30 +20,17 @@ import type {
 /**
  * Server action to fetch classrooms for a faculty member.
  */
-export async function fetchClassroomsByFaculty(
-  idToken: string
-): Promise<Classroom[]> {
-  try {
-    return await getClassroomsByFaculty(idToken);
-  } catch (error) {
-    console.error("Fetch classrooms error:", error);
-    return [];
-  }
+export async function fetchClassroomsByFaculty(): Promise<Classroom[]> {
+  return await getClassroomsByFaculty();
 }
 
 /**
  * Server action to fetch students in a classroom.
  */
 export async function fetchStudentsInClassroom(
-  idToken: string,
   classroomId: string
 ): Promise<ClassroomStudentInfo[]> {
-  try {
-    return await getStudentsInClassroom(idToken, classroomId);
-  } catch (error) {
-    console.error("Fetch students error:", error);
-    return [];
-  }
+  return await getStudentsInClassroom(classroomId);
 }
 
 /**
@@ -64,54 +51,35 @@ export async function submitAttendance(
  * Server action to get lecture attendance for a specific date.
  */
 export async function getAttendanceForDate(
-  idToken: string,
   classroomId: string,
   date: string
 ): Promise<LectureAttendanceRecord[]> {
-  try {
-    return await getLectureAttendanceForDate(idToken, classroomId, date);
-  } catch (error) {
-    console.error("Fetch attendance for date error:", error);
-    return [];
-  }
+  return await getLectureAttendanceForDate(classroomId, date);
 }
 
 /**
  * Server action to get lecture attendance for a date range.
  */
 export async function getAttendanceForDateRange(
-  idToken: string,
   classroomId: string,
   startDate: string,
   endDate: string
 ): Promise<LectureAttendanceRecord[]> {
-  try {
-    return await getLectureAttendanceForDateRange(
-      idToken,
-      classroomId,
-      startDate,
-      endDate
-    );
-  } catch (error) {
-    console.error("Fetch attendance for date range error:", error);
-    return [];
-  }
+  return await getLectureAttendanceForDateRange(
+    classroomId,
+    startDate,
+    endDate
+  );
 }
 
 /**
  * Server action to delete lecture attendance.
  */
 export async function deleteAttendance(
-  idToken: string,
   classroomId: string,
   date: string
 ): Promise<void> {
-  try {
-    return await deleteLectureAttendance(idToken, classroomId, date);
-  } catch (error) {
-    console.error("Delete attendance error:", error);
-    throw error;
-  }
+  return await deleteLectureAttendance(classroomId, date);
 }
 
 /**
@@ -121,7 +89,15 @@ export async function analyzeAttendanceData(
   records: LectureAttendanceRecord[]
 ): Promise<AttendanceAnalysisOutput> {
   try {
-    return await analyzeAttendance(records);
+    const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080') + '/api/ai/analyze-attendance', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ records }),
+    });
+    if (!res.ok) throw new Error('Failed to analyze');
+    return await res.json();
   } catch (error) {
     console.error("Attendance analysis error:", error);
     return {

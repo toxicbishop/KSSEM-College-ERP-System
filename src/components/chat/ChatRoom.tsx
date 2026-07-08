@@ -5,16 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Send, Loader2, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { sendMessage } from "@/services/chat";
-import { auth as clientAuth, db as clientDb } from "@/lib/firebase/client"; // For client-side Firestore access
-import {
-  collection,
-  query,
-  orderBy,
-  onSnapshot,
-  Timestamp as ClientTimestamp,
-} from "firebase/firestore";
-import type { ChatMessage } from "@/services/chat";
+import { getChatMessages, sendMessage, fromChatWire } from "@/services/chat";
+import { auth as clientAuth } from "@/lib/firebase/client";
+import type { ChatMessage, ChatMessageWire } from "@/services/chat";
+import { useGenerateStream } from "@/hooks/use-generate-stream";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDistanceToNowStrict } from "date-fns";
@@ -36,54 +30,25 @@ export function ChatRoom({
   const [isLoadingMessages, setIsLoadingMessages] = useState(true);
   const { toast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const streamPath = classroomId
+    ? `/api/communication/chat/${encodeURIComponent(classroomId)}/stream`
+    : null;
+  const { event: streamedMessage, error: streamError } =
+    useGenerateStream<ChatMessageWire>(streamPath);
 
   useEffect(() => {
-    if (!clientDb || !classroomId) {
+    if (!classroomId) {
       setIsLoadingMessages(false);
       return;
     }
 
     setIsLoadingMessages(true);
-    const messagesColRef = collection(
-      clientDb,
-      "classrooms",
-      classroomId,
-      "messages",
-    );
-    const q = query(messagesColRef, orderBy("timestamp", "asc"));
-
-    const unsubscribe = onSnapshot(
-      q,
-      (querySnapshot) => {
-        const fetchedMessages: ChatMessage[] = [];
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          // Ensure timestamp is a Date object
-          let messageTimestamp: Date;
-          if (data.timestamp instanceof ClientTimestamp) {
-            messageTimestamp = data.timestamp.toDate();
-          } else if (
-            data.timestamp &&
-            typeof data.timestamp.toDate === "function"
-          ) {
-            // For server-side FieldValue
-            messageTimestamp = data.timestamp.toDate();
-          } else if (typeof data.timestamp === "string") {
-            messageTimestamp = new Date(data.timestamp);
-          } else {
-            messageTimestamp = new Date(); // Fallback, though unlikely
-          }
-
-          fetchedMessages.push({
-            id: doc.id,
-            ...data,
-            timestamp: messageTimestamp,
-          } as ChatMessage);
-        });
+    void getChatMessages(classroomId)
+      .then((fetchedMessages) => {
         setMessages(fetchedMessages);
         setIsLoadingMessages(false);
-      },
-      (error) => {
+      })
+      .catch((error) => {
         console.error("Error fetching messages:", error);
         toast({
           title: "Error",
@@ -91,11 +56,21 @@ export function ChatRoom({
           variant: "destructive",
         });
         setIsLoadingMessages(false);
-      },
-    );
-
-    return () => unsubscribe();
+      });
   }, [classroomId, toast]);
+
+  useEffect(() => {
+    if (!streamedMessage) return;
+    const next = fromChatWire(streamedMessage);
+    setMessages((current) =>
+      current.some((message) => message.id === next.id) ? current : [...current, next],
+    );
+  }, [streamedMessage]);
+
+  useEffect(() => {
+    if (!streamError) return;
+    toast({ title: "Chat disconnected", description: streamError.message, variant: "destructive" });
+  }, [streamError, toast]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -111,8 +86,7 @@ export function ChatRoom({
     }
     setIsSending(true);
     try {
-      const idToken = await clientAuth?.currentUser.getIdToken();
-      await sendMessage(idToken, classroomId, newMessage);
+      await sendMessage(classroomId, newMessage);
       setNewMessage("");
     } catch (error) {
       console.error("Failed to send message:", error);

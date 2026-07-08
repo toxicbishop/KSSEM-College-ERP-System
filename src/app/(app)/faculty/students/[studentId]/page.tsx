@@ -76,11 +76,9 @@ export default function FacultyStudentDetailPage() {
     setLoadingData(true);
     setError(null);
     try {
-      const idToken = await clientAuth!.currentUser!.getIdToken();
-
-      const attendancePromise = fetchAttendanceForStudent(idToken, studentId);
-      const profilePromise = getStudentProfile(idToken, studentId);
-      const gradesPromise = fetchGradesForStudent(idToken, studentId);
+            const attendancePromise = fetchAttendanceForStudent(studentId);
+      const profilePromise = getStudentProfile(studentId);
+      const gradesPromise = fetchGradesForStudent(studentId);
 
       const [profile, attendance, grades] = await Promise.all([
         profilePromise,

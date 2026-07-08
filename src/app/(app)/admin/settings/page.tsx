@@ -3,8 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase/client"; // Import db
+import { auth as clientAuth } from "@/lib/firebase/client";
 import {
   ShieldAlert,
   Settings,
@@ -77,12 +76,10 @@ export default function AdminSettingsPage() {
     const checkAdminAccess = async () => {
       setCheckingRole(true);
       let userIsCurrentlyAdmin = false;
-      if (db) {
-        // Check Firestore role only if db is available
+      if (clientAuth?.currentUser) {
         try {
-          const userDocRef = doc(db, "users", user.uid);
-          const userDocSnap = await getDoc(userDocRef);
-          if (userDocSnap.exists() && userDocSnap.data().role === "admin") {
+          const tokenResult = await clientAuth.currentUser.getIdTokenResult();
+          if (tokenResult.claims.role === "admin") {
             userIsCurrentlyAdmin = true;
           }
         } catch (error) {
@@ -90,17 +87,10 @@ export default function AdminSettingsPage() {
           toast({
             title: "Error",
             description:
-              "Could not verify admin role. Check Firestore permissions.",
+              "Could not verify admin role.",
             variant: "destructive",
           });
         }
-      } else {
-        toast({
-          title: "Database Error",
-          description:
-            "Firestore is not available. Cannot verify admin role.",
-          variant: "destructive",
-        });
       }
 
       if (userIsCurrentlyAdmin) {
@@ -124,19 +114,6 @@ export default function AdminSettingsPage() {
       const fetchSettings = async () => {
         setLoadingSettings(true);
         setErrorSettings(null);
-        if (!db) {
-          // Check db again before service call
-          setErrorSettings(
-            "Database connection is not available for settings.",
-          );
-          setLoadingSettings(false);
-          toast({
-            title: "Database Error",
-            description: "Cannot load system settings.",
-            variant: "destructive",
-          });
-          return;
-        }
         try {
           const currentSettings = await getSystemSettings();
           setSettings(currentSettings);
@@ -167,15 +144,6 @@ export default function AdminSettingsPage() {
     successMessage: string,
   ) => {
     if (!settings || !isAdmin) return; // Ensure user is admin
-    if (!db) {
-      // Check db before service call
-      toast({
-        title: "Database Error",
-        description: "Cannot update settings.",
-        variant: "destructive",
-      });
-      return;
-    }
 
     const newSettings: Partial<SystemSettings> = { [key]: value };
     try {
@@ -193,17 +161,11 @@ export default function AdminSettingsPage() {
         description: `Could not update ${key}. Ensure Firestore rules allow writing to 'systemSettings/appConfiguration' for admins.`,
         variant: "destructive",
       });
-      // Revert UI change on error by refetching if db is available
-      if (db) {
-        const currentSettings = await getSystemSettings();
-        setSettings(currentSettings);
-        if (key === "applicationName")
-          setTempAppName(currentSettings.applicationName);
-        if (key === "announcementTitle")
-          setTempAnnouncementTitle(currentSettings.announcementTitle);
-        if (key === "announcementContent")
-          setTempAnnouncementContent(currentSettings.announcementContent);
-      }
+      const currentSettings = await getSystemSettings();
+      setSettings(currentSettings);
+      if (key === "applicationName") setTempAppName(currentSettings.applicationName);
+      if (key === "announcementTitle") setTempAnnouncementTitle(currentSettings.announcementTitle);
+      if (key === "announcementContent") setTempAnnouncementContent(currentSettings.announcementContent);
     }
   };
 
@@ -579,4 +541,3 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
-

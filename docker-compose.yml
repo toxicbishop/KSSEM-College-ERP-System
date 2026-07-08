@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - FIRESTORE_PROJECT_ID=${FIRESTORE_PROJECT_ID}
+      - GOOGLE_APPLICATION_CREDENTIALS_B64=${GOOGLE_APPLICATION_CREDENTIALS_B64}
+    restart: unless-stopped

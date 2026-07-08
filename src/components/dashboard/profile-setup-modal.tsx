@@ -76,14 +76,14 @@ export function ProfileSetupModal({
 
     setLoading(true);
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
+      const uid = clientAuth.currentUser.uid;
 
       // Basic validation
       if (!formData.name || !formData.contactNumber || !formData.bloodGroup) {
         throw new Error("Please fill in all basic information.");
       }
 
-      await updateStudentProfile(idToken, formData);
+      await updateStudentProfile(uid, formData);
 
       toast({
         title: "Profile Finalized",
@@ -132,7 +132,7 @@ export function ProfileSetupModal({
               <Input
                 id="name"
                 name="name"
-                className="pl-9 h-11 border-kssem-border focus-visible:ring-kssem-navy"
+                className="pl-9 h-11 border-kssem-border focus-visible:ring-kssem-navy text-gray-900"
                 placeholder="John Doe"
                 value={formData.name}
                 onChange={handleChange}
@@ -154,7 +154,7 @@ export function ProfileSetupModal({
                   id="contactNumber"
                   name="contactNumber"
                   type="tel"
-                  className="pl-9 h-11 border-kssem-border"
+                  className="pl-9 h-11 border-kssem-border text-gray-900"
                   placeholder="+91..."
                   value={formData.contactNumber}
                   onChange={handleChange}
@@ -173,7 +173,7 @@ export function ProfileSetupModal({
                 <select
                   id="bloodGroup"
                   name="bloodGroup"
-                  className="flex h-11 w-full rounded-md border border-kssem-border bg-transparent px-9 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-kssem-navy focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex h-11 w-full rounded-md border border-kssem-border bg-white px-9 py-2 text-sm text-gray-900 ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-kssem-navy focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   value={formData.bloodGroup}
                   onChange={handleChange}
                   required>
@@ -201,7 +201,7 @@ export function ProfileSetupModal({
               id="dateOfBirth"
               name="dateOfBirth"
               type="date"
-              className="h-11 border-kssem-border"
+              className="h-11 border-kssem-border text-gray-900"
               value={formData.dateOfBirth}
               onChange={handleChange}
               required
@@ -219,7 +219,7 @@ export function ProfileSetupModal({
               <Input
                 id="permanentAddress"
                 name="permanentAddress"
-                className="pl-9 h-11 border-kssem-border"
+                className="pl-9 h-11 border-kssem-border text-gray-900"
                 placeholder="City, State, Country"
                 value={formData.permanentAddress}
                 onChange={handleChange}

@@ -94,9 +94,7 @@ export default function ManageClassroomStudentsPage() {
     if (!user || !classroomId) return;
     setLoadingStudents(true);
     try {
-      const idToken = await user.getIdToken();
-
-      const facultyClassrooms = await fetchFacultyClassroomsForStudent(idToken);
+      const facultyClassrooms = await fetchFacultyClassroomsForStudent();
       const currentClassroom = facultyClassrooms.find(
         (c) => c.id === classroomId,
       );
@@ -116,7 +114,7 @@ export default function ManageClassroomStudentsPage() {
         return;
       }
 
-      const students = await fetchStudentsInClass(idToken, classroomId);
+      const students = await fetchStudentsInClass(classroomId);
       setCurrentStudents(students);
     } catch (error) {
       toast({
@@ -141,8 +139,7 @@ export default function ManageClassroomStudentsPage() {
     setLoadingSearch(true);
     setSelectedStudents({});
     try {
-      const idToken = await user.getIdToken();
-      const results = await searchForStudents(idToken, classroomId, searchTerm);
+      const results = await searchForStudents(classroomId, searchTerm);
       setSearchResults(results);
       if (results.length === 0) {
         toast({
@@ -175,11 +172,10 @@ export default function ManageClassroomStudentsPage() {
 
     setIsSubmitting(true);
     try {
-      const idToken = await user.getIdToken();
       const studentsDetails = studentUidsToAdd.map(
         (uid) => selectedStudents[uid],
       );
-      await addStudentsToClass(idToken, classroomId, studentsDetails);
+      await addStudentsToClass(classroomId, studentsDetails);
 
       toast({
         title: "Students Added",
@@ -204,8 +200,7 @@ export default function ManageClassroomStudentsPage() {
     if (!user) return;
     setIsSubmitting(true);
     try {
-      const idToken = await user.getIdToken();
-      await removeStudentFromClass(idToken, classroomId, studentUid);
+      await removeStudentFromClass(classroomId, studentUid);
       toast({
         title: "Student Removed",
         description: "The student has been removed from the classroom.",
@@ -232,9 +227,7 @@ export default function ManageClassroomStudentsPage() {
     if (!editingStudent || !user) return;
     setIsSubmitting(true);
     try {
-      const idToken = await user.getIdToken();
       await updateStudentBatchForClassroom(
-        idToken,
         classroomId,
         editingStudent.userId,
         newBatchValue.trim(),

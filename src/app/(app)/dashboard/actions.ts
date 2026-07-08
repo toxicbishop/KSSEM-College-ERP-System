@@ -1,6 +1,6 @@
 "use server";
 
-import { analyzeGrades } from "@/ai/flows/analyze-grades-flow";
+
 import { getAttendanceRecords as getAttendanceRecordsService } from "@/services/attendance";
 import { getGrades as getGradesService } from "@/services/grades";
 import type { Grade } from "@/services/grades";
@@ -13,11 +13,10 @@ import type { AttendanceRecord } from "@/services/attendance";
  * (which require Node.js modules) are only loaded on the server.
  */
 export async function fetchAttendanceRecords(
-  idToken: string,
   studentId?: string
 ): Promise<AttendanceRecord[]> {
   try {
-    return await getAttendanceRecordsService(idToken, studentId);
+    return await getAttendanceRecordsService(studentId);
   } catch (error) {
     console.error("Attendance records fetch error:", error);
     return [];
@@ -47,7 +46,15 @@ export async function analyzeStudentGrades(
   grades: Grade[]
 ): Promise<GradeAnalysisOutput> {
   try {
-    return await analyzeGrades(grades);
+    const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080') + '/api/ai/analyze-grades', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ grades }),
+    });
+    if (!res.ok) throw new Error('Failed to analyze');
+    return await res.json();
   } catch (error) {
     console.error("Grade analysis server action error:", error);
     // Return a default analysis on error

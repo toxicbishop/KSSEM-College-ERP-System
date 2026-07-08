@@ -8,8 +8,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase/client";
+import { auth } from "@/lib/firebase/client";
+import { apiPost } from "@/lib/api-client";
 import { Input } from "@/components/ui/input";
 import {
   Form,
@@ -108,7 +108,7 @@ export default function SignUpPage() {
       setLoading(false);
       return;
     }
-    if (!auth || !db) {
+    if (!auth) {
       toast({
         title: "Initialization Error",
         description: "Firebase is not configured correctly.",
@@ -125,16 +125,18 @@ export default function SignUpPage() {
         data.password,
       );
       const user = userCredential.user;
-      await setDoc(doc(db, "users", user.uid), {
-        name: data.name,
+      
+      const idToken = await user.getIdToken();
+      setCookie("firebaseAuthToken", idToken, 1);
+      
+      await apiPost("/api/academic/profile", {
         studentId: data.studentId,
-        major: data.major,
+        name: data.name,
+        courseProgram: data.major,
         email: data.email,
         parentEmail: data.parentEmail,
         role: "student",
       });
-      const idToken = await user.getIdToken();
-      setCookie("firebaseAuthToken", idToken, 1);
       toast({
         title: "Sign Up Successful",
         description: "Your account has been created.",

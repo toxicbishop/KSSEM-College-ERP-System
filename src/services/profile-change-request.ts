@@ -1,308 +1,111 @@
-"use server"; // Make it a server action file
+/**
+ * Profile Change Request Service — gateway-backed (no more direct Firebase Admin).
+ *
+ * This module replaces the previous server-action-based implementation that
+ * bypassed the Go microservices.  All profile-change-request operations now
+ * go through the API Gateway (`/api/admin/*`) which routes to the Admin
+ * microservice via gRPC.
+ *
+ * The admin-approval page and the student profile page use these wrappers
+ * instead of calling `createProfileChangeRequest`, `approveProfileChangeRequest`,
+ * and `denyProfileChangeRequest` server actions directly.
+ */
 
+import { apiPost, apiGet } from '@/lib/api-client';
 import {
-  adminDb,
-  adminAuth,
-  adminInitializationError,
-} from "@/lib/firebase/admin.server";
-import {
-  FieldValue as AdminFieldValue,
-  Timestamp as AdminTimestamp,
-} from "firebase-admin/firestore";
-import type { QueryDocumentSnapshot } from "firebase-admin/firestore";
+  createProfileChangeRequestSchema,
+  approveProfileChangeRequestSchema,
+  denyProfileChangeRequestSchema,
+  formatZodError,
+  type CreateProfileChangeRequestInput as ValidatedCreateInput,
+  type ApproveProfileChangeRequestInput as ValidatedApproveInput,
+  type DenyProfileChangeRequestInput as ValidatedDenyInput,
+} from './validation';
 
-export type ProfileChangeRequestStatus = "pending" | "approved" | "denied";
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+export type ProfileChangeRequestStatus = 'pending' | 'approved' | 'denied';
 
 export interface ProfileChangeRequest {
-  id: string; // Firestore document ID
-  userId: string; // UID of the student
-  userName?: string; // Name of the student, for display in admin panel
-  userEmail?: string; // Email of the student, for display
-  fieldName: string; // e.g., 'email', 'contactNumber'
+  id: string;
+  userId: string;
+  userName?: string;
+  userEmail?: string;
+  fieldName: string;
   oldValue: any;
   newValue: any;
-  requestedAt: Date | any; // Firestore Timestamp
+  requestedAt: string;       // ISO-8601 timestamp from the backend
   status: ProfileChangeRequestStatus;
-  adminNotes?: string; // Notes from admin on approval/denial
-  resolvedAt?: Date | any; // Firestore Timestamp
+  adminNotes?: string;
+  resolvedAt?: string;       // ISO-8601 timestamp, undefined for pending
 }
 
-import type { StudentProfile } from "./profile";
+// ---------------------------------------------------------------------------
+// Create a new profile change request (student workflow)
+// ---------------------------------------------------------------------------
 
-/**
- * Creates a new profile change request in Firestore (Server Action).
- * This is called from the client (e.g., student profile page).
- * Requires the student's Firebase ID token for authentication.
- */
+// Re-export the validated type from the validation module for convenience.
+export type CreateProfileChangeRequestInput = ValidatedCreateInput;
+
+// Re-export for convenience so existing callers don't break.
+export type ApproveProfileChangeRequestInput = ValidatedApproveInput;
+export type DenyProfileChangeRequestInput = ValidatedDenyInput;
+
 export async function createProfileChangeRequest(
-  idToken: string, // Student's Firebase ID token
-  fieldName: keyof StudentProfile,
-  oldValue: any,
-  newValue: any,
-): Promise<string> {
-  if (adminInitializationError) {
-    console.error(
-      "[ServerAction:createProfileChangeRequest] Admin SDK init failed:",
-      adminInitializationError.message,
-    );
-    throw new Error("Server error: Admin SDK initialization failed.");
-  }
-  if (!adminDb || !adminAuth) {
-    console.error(
-      "[ServerAction:createProfileChangeRequest] Admin DB or Auth not initialized.",
-    );
-    throw new Error("Server error: Admin services not initialized.");
+  input: CreateProfileChangeRequestInput,
+): Promise<{ id: string }> {
+  // Validate on the client / server-action side before hitting the gateway.
+  const validated = createProfileChangeRequestSchema.safeParse(input);
+  if (!validated.success) {
+    throw new Error(`Validation failed: ${formatZodError(validated.error)}`);
   }
 
-  let decodedToken;
-  try {
-    decodedToken = await adminAuth.verifyIdToken(idToken);
-  } catch (error) {
-    console.error(
-      "[ServerAction:createProfileChangeRequest] Invalid ID token:",
-      error,
-    );
-    throw new Error("Authentication failed. Invalid or expired token.");
-  }
-
-  const userId = decodedToken.uid;
-  const userEmail = decodedToken.email || "N/A";
-  // Firebase ID token (from client) usually doesn't include custom profile data like 'name'.
-  // We must fetch it from our Firestore 'users' collection.
-  let userName = "N/A"; // Default if not found or error
-
-  try {
-    const userDocRef = adminDb.collection("users").doc(userId);
-    const userDocSnap = await userDocRef.get();
-
-    if (userDocSnap.exists) {
-      const userData = userDocSnap.data();
-      if (userData && userData.name) {
-        userName = userData.name;
-      } else {
-        userName = "User (name field missing in DB)";
-      }
-    } else {
-      userName = "User (document not found in DB)";
-    }
-  } catch (fetchError: any) {
-    console.error(
-      `[ServerAction:createProfileChangeRequest] CRITICAL: Error fetching user document or name for UID ${userId} from Firestore. Error: ${fetchError.message}`,
-      fetchError.stack,
-    );
-    userName = "User (DB fetch error)"; // Specific fallback for DB read errors
-  }
-
-  const dataToCreate = {
-    userId,
-    userName, // This will be the fetched name or one of the fallbacks
-    userEmail,
-    fieldName,
-    oldValue,
-    newValue,
-    requestedAt: AdminFieldValue.serverTimestamp(),
-    status: "pending",
-  };
-
-  try {
-    const requestsCollection = adminDb.collection("profileChangeRequests");
-    const docRef = await requestsCollection.add(dataToCreate);
-    return docRef.id;
-  } catch (error) {
-    console.error(
-      "[ServerAction:createProfileChangeRequest] Error creating profile change request document (Admin SDK):",
-      error,
-    );
-    throw error;
-  }
+  const res = await apiPost<{ id: string }>('/api/admin/profile-change-requests', validated.data);
+  return res;
 }
 
-/**
- * Fetches all profile change requests from Firestore using Admin SDK (Server Action for admin).
- * @param idToken - Admin's Firebase ID token for verification.
- */
-export async function getProfileChangeRequests(
-  idToken: string,
-): Promise<ProfileChangeRequest[]> {
-  if (adminInitializationError) {
-    console.error(
-      "getProfileChangeRequests SA Error: Admin SDK init failed:",
-      adminInitializationError.message,
-    );
-    throw new Error("Server error: Admin SDK initialization failed.");
-  }
-  if (!adminDb || !adminAuth) {
-    console.error(
-      "getProfileChangeRequests SA Error: Admin DB or Auth not initialized.",
-    );
-    throw new Error("Server error: Admin services not initialized.");
-  }
+// ---------------------------------------------------------------------------
+// List all profile change requests (admin workflow)
+// ---------------------------------------------------------------------------
 
-  try {
-    // Verify the admin's token to ensure this action is authorized
-    await adminAuth.verifyIdToken(idToken);
-  } catch (error) {
-    console.error(
-      "getProfileChangeRequests SA Error: Invalid ID token for admin",
-      error,
-    );
-    throw new Error("Authentication failed for admin action.");
-  }
-
-  try {
-    const requestsCollectionRef = adminDb.collection("profileChangeRequests");
-    const q = requestsCollectionRef.orderBy("requestedAt", "desc");
-    const snapshot = await q.get();
-
-    return snapshot.docs.map((docSnap: QueryDocumentSnapshot) => {
-      const data = docSnap.data();
-      const requestedAt = data.requestedAt as AdminTimestamp | undefined;
-      const resolvedAt = data.resolvedAt as AdminTimestamp | undefined;
-
-      return {
-        id: docSnap.id,
-        userId: data.userId || "",
-        userName: data.userName || "Unknown User",
-        userEmail: data.userEmail || "N/A",
-        fieldName: data.fieldName || "",
-        oldValue: data.oldValue,
-        newValue: data.newValue,
-        requestedAt: requestedAt ? requestedAt.toDate() : new Date(0),
-        status: data.status || "pending",
-        adminNotes: data.adminNotes || "",
-        resolvedAt: resolvedAt ? resolvedAt.toDate() : undefined,
-      } as ProfileChangeRequest;
-    });
-  } catch (error) {
-    console.error("Error fetching profile change requests (Admin SDK):", error);
-    throw error;
-  }
+export async function getProfileChangeRequests(): Promise<ProfileChangeRequest[]> {
+  const res = await apiGet<ProfileChangeRequest[]>('/api/admin/profile-change-requests');
+  return res ?? [];
 }
 
-/**
- * Approves a profile change request, updating user's profile and request status (Server Action for admin).
- * @param idToken - Admin's Firebase ID token.
- * @param requestId - The ID of the profile change request document.
- * @param userId - The UID of the student whose profile is to be updated.
- * @param fieldName - The specific field in the student's profile to update.
- * @param newValue - The new value for the field.
- * @param adminNotes - Optional notes from the admin.
- */
+// ---------------------------------------------------------------------------
+// Approve a profile change request (admin workflow)
+// ---------------------------------------------------------------------------
+
 export async function approveProfileChangeRequest(
-  idToken: string,
-  requestId: string,
-  userId: string,
-  fieldName: string,
-  newValue: any,
-  adminNotes?: string,
+  input: ApproveProfileChangeRequestInput,
 ): Promise<void> {
-  if (adminInitializationError) {
-    console.error(
-      "approveProfileChangeRequest SA Error: Admin SDK init failed:",
-      adminInitializationError.message,
-    );
-    throw new Error("Server error: Admin SDK initialization failed.");
-  }
-  if (!adminDb || !adminAuth) {
-    console.error(
-      "approveProfileChangeRequest SA Error: Admin DB or Auth not initialized.",
-    );
-    throw new Error("Server error: Admin services not initialized.");
+  const validated = approveProfileChangeRequestSchema.safeParse(input);
+  if (!validated.success) {
+    throw new Error(`Validation failed: ${formatZodError(validated.error)}`);
   }
 
-  let adminEmail = "Unknown Admin";
-  try {
-    const adminDecodedToken = await adminAuth.verifyIdToken(idToken);
-    adminEmail = adminDecodedToken.email || adminDecodedToken.uid;
-  } catch (error) {
-    console.error(
-      "approveProfileChangeRequest SA Error: Invalid ID token for admin",
-      error,
-    );
-    throw new Error("Authentication failed for admin action.");
-  }
-
-  try {
-    const requestDocRef = adminDb
-      .collection("profileChangeRequests")
-      .doc(requestId);
-    const userDocRef = adminDb.collection("users").doc(userId);
-
-    const batch = adminDb.batch();
-
-    batch.update(userDocRef, { [fieldName]: newValue });
-
-    batch.update(requestDocRef, {
-      status: "approved",
-      resolvedAt: AdminFieldValue.serverTimestamp(),
-      adminNotes: adminNotes || `Approved by admin (${adminEmail}).`,
-    });
-
-    await batch.commit();
-  } catch (error) {
-    console.error(
-      "Error approving profile change request (Admin SDK):",
-      requestId,
-      error,
-    );
-    throw error;
-  }
+  await apiPost(`/api/admin/profile-change-requests/${validated.data.requestId}/approve`, {
+    adminNotes: validated.data.adminNotes || '',
+    newValue: validated.data.newValue || '',
+  });
 }
 
-/**
- * Denies a profile change request (Server Action for admin).
- * @param idToken - Admin's Firebase ID token.
- * @param requestId - The ID of the profile change request document.
- * @param adminNotes - Reason for denial from the admin.
- */
+// ---------------------------------------------------------------------------
+// Deny a profile change request (admin workflow)
+// ---------------------------------------------------------------------------
+
 export async function denyProfileChangeRequest(
-  idToken: string,
-  requestId: string,
-  adminNotes: string,
+  input: DenyProfileChangeRequestInput,
 ): Promise<void> {
-  if (adminInitializationError) {
-    console.error(
-      "denyProfileChangeRequest SA Error: Admin SDK init failed:",
-      adminInitializationError.message,
-    );
-    throw new Error("Server error: Admin SDK initialization failed.");
-  }
-  if (!adminDb || !adminAuth) {
-    console.error(
-      "denyProfileChangeRequest SA Error: Admin DB or Auth not initialized.",
-    );
-    throw new Error("Server error: Admin services not initialized.");
+  const validated = denyProfileChangeRequestSchema.safeParse(input);
+  if (!validated.success) {
+    throw new Error(`Validation failed: ${formatZodError(validated.error)}`);
   }
 
-  try {
-    await adminAuth.verifyIdToken(idToken);
-  } catch (error) {
-    console.error(
-      "denyProfileChangeRequest SA Error: Invalid ID token for admin",
-      error,
-    );
-    throw new Error("Authentication failed for admin action.");
-  }
-
-  if (!adminNotes || adminNotes.trim() === "") {
-    throw new Error("Admin notes are required for denying a request.");
-  }
-
-  try {
-    const requestDocRef = adminDb
-      .collection("profileChangeRequests")
-      .doc(requestId);
-    await requestDocRef.update({
-      status: "denied",
-      resolvedAt: AdminFieldValue.serverTimestamp(),
-      adminNotes: adminNotes,
-    });
-  } catch (error) {
-    console.error(
-      "Error denying profile change request (Admin SDK):",
-      requestId,
-      error,
-    );
-    throw error;
-  }
+  await apiPost(`/api/admin/profile-change-requests/${validated.data.requestId}/deny`, {
+    adminNotes: validated.data.adminNotes,
+  });
 }

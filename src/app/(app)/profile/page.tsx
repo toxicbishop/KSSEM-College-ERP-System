@@ -14,7 +14,7 @@ import { useAuth } from "@/context/auth-context";
 import { auth as clientAuth } from "@/lib/firebase/client";
 import type { StudentProfile } from "@/services/profile";
 import { getStudentProfile, updateStudentProfile } from "@/services/profile";
-import { createProfileChangeRequest } from "@/services/profile-change-request";
+import { createProfileChangeRequest, type CreateProfileChangeRequestInput } from "@/services/profile-change-request";
 import type {
   StudentClassroomEnrollmentInfo,
   ClassmateInfo,
@@ -123,7 +123,7 @@ const InfoItem = ({
   fieldName: keyof StudentProfile;
   isEditable?: boolean;
   isEditMode: boolean;
-  onEditRequest?: (fieldName: keyof StudentProfile, label: string) => void;
+  onEditRequest?: (fieldName: CreateProfileChangeRequestInput["fieldName"], label: string) => void;
   editModeRender?: (
     currentValue: any,
     handleChange: (
@@ -189,7 +189,7 @@ const InfoItem = ({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => onEditRequest(fieldName, label)}
+          onClick={() => onEditRequest(fieldName as CreateProfileChangeRequestInput["fieldName"], label)}
           className="whitespace-nowrap bg-kssem-gold text-kssem-navy border-kssem-gold hover:bg-[#c4a030] transition-all shadow-md font-bold uppercase tracking-wider text-[10px]">
           <Send className="mr-2 h-3 w-3" /> Request Change
         </Button>
@@ -291,7 +291,7 @@ function ProfileDetailsLoader() {
 
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [requestFieldInfo, setRequestFieldInfo] = useState<{
-    key: keyof StudentProfile;
+    key: CreateProfileChangeRequestInput["fieldName"];
     label: string;
   } | null>(null);
   const [requestOldValue, setRequestOldValue] = useState("");
@@ -324,8 +324,7 @@ function ProfileDetailsLoader() {
         setClassroomsError(null);
 
         try {
-          const idToken = await clientAuth!.currentUser!.getIdToken();
-          const fetchedProfile = await getStudentProfile(idToken);
+          const fetchedProfile = await getStudentProfile(user.uid);
           if (fetchedProfile) {
             const enrichedProfile = {
               ...fetchedProfile,
@@ -339,7 +338,7 @@ function ProfileDetailsLoader() {
 
           // Fetch classrooms separately and handle its error state independently
           try {
-            const fetchedClassrooms = await fetchStudentClassrooms(idToken);
+            const fetchedClassrooms = await fetchStudentClassrooms();
             setEnrolledClassrooms(fetchedClassrooms);
           } catch (classroomErr) {
             const errorMessage =
@@ -396,8 +395,7 @@ function ProfileDetailsLoader() {
     if (!profile || !user || !clientAuth || !clientAuth.currentUser) return;
     setIsSubmitting(true);
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
-      await updateStudentProfile(idToken, editableProfile);
+      await updateStudentProfile(user.uid, editableProfile);
       // Optimistically update the main profile state
       setProfile((prev) => (prev ? { ...prev, ...editableProfile } : null));
       toast({
@@ -416,7 +414,7 @@ function ProfileDetailsLoader() {
     }
   };
 
-  const openRequestModal = (fieldName: keyof StudentProfile, label: string) => {
+  const openRequestModal = (fieldName: CreateProfileChangeRequestInput["fieldName"], label: string) => {
     if (!profile || !user) return;
     setRequestFieldInfo({ key: fieldName, label });
     setRequestOldValue(String(profile[fieldName] ?? "N/A"));
@@ -446,20 +444,19 @@ function ProfileDetailsLoader() {
       description: `Requesting to change ${requestFieldInfo.label}.`,
     });
     try {
-      const idToken = await clientAuth!.currentUser!.getIdToken(); // Force refresh token
-      await createProfileChangeRequest(
-        idToken,
-        requestFieldInfo.key,
-        requestOldValue,
-        requestNewValue,
-      );
+      const input: CreateProfileChangeRequestInput = {
+        fieldName: requestFieldInfo.key,
+        oldValue: requestOldValue,
+        newValue: requestNewValue,
+      };
+      await createProfileChangeRequest(input);
       toast({
         title: "Request Submitted",
         description: `Your request to change ${requestFieldInfo.label} has been submitted for admin approval.`,
       });
     } catch (error) {
       console.error(
-        "Error submitting change request (via Server Action):",
+        "Error submitting change request (via Gateway):",
         error,
       );
       toast({
@@ -491,9 +488,7 @@ function ProfileDetailsLoader() {
     setLoadingClassmatesView(true);
     setFetchClassmatesError(null);
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
       const fetchedClassmates = await fetchClassmates(
-        idToken,
         classroom.classroomId,
       );
       setClassmates(fetchedClassmates);

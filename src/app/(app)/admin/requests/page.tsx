@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
-import { db as clientDb, auth as clientAuth } from "@/lib/firebase/client"; // clientDb for user role check, clientAuth for token
-import { doc, getDoc } from "firebase/firestore";
 import {
   Card,
   CardHeader,
@@ -40,11 +38,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogClose,
-  DialogTrigger, // Added DialogTrigger import
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import type { StudentProfile } from "@/services/profile";
+
 
 export default function AdminRequestsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -58,6 +56,12 @@ export default function AdminRequestsPage() {
     useState<ProfileChangeRequest | null>(null);
   const [denialReason, setDenialReason] = useState("");
 
+  // -----------------------------------------------------------------------
+  // Role check — still uses Firebase custom claims for the *UI gate*.
+  // The actual CRUD operations are handled by the gateway + admin service,
+  // which enforce their own role checks via the X-User-Id header.
+  // -----------------------------------------------------------------------
+
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
@@ -65,57 +69,57 @@ export default function AdminRequestsPage() {
       setCheckingRole(false);
       return;
     }
+
     const checkAdminAccess = async () => {
       setCheckingRole(true);
       let userIsCurrentlyAdmin = false;
-      if (clientDb) {
-        try {
-          const userDocRef = doc(clientDb, "users", user.uid);
-          const userDocSnap = await getDoc(userDocRef);
-          if (userDocSnap.exists() && userDocSnap.data().role === "admin") {
-            userIsCurrentlyAdmin = true;
-          }
-        } catch (error) {
-          console.error("Error fetching user role:", error);
-          toast({
-            title: "Error",
-            description: "Could not verify admin role.",
-            variant: "destructive",
-          });
+
+      // Check custom claims from Firebase
+      try {
+        const idTokenResult = await user.getIdTokenResult();
+        if (idTokenResult.claims?.role === "admin") {
+          userIsCurrentlyAdmin = true;
         }
-      } else {
+      } catch (error) {
+        console.error("Error fetching user role:", error);
         toast({
-          title: "Database Error",
-          description: "Firestore is not available. Cannot verify admin role.",
+          title: "Error",
+          description: "Could not verify admin role.",
           variant: "destructive",
         });
       }
-      if (userIsCurrentlyAdmin) setIsAdmin(true);
-      else {
+
+      setIsAdmin(userIsCurrentlyAdmin);
+      setCheckingRole(false);
+
+      if (!userIsCurrentlyAdmin) {
         toast({
           title: "Access Denied",
-          description: "You do not have permission.",
+          description: "You do not have permission to view this page.",
           variant: "destructive",
         });
-        router.push("/");
+        router.push("/dashboard");
       }
-      setCheckingRole(false);
     };
+
     checkAdminAccess();
   }, [user, authLoading, router, toast]);
 
+  // -----------------------------------------------------------------------
+  // Data fetching — now calls the gateway (no ID token needed)
+  // -----------------------------------------------------------------------
+
   const fetchRequests = async () => {
-    if (!isAdmin || !clientAuth?.currentUser) return; // Need currentUser for token
+    if (!isAdmin) return;
     setLoadingRequests(true);
     try {
-      const idToken = await clientAuth?.currentUser?.getIdToken();
-      const fetchedRequests = await getProfileChangeRequests(idToken);
+      const fetchedRequests = await getProfileChangeRequests();
       setRequests(fetchedRequests);
     } catch (error) {
       console.error("Error fetching requests:", error);
       toast({
         title: "Error Fetching Requests",
-        description: "Could not load change requests.",
+        description: "Could not load change requests from the server.",
         variant: "destructive",
       });
     } finally {
@@ -124,36 +128,27 @@ export default function AdminRequestsPage() {
   };
 
   useEffect(() => {
-    if (isAdmin && !authLoading && !checkingRole && clientAuth?.currentUser) {
+    if (isAdmin && !authLoading && !checkingRole) {
       fetchRequests();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAdmin, authLoading, checkingRole, user]); // Added user dependency for clientAuth.currentUser re-check
+  }, [isAdmin, authLoading, checkingRole]);
+
+  // -----------------------------------------------------------------------
+  // Approve / Deny — gateway-backed
+  // -----------------------------------------------------------------------
 
   const handleApprove = async (request: ProfileChangeRequest) => {
-    if (!clientAuth?.currentUser) {
-      toast({
-        title: "Authentication Error",
-        description: "Cannot approve, admin not fully authenticated.",
-        variant: "destructive",
-      });
-      return;
-    }
     try {
-      const idToken = await clientAuth?.currentUser?.getIdToken();
-      await approveProfileChangeRequest(
-        idToken,
-        request.id,
-        request.userId,
-        request.fieldName as keyof StudentProfile,
-        request.newValue,
-        `Approved by admin: ${user?.email}`,
-      );
+      await approveProfileChangeRequest({
+        requestId: request.id,
+        adminNotes: `Approved by admin: ${user?.email}`,
+        newValue: String(request.newValue ?? ""),
+      });
       toast({
         title: "Request Approved",
-        description: `Request ID: ${request.id} for ${request.fieldName} has been approved.`,
+        description: `Request for ${request.fieldName} has been approved.`,
       });
-      fetchRequests(); // Refresh the list
+      fetchRequests();
     } catch (error) {
       console.error("Error approving request:", error);
       toast({
@@ -166,15 +161,7 @@ export default function AdminRequestsPage() {
   };
 
   const handleDeny = async () => {
-    if (!selectedRequestForDenial || !clientAuth?.currentUser) {
-      toast({
-        title: "Authentication Error or No Request Selected",
-        description:
-          "Cannot deny, admin not authenticated or no request selected.",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!selectedRequestForDenial) return;
     if (!denialReason.trim()) {
       toast({
         title: "Reason Required",
@@ -184,17 +171,15 @@ export default function AdminRequestsPage() {
       return;
     }
     try {
-      const idToken = await clientAuth?.currentUser?.getIdToken();
-      await denyProfileChangeRequest(
-        idToken,
-        selectedRequestForDenial.id,
-        denialReason,
-      );
+      await denyProfileChangeRequest({
+        requestId: selectedRequestForDenial.id,
+        adminNotes: denialReason,
+      });
       toast({
         title: "Request Denied",
-        description: `Request ID: ${selectedRequestForDenial.id} for ${selectedRequestForDenial.fieldName} has been denied.`,
+        description: `Request for ${selectedRequestForDenial.fieldName} has been denied.`,
       });
-      fetchRequests(); // Refresh the list
+      fetchRequests();
     } catch (error) {
       console.error("Error denying request:", error);
       toast({
@@ -207,6 +192,10 @@ export default function AdminRequestsPage() {
       setDenialReason("");
     }
   };
+
+  // -----------------------------------------------------------------------
+  // Rendering
+  // -----------------------------------------------------------------------
 
   if (authLoading || checkingRole) {
     return (
@@ -225,7 +214,7 @@ export default function AdminRequestsPage() {
       <div className="flex h-screen flex-col items-center justify-center text-center">
         <ShieldAlert className="h-16 w-16 text-destructive mb-4" />
         <h1 className="text-2xl font-bold">Access Denied</h1>
-        <Button onClick={() => router.push("/")} className="mt-4">
+        <Button onClick={() => router.push("/dashboard")} className="mt-4">
           Go to Dashboard
         </Button>
       </div>
@@ -249,8 +238,10 @@ export default function AdminRequestsPage() {
         </a>
       );
     }
-    if (value instanceof Date) {
-      return format(value, "PPP p");
+    // Attempt to format as a date
+    const parsed = new Date(String(value));
+    if (!isNaN(parsed.getTime())) {
+      return format(parsed, "PP p");
     }
     return String(value === undefined || value === null ? "N/A" : value);
   };
@@ -269,6 +260,7 @@ export default function AdminRequestsPage() {
         </CardHeader>
       </Card>
 
+      {/* Pending Requests */}
       <Card className="bg-white border-kssem-border text-kssem-text">
         <CardHeader>
           <CardTitle className="text-kssem-text">Pending Requests</CardTitle>
@@ -319,8 +311,8 @@ export default function AdminRequestsPage() {
                         {renderValue(req.newValue)}
                       </TableCell>
                       <TableCell className="text-kssem-text-muted">
-                        {req.requestedAt instanceof Date
-                          ? format(req.requestedAt, "PP p")
+                        {req.requestedAt
+                          ? format(new Date(req.requestedAt), "PP p")
                           : "Invalid Date"}
                       </TableCell>
                       <TableCell className="text-right space-x-2">
@@ -407,6 +399,7 @@ export default function AdminRequestsPage() {
         </CardContent>
       </Card>
 
+      {/* Resolved Requests */}
       <Card className="bg-white border-kssem-border text-kssem-text">
         <CardHeader>
           <CardTitle className="text-kssem-text">Resolved Requests</CardTitle>
@@ -473,9 +466,7 @@ export default function AdminRequestsPage() {
                       </TableCell>
                       <TableCell className="text-kssem-text-muted">
                         {req.resolvedAt
-                          ? req.resolvedAt instanceof Date
-                            ? format(req.resolvedAt, "PP p")
-                            : "Invalid Date"
+                          ? format(new Date(req.resolvedAt), "PP p")
                           : "N/A"}
                       </TableCell>
                       <TableCell className="max-w-xs truncate text-kssem-text-muted">
@@ -495,4 +486,3 @@ export default function AdminRequestsPage() {
     </div>
   );
 }
-

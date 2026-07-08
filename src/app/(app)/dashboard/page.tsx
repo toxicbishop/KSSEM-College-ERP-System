@@ -20,12 +20,12 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
-import { auth as clientAuth, db } from "@/lib/firebase/client";
+import { auth as clientAuth } from "@/lib/firebase/client";
 import type { StudentProfile } from "@/services/profile";
 import type { AttendanceRecord } from "@/services/attendance";
 import type { Grade } from "@/services/grades";
 import type { Announcement } from "@/services/announcements";
-import { doc, getDoc } from "firebase/firestore";
+import { getStudentProfile } from "@/services/profile";
 import { useToast } from "@/hooks/use-toast";
 import {
   analyzeStudentGrades,
@@ -83,21 +83,21 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!authLoading && user && clientAuth?.currentUser && db) {
+    if (!authLoading && user && clientAuth?.currentUser) {
       const fetchData = async () => {
         setLoading(true);
         setError(null);
         try {
-          const userDocRef = doc(
-            db as NonNullable<typeof db>,
-            "users",
-            user.uid,
-          );
-          const userDocSnap = await getDoc(userDocRef);
-          let profileData: StudentProfile | null = null;
+          let profileData = await getStudentProfile(user.uid);
 
-          if (userDocSnap.exists()) {
-            profileData = { ...userDocSnap.data() } as StudentProfile;
+          if (!profileData) {
+            profileData = {
+              name: user.displayName || "Student",
+              studentId: user.uid,
+              courseProgram: "Unknown",
+              email: user.email || "N/A",
+            } as StudentProfile;
+          } else {
             if (!profileData.studentId) profileData.studentId = user.uid;
             const userRole = profileData.role || "student";
             const fallbackName =
@@ -109,13 +109,6 @@ export default function DashboardPage() {
             if (!profileData.name)
               profileData.name = user.displayName || fallbackName;
             if (!profileData.email) profileData.email = user.email || "N/A";
-          } else {
-            profileData = {
-              name: user.displayName || "Student",
-              studentId: user.uid,
-              courseProgram: "Unknown",
-              email: user.email || "N/A",
-            } as StudentProfile;
           }
 
           const idToken = await clientAuth!.currentUser!.getIdToken();
@@ -314,7 +307,7 @@ export default function DashboardPage() {
       fetchData();
     } else if (!authLoading && !user) {
       setLoading(false);
-    } else if (!authLoading && user && (!clientAuth?.currentUser || !db)) {
+    } else if (!authLoading && user && (!clientAuth?.currentUser)) {
       setLoading(false);
       setError("Firebase services not fully initialized. Please try again.");
     }

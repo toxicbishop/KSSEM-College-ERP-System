@@ -1,79 +1,43 @@
-import {
-  adminDb,
-  adminAuth,
-  adminInitializationError,
-} from "@/lib/firebase/admin.server";
+import { apiGet, apiPost, apiDelete } from '@/lib/api-client';
+import { submitAttendanceSchema, formatZodError } from './validation';
 import { z } from "zod";
 
-/**
- * Defines the simplified input structure for the attendance analysis AI flow.
- * We only need basic details for the prompt.
- */
 export const AttendanceAnalysisInputSchema = z.array(
   z.object({
-    date: z.string().describe("The date of the lecture in YYYY-MM-DD format."),
-    studentName: z.string().describe("The name of the student."),
-    status: z
-      .enum(["present", "absent"])
-      .describe("The student's attendance status."),
+    date: z.string(),
+    studentName: z.string(),
+    status: z.enum(["present", "absent"]),
   }),
 );
-export type AttendanceAnalysisInput = z.infer<
-  typeof AttendanceAnalysisInputSchema
->;
+export type AttendanceAnalysisInput = z.infer<typeof AttendanceAnalysisInputSchema>;
 
-/**
- * Defines the structured output expected from the attendance analysis AI flow.
- */
 export const AttendanceAnalysisOutputSchema = z.object({
-  overallSummary: z
-    .string()
-    .describe(
-      "A brief, encouraging overall summary of the classroom's attendance for the period.",
-    ),
-  keyObservations: z
-    .array(z.string())
-    .describe(
-      "A list of specific, data-driven observations about attendance patterns (e.g., individual student habits, day-specific trends).",
-    ),
-  actionableSuggestions: z
-    .array(z.string())
-    .describe(
-      "A list of concrete, supportive suggestions for the faculty to act upon based on the analysis.",
-    ),
+  overallSummary: z.string(),
+  keyObservations: z.array(z.string()),
+  actionableSuggestions: z.array(z.string()),
 });
-export type AttendanceAnalysisOutput = z.infer<
-  typeof AttendanceAnalysisOutputSchema
->;
-
-import {
-  FieldValue as AdminFieldValue,
-  Timestamp as AdminTimestamp,
-} from "firebase-admin/firestore";
+export type AttendanceAnalysisOutput = z.infer<typeof AttendanceAnalysisOutputSchema>;
 
 export interface LectureAttendanceRecord {
-  id?: string; // Firestore document ID, optional for creation
+  id?: string;
   classroomId: string;
-  classroomName: string; // Denormalized for easier querying/display
-  facultyId: string; // UID of faculty who submitted this specific attendance
-  facultyName?: string; // Denormalized name of the faculty for display
-  date: string; // YYYY-MM-DD
-  lectureName: string; // This will now represent the Subject/Topic of the lecture
-  lectureTopicSlNo?: string; // Serial number or identification for the topic/lesson
-  lectureDescription?: string; // Detailed description of what was covered
-  studentId: string; // UID of the student
-  studentName: string; // Denormalized for easier querying/display
-  studentIdNumber?: string; // The official student ID/roll number
+  classroomName: string;
+  facultyId: string;
+  facultyName?: string;
+  date: string;
+  lectureName: string;
+  lectureTopicSlNo?: string;
+  lectureDescription?: string;
+  studentId: string;
+  studentName: string;
+  studentIdNumber?: string;
   status: "present" | "absent";
-  batch?: string; // Optional: The batch for which attendance was taken (e.g., "A", "Practical Batch 1")
-  submittedAt?: AdminTimestamp | Date;
+  batch?: string;
+  submittedAt?: Date | string;
 }
 
-/**
- * Represents a student's attendance record for a specific date (structure for student view).
- */
 export interface AttendanceRecord {
-  date: string; // YYYY-MM-DD
+  date: string;
   status: "present" | "absent";
   lectureName?: string;
   lectureTopicSlNo?: string;
@@ -82,417 +46,100 @@ export interface AttendanceRecord {
   facultyName?: string;
 }
 
-/**
- * Asynchronously retrieves the attendance records for a given student from the 'lectureAttendance' collection.
- * This is a Server Action called from client-side (student attendance page and dashboard).
- *
- * @param idToken The Firebase ID token of the authenticated user.
- * @param studentId If provided, fetches records for this student ID (faculty use). If not, uses the token holder's UID (student use).
- * @returns A promise that resolves to an array of AttendanceRecord objects.
- */
 export async function getAttendanceRecords(
-  idToken: string,
   studentId?: string,
 ): Promise<AttendanceRecord[]> {
-  if (adminInitializationError) {
-    console.error(
-      "getAttendanceRecords SA Error: Admin SDK init failed:",
-      adminInitializationError.message,
-    );
-    throw new Error("Server error: Admin SDK initialization failed.");
-  }
-  if (!adminDb || !adminAuth) {
-    console.error(
-      "getAttendanceRecords SA Error: Admin DB or Auth not initialized.",
-    );
-    throw new Error("Server error: Admin services not initialized.");
-  }
-
-  let targetStudentId: string;
   try {
-    const decodedToken = await adminAuth.verifyIdToken(idToken);
-    if (studentId) {
-      // Potentially add a faculty role check here in the future
-      targetStudentId = studentId;
-    } else {
-      targetStudentId = decodedToken.uid;
-    }
+    // If studentId is not provided, the backend will infer it from the auth token
+    const url = studentId ? `/api/academic/attendance/${studentId}` : `/api/academic/attendance/me`;
+    return await apiGet<AttendanceRecord[]>(url);
   } catch (error) {
-    console.error("getAttendanceRecords SA Error: Invalid ID token", error);
-    throw new Error("Authentication failed.");
-  }
-
-  try {
-    const lectureAttendanceCollectionRef =
-      adminDb.collection("lectureAttendance");
-    const q = lectureAttendanceCollectionRef
-      .where("studentId", "==", targetStudentId)
-      .orderBy("date", "desc")
-      .orderBy("submittedAt", "desc");
-
-    const snapshot = await q.get();
-
-    if (snapshot.empty) {
-      return [];
-    }
-
-    return snapshot.docs.map((docSnap: any) => {
-      const data = docSnap.data();
-      let dateStr = data.date; // Expects YYYY-MM-DD string
-
-      // If date is an AdminTimestamp, format it (though it should be string from submission)
-      if (data.date instanceof AdminTimestamp) {
-        dateStr = data.date.toDate().toISOString().split("T")[0];
-      }
-
-      return {
-        date: dateStr,
-        status: data.status as "present" | "absent",
-        lectureName: data.lectureName,
-        lectureTopicSlNo: data.lectureTopicSlNo,
-        lectureDescription: data.lectureDescription,
-        classroomName: data.classroomName,
-        facultyName: data.facultyName,
-      };
-    });
-  } catch (error) {
-    console.error(
-      `Error fetching attendance records for student ${targetStudentId} (Admin SDK):`,
-      error,
-    );
+    console.error("Error fetching attendance records:", error);
     throw error;
   }
 }
 
-/**
- * Retrieves lecture attendance records for a specific classroom on a specific date.
- * This is a Server Action called by faculty to check for existing records before marking.
- * @param idToken - Faculty's Firebase ID token.
- * @param classroomId - The ID of the classroom.
- * @param date - The date in "yyyy-MM-dd" format.
- * @returns A promise that resolves to an array of LectureAttendanceRecord objects or an empty array if none found.
- */
 export async function getLectureAttendanceForDate(
-  idToken: string,
   classroomId: string,
   date: string,
 ): Promise<LectureAttendanceRecord[]> {
-  if (adminInitializationError) {
-    console.error(
-      "getLectureAttendanceForDate SA Error: Admin SDK init failed:",
-      adminInitializationError.message,
-    );
-    throw new Error("Server error: Admin SDK initialization failed.");
+  if (!classroomId || classroomId.trim() === '') {
+    throw new Error('Classroom ID is required');
   }
-  if (!adminDb || !adminAuth) {
-    console.error(
-      "getLectureAttendanceForDate SA Error: Admin DB or Auth not initialized.",
-    );
-    throw new Error("Server error: Admin services not initialized.");
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    throw new Error('Date must be in YYYY-MM-DD format');
   }
-
   try {
-    await adminAuth.verifyIdToken(idToken);
+    return await apiGet<LectureAttendanceRecord[]>(`/api/academic/attendance/lecture?classroomId=${classroomId}&date=${date}`);
   } catch (error) {
-    console.error(
-      "getLectureAttendanceForDate SA Error: Invalid ID token",
-      error,
-    );
-    throw new Error("Authentication failed.");
-  }
-
-  try {
-    const lectureAttendanceCollectionRef =
-      adminDb.collection("lectureAttendance");
-    const q = lectureAttendanceCollectionRef
-      .where("classroomId", "==", classroomId)
-      .where("date", "==", date);
-
-    const snapshot = await q.get();
-
-    if (snapshot.empty) {
-      return [];
-    }
-
-    return snapshot.docs.map((docSnap: any) => {
-      const data = docSnap.data();
-      const submittedAt = data.submittedAt as AdminTimestamp | undefined;
-      return {
-        id: docSnap.id,
-        classroomId: data.classroomId,
-        classroomName: data.classroomName,
-        facultyId: data.facultyId,
-        facultyName: data.facultyName,
-        date: data.date,
-        lectureName: data.lectureName,
-        lectureTopicSlNo: data.lectureTopicSlNo,
-        lectureDescription: data.lectureDescription,
-        studentId: data.studentId,
-        studentName: data.studentName,
-        studentIdNumber: data.studentIdNumber,
-        status: data.status,
-        batch: data.batch,
-        submittedAt: submittedAt?.toDate(),
-      } as LectureAttendanceRecord;
-    });
-  } catch (error) {
-    console.error(
-      `Error fetching lecture attendance for classroom ${classroomId} on ${date}:`,
-      error,
-    );
+    console.error("Error fetching lecture attendance:", error);
     throw error;
   }
 }
 
-/**
- * Retrieves lecture attendance records for a specific classroom within a given date range.
- * This is a Server Action called by faculty to view historical attendance.
- * @param idToken - Faculty's Firebase ID token.
- * @param classroomId - The ID of the classroom.
- * @param startDate - The start date in "yyyy-MM-dd" format.
- * @param endDate - The end date in "yyyy-MM-dd" format.
- * @returns A promise that resolves to an array of LectureAttendanceRecord objects.
- */
 export async function getLectureAttendanceForDateRange(
-  idToken: string,
   classroomId: string,
   startDate: string,
   endDate: string,
 ): Promise<LectureAttendanceRecord[]> {
-  if (adminInitializationError) {
-    console.error(
-      "getLectureAttendanceForDateRange SA Error: Admin SDK init failed:",
-      adminInitializationError.message,
-    );
-    throw new Error("Server error: Admin SDK initialization failed.");
+  if (!classroomId || classroomId.trim() === '') {
+    throw new Error('Classroom ID is required');
   }
-  if (!adminDb || !adminAuth) {
-    console.error(
-      "getLectureAttendanceForDateRange SA Error: Admin DB or Auth not initialized.",
-    );
-    throw new Error("Server error: Admin services not initialized.");
+  if (!startDate || !/^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
+    throw new Error('Start date must be in YYYY-MM-DD format');
   }
-
+  if (!endDate || !/^\d{4}-\d{2}-\d{2}$/.test(endDate)) {
+    throw new Error('End date must be in YYYY-MM-DD format');
+  }
   try {
-    await adminAuth.verifyIdToken(idToken);
+    return await apiGet<LectureAttendanceRecord[]>(`/api/academic/attendance/lecture/range?classroomId=${classroomId}&startDate=${startDate}&endDate=${endDate}`);
   } catch (error) {
-    console.error(
-      "getLectureAttendanceForDateRange SA Error: Invalid ID token",
-      error,
-    );
-    throw new Error("Authentication failed.");
-  }
-
-  try {
-    const lectureAttendanceCollectionRef =
-      adminDb.collection("lectureAttendance");
-    const q = lectureAttendanceCollectionRef
-      .where("classroomId", "==", classroomId)
-      .where("date", ">=", startDate)
-      .where("date", "<=", endDate)
-      .orderBy("date", "desc")
-      .orderBy("submittedAt", "desc");
-
-    const snapshot = await q.get();
-
-    if (snapshot.empty) {
-      return [];
-    }
-
-    return snapshot.docs.map((docSnap: any) => {
-      const data = docSnap.data();
-      const submittedAt = data.submittedAt as AdminTimestamp | undefined;
-      return {
-        id: docSnap.id,
-        classroomId: data.classroomId,
-        classroomName: data.classroomName,
-        facultyId: data.facultyId,
-        facultyName: data.facultyName,
-        date: data.date,
-        lectureName: data.lectureName,
-        lectureTopicSlNo: data.lectureTopicSlNo,
-        lectureDescription: data.lectureDescription,
-        studentId: data.studentId,
-        studentName: data.studentName,
-        studentIdNumber: data.studentIdNumber,
-        status: data.status,
-        batch: data.batch,
-        submittedAt: submittedAt?.toDate(),
-      } as LectureAttendanceRecord;
-    });
-  } catch (error) {
-    console.error(
-      "Error fetching lecture attendance for classroom %s in range %s to %s:",
-      classroomId,
-      startDate,
-      endDate,
-      error,
-    );
+    console.error("Error fetching lecture attendance range:", error);
     throw error;
   }
 }
 
-/**
- * Submits lecture attendance for multiple students. This handles both creating new records
- * and updating existing ones for a given day by deleting old records and creating new ones in a batch.
- * This is a Server Action called by faculty.
- * @param records - An array of LectureAttendanceRecord objects to be submitted.
- */
 export async function submitLectureAttendance(
   records: Omit<LectureAttendanceRecord, "id" | "submittedAt">[],
 ): Promise<void> {
-  if (adminInitializationError) {
-    console.error(
-      "submitLectureAttendance SA Error: Admin SDK init failed:",
-      adminInitializationError.message,
-    );
-    throw new Error("Server error: Admin SDK initialization failed.");
-  }
-  if (!adminDb) {
-    console.error(
-      "submitLectureAttendance SA Error: Admin DB not initialized.",
-    );
-    throw new Error("Server error: Admin DB not initialized.");
-  }
+  if (records.length === 0) return;
 
-  if (records.length === 0) {
-    console.warn(
-      "submitLectureAttendance SA: called with an empty records array. No action taken.",
-    );
-    return;
-  }
-
-  const { classroomId, date } = records[0];
-
-  const batch = adminDb.batch();
-  const lectureAttendanceCollectionRef =
-    adminDb.collection("lectureAttendance");
-
-  // 1. Find and delete all existing records for this classroom and date
-  try {
-    const existingRecordsQuery = lectureAttendanceCollectionRef
-      .where("classroomId", "==", classroomId)
-      .where("date", "==", date);
-
-    const snapshot = await existingRecordsQuery.get();
-
-    if (!snapshot.empty) {
-      console.log(
-        `submitLectureAttendance SA: Found ${snapshot.docs.length} existing records for classroom ${classroomId} on ${date}. Deleting them.`,
-      );
-      snapshot.docs.forEach((doc: any) => {
-        batch.delete(doc.ref);
-      });
-    }
-  } catch (error) {
-    console.error(
-      `submitLectureAttendance SA: Error querying for existing records to delete:`,
-      error,
-    );
-    throw error;
-  }
-
-  // 2. Add the new records
-  const adminServerTimestamp = AdminFieldValue.serverTimestamp();
-  records.forEach((record) => {
-    if (
-      !record.facultyId ||
-      !record.classroomId ||
-      !record.studentId ||
-      !record.lectureName ||
-      !record.date
-    ) {
-      console.error(
-        "submitLectureAttendance SA: Attempted to submit incomplete attendance record:",
-        record,
-      );
-      throw new Error(
-        "Faculty ID, Classroom ID, Student ID, Lecture Name, and Date are required for each attendance record.",
-      );
-    }
-    const newRecordRef = lectureAttendanceCollectionRef.doc();
-    batch.set(newRecordRef, {
-      ...record,
-      submittedAt: adminServerTimestamp,
+  // Validate all records using the schema
+  for (const rec of records) {
+    const validated = submitAttendanceSchema.safeParse({
+      studentId: rec.studentId,
+      lectureId: rec.lectureName, // Map lectureName to lectureId for validation
+      courseId: rec.classroomId,  // Map classroomId to courseId for validation
+      date: rec.date,
+      status: rec.status,
     });
-  });
+    if (!validated.success) {
+      throw new Error(`Validation failed for student ${rec.studentName}: ${formatZodError(validated.error)}`);
+    }
+  }
 
   try {
-    await batch.commit();
-    console.log(
-      `submitLectureAttendance SA: Batch of ${records.length} new/updated attendance records committed successfully for classroom ${classroomId} on ${date}.`,
-    );
+    await apiPost(`/api/academic/attendance/lecture`, { records });
   } catch (error) {
-    console.error(
-      "submitLectureAttendance SA: Error committing attendance batch (Admin SDK):",
-      error,
-    );
+    console.error("Error submitting attendance:", error);
     throw error;
   }
 }
 
-/**
- * Deletes all lecture attendance records for a specific classroom and date.
- * This is a Server Action called by faculty.
- * @param idToken - Faculty's Firebase ID token.
- * @param classroomId - The ID of the classroom.
- * @param date - The date in "yyyy-MM-dd" format for which to delete records.
- */
 export async function deleteLectureAttendance(
-  idToken: string,
   classroomId: string,
   date: string,
 ): Promise<void> {
-  if (adminInitializationError) {
-    throw new Error("Server error: Admin SDK initialization failed.");
+  if (!classroomId || classroomId.trim() === '') {
+    throw new Error('Classroom ID is required');
   }
-  if (!adminDb || !adminAuth) {
-    throw new Error("Server error: Admin services not initialized.");
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    throw new Error('Date must be in YYYY-MM-DD format');
   }
-
   try {
-    await adminAuth.verifyIdToken(idToken);
+    await apiDelete(`/api/academic/attendance/lecture?classroomId=${classroomId}&date=${date}`);
   } catch (error) {
-    console.error("deleteLectureAttendance SA Error: Invalid ID token", error);
-    throw new Error("Authentication failed.");
-  }
-
-  const batch = adminDb.batch();
-  const lectureAttendanceCollectionRef =
-    adminDb.collection("lectureAttendance");
-
-  try {
-    const existingRecordsQuery = lectureAttendanceCollectionRef
-      .where("classroomId", "==", classroomId)
-      .where("date", "==", date);
-
-    const snapshot = await existingRecordsQuery.get();
-
-    if (snapshot.empty) {
-      console.log(
-        `deleteLectureAttendance SA: No records found to delete for classroom ${classroomId} on ${date}.`,
-      );
-      return; // Nothing to do
-    }
-
-    console.log(
-      `deleteLectureAttendance SA: Found ${snapshot.docs.length} records to delete for classroom ${classroomId} on ${date}.`,
-    );
-    snapshot.docs.forEach((doc: any) => {
-      batch.delete(doc.ref);
-    });
-
-    await batch.commit();
-    console.log(
-      `deleteLectureAttendance SA: All records for classroom ${classroomId} on ${date} have been deleted.`,
-    );
-  } catch (error) {
-    console.error(
-      "deleteLectureAttendance SA: Error deleting attendance for classroom %s on %s:",
-      classroomId,
-      date,
-      error,
-    );
-    throw new Error("Failed to delete attendance records.");
+    console.error("Error deleting attendance:", error);
+    throw error;
   }
 }

@@ -2,16 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  limit,
-  orderBy,
-  query,
-  Timestamp,
-} from "firebase/firestore";
 import { format } from "date-fns";
 import {
   ClipboardList,
@@ -45,8 +35,9 @@ import {
 } from "@/components/ui/table";
 import { useAuth } from "@/context/auth-context";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase/client";
+import { auth as clientAuth } from "@/lib/firebase/client";
 import type { AuditAction } from "@/services/audit-logs";
+import { getAuditLogs } from "@/services/admin-users";
 
 type AuditLog = {
   id: string;
@@ -58,7 +49,7 @@ type AuditLog = {
   targetId: string;
   targetEmail?: string;
   details?: Record<string, unknown>;
-  createdAt?: Timestamp;
+  createdAt?: string;
 };
 
 const actionMeta: Record<
@@ -87,9 +78,9 @@ const actionMeta: Record<
   },
 };
 
-function formatTimestamp(timestamp?: Timestamp) {
+function formatTimestamp(timestamp?: string) {
   if (!timestamp) return "Pending timestamp";
-  return format(timestamp.toDate(), "dd MMM yyyy, hh:mm a");
+  return format(new Date(timestamp), "dd MMM yyyy, hh:mm a");
 }
 
 function formatDetails(details?: Record<string, unknown>) {
@@ -128,20 +119,18 @@ export default function AdminAuditLogsPage() {
     const checkAdminAccess = async () => {
       setCheckingRole(true);
       try {
-        if (!db) {
-          throw new Error("Firestore is not available.");
-        }
-
-        const userDocSnap = await getDoc(doc(db, "users", user.uid));
-        if (userDocSnap.exists() && userDocSnap.data().role === "admin") {
-          setIsAdmin(true);
-        } else {
-          toast({
-            title: "Access Denied",
-            description: "You do not have permission to view audit logs.",
-            variant: "destructive",
-          });
-          router.push("/");
+        if (clientAuth?.currentUser) {
+          const tokenResult = await clientAuth.currentUser.getIdTokenResult();
+          if (tokenResult.claims.role === "admin") {
+            setIsAdmin(true);
+          } else {
+            toast({
+              title: "Access Denied",
+              description: "You do not have permission to view audit logs.",
+              variant: "destructive",
+            });
+            router.push("/");
+          }
         }
       } catch (error) {
         console.error("Error verifying admin access:", error);
@@ -160,27 +149,18 @@ export default function AdminAuditLogsPage() {
   }, [authLoading, router, toast, user]);
 
   const fetchAuditLogs = useCallback(async () => {
-    if (!db || !isAdmin) return;
+    if (!isAdmin) return;
 
     setLoadingLogs(true);
     try {
-      const logsQuery = query(
-        collection(db, "auditLogs"),
-        orderBy("createdAt", "desc"),
-        limit(100),
-      );
-      const snapshot = await getDocs(logsQuery);
-      const fetchedLogs = snapshot.docs.map((logDoc) => ({
-        id: logDoc.id,
-        ...logDoc.data(),
-      })) as AuditLog[];
+      const fetchedLogs = await getAuditLogs();
       setLogs(fetchedLogs);
     } catch (error) {
       console.error("Error fetching audit logs:", error);
       toast({
         title: "Error Fetching Audit Logs",
         description:
-          "Could not load audit logs. Check Firestore rules and indexes.",
+          "Could not load audit logs. Check the API response.",
         variant: "destructive",
       });
     } finally {
