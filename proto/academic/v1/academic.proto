@@ -1,0 +1,405 @@
+syntax = "proto3";
+
+package academic.v1;
+
+option go_package = "github.com/toxicbishop/kssem-college-erp-system/proto/academic/v1;academicv1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service AcademicService {
+  rpc GetStudentProfile(GetStudentProfileRequest) returns (StudentProfile) {
+    option (google.api.http) = {
+      get: "/api/academic/profile/{uid}"
+    };
+  }
+
+  // Internal endpoints for Admin Service (not mapped to HTTP gateway, or mapped but protected)
+  rpc ListStudentProfiles(google.protobuf.Empty) returns (ListStudentProfilesResponse) {}
+  rpc CreateStudentProfile(CreateStudentProfileRequest) returns (StudentProfile) {}
+  rpc DeleteStudentProfile(DeleteStudentProfileRequest) returns (google.protobuf.Empty) {}
+
+  rpc UpdateStudentProfile(UpdateStudentProfileRequest) returns (StudentProfile) {
+    option (google.api.http) = {
+      patch: "/api/academic/profile/{uid}"
+      body: "profile_data"
+    };
+  }
+
+  rpc GetAttendanceRecords(GetAttendanceRecordsRequest) returns (ListAttendanceResponse) {
+    option (google.api.http) = {
+      get: "/api/academic/attendance/{student_id}"
+    };
+  }
+
+  rpc SubmitLectureAttendance(SubmitLectureAttendanceRequest) returns (AttendanceRecord) {
+    option (google.api.http) = {
+      post: "/api/academic/attendance"
+      body: "*"
+    };
+  }
+
+  rpc GetLectureAttendanceForDate(GetLectureAttendanceForDateRequest) returns (LectureAttendanceRecord) {
+    option (google.api.http) = {
+      get: "/api/academic/attendance/lecture"
+    };
+  }
+
+  rpc GetLectureAttendanceForDateRange(GetLectureAttendanceForDateRangeRequest) returns (ListLectureAttendanceResponse) {
+    option (google.api.http) = {
+      get: "/api/academic/attendance/lecture/range"
+    };
+  }
+
+  rpc GetGrades(GetGradesRequest) returns (ListGradesResponse) {
+    option (google.api.http) = {
+      get: "/api/academic/grades/{student_id}"
+    };
+  }
+
+  rpc GetGradesForClassroom(GetGradesForClassroomRequest) returns (ListGradesResponse) {
+    option (google.api.http) = {
+      post: "/api/academic/grades/classroom"
+      body: "*"
+    };
+  }
+
+  rpc UpdateStudentGrade(UpdateStudentGradeRequest) returns (Grade) {
+    option (google.api.http) = {
+      post: "/api/academic/grades"
+      body: "grade"
+    };
+  }
+
+  rpc DeleteStudentGrade(DeleteStudentGradeRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/academic/grades/{id}"
+    };
+  }
+
+  rpc GetClassroomsByFaculty(GetClassroomsByFacultyRequest) returns (ListClassroomsResponse) {
+    option (google.api.http) = {
+      get: "/api/academic/classrooms"
+    };
+  }
+
+  rpc GetStudentsInClassroom(GetStudentsInClassroomRequest) returns (ListStudentsResponse) {
+    option (google.api.http) = {
+      get: "/api/academic/classrooms/{classroom_id}/students"
+    };
+  }
+
+  rpc CreateClassroom(CreateClassroomRequest) returns (Classroom) {
+    option (google.api.http) = {
+      post: "/api/academic/classrooms"
+      body: "classroom"
+    };
+  }
+
+  rpc AddStudentsToClassroom(AddStudentsToClassroomRequest) returns (Classroom) {
+    option (google.api.http) = {
+      post: "/api/academic/classrooms/{classroom_id}/students"
+      body: "*"
+    };
+  }
+
+  rpc RemoveStudentFromClassroom(RemoveStudentFromClassroomRequest) returns (Classroom) {
+    option (google.api.http) = {
+      delete: "/api/academic/classrooms/{classroom_id}/students/{student_id}"
+    };
+  }
+
+  rpc GetAcademicCalendarEvents(google.protobuf.Empty) returns (ListEventsResponse) {
+    option (google.api.http) = {
+      get: "/api/academic/events"
+    };
+  }
+}
+
+// ---------------------------------------------------------
+// Messages
+// ---------------------------------------------------------
+
+message StudentProfile {
+  string student_id = 1;
+  string name = 2;
+  string profile_photo_url = 3;
+  string date_of_birth = 4;
+  string gender = 5;
+  string contact_number = 6;
+  string email = 7;
+  string permanent_address = 8;
+  string current_address = 9;
+  string blood_group = 10;
+  string emergency_contact_name = 11;
+  string emergency_contact_number = 12;
+  string enrollment_number = 13;
+  string course_program = 14;
+  string department = 15;
+  int32 current_year = 16;
+  int32 current_semester = 17;
+  string academic_advisor_name = 18;
+  string section_or_batch = 19;
+  string admission_date = 20;
+  string mode_of_admission = 21;
+  string id_card_url = 22;
+  string admission_letter_url = 23;
+  string marksheet10th_url = 24;
+  string marksheet12th_url = 25;
+  string migration_certificate_url = 26;
+  string bonafide_certificate_url = 27;
+  string uploaded_photo_url = 28;
+  string uploaded_signature_url = 29;
+  string exam_registration_status = 30;
+  string admit_card_url = 31;
+  string internal_exam_timetable_url = 32;
+  string external_exam_timetable_url = 33;
+  string results_and_grade_cards_url = 34;
+  string revaluation_request_status = 35;
+  string revaluation_request_link = 36;
+  string role = 37;
+  string parent_email = 38;
+}
+
+message StudentProfileInput {
+  string name = 1;
+  string profile_photo_url = 2;
+  string date_of_birth = 3;
+  string gender = 4;
+  string contact_number = 5;
+  string email = 6;
+  string permanent_address = 7;
+  string current_address = 8;
+  string blood_group = 9;
+  string emergency_contact_name = 10;
+  string emergency_contact_number = 11;
+  string enrollment_number = 12;
+  string course_program = 13;
+  string department = 14;
+  int32 current_year = 15;
+  int32 current_semester = 16;
+  string academic_advisor_name = 17;
+  string section_or_batch = 18;
+  string admission_date = 19;
+  string mode_of_admission = 20;
+  string id_card_url = 21;
+  string admission_letter_url = 22;
+  string marksheet10th_url = 23;
+  string marksheet12th_url = 24;
+  string migration_certificate_url = 25;
+  string bonafide_certificate_url = 26;
+  string uploaded_photo_url = 27;
+  string uploaded_signature_url = 28;
+  string exam_registration_status = 29;
+  string admit_card_url = 30;
+  string internal_exam_timetable_url = 31;
+  string external_exam_timetable_url = 32;
+  string results_and_grade_cards_url = 33;
+  string revaluation_request_status = 34;
+  string revaluation_request_link = 35;
+  string role = 36;
+  string parent_email = 37;
+}
+
+message GetStudentProfileRequest {
+  string uid = 1;
+}
+
+message UpdateStudentProfileRequest {
+  string uid = 1;
+  StudentProfileInput profile_data = 2;
+}
+
+message ListStudentProfilesResponse {
+  repeated StudentProfile profiles = 1;
+}
+
+message CreateStudentProfileRequest {
+  string uid = 1;
+  StudentProfileInput profile_data = 2;
+}
+
+message DeleteStudentProfileRequest {
+  string uid = 1;
+}
+
+message AttendanceRecord {
+  string id = 1;
+  string student_id = 2;
+  string lecture_id = 3;
+  string course_id = 4;
+  string date = 5;
+  string status = 6;
+  string timestamp = 7;
+}
+
+message LectureAttendanceRecord {
+  string lecture_id = 1;
+  string course_id = 2;
+  string date = 3;
+  int32 total_students = 4;
+  int32 present_students = 5;
+  int32 absent_students = 6;
+  repeated AttendanceRecord attendance = 7;
+}
+
+message GetAttendanceRecordsRequest {
+  string student_id = 1;
+}
+
+message ListAttendanceResponse {
+  repeated AttendanceRecord records = 1;
+}
+
+message SubmitLectureAttendanceRequest {
+  string student_id = 1;
+  string lecture_id = 2;
+  string course_id = 3;
+  string date = 4;
+  string status = 5;
+}
+
+message GetLectureAttendanceForDateRequest {
+  string date = 1;
+  string classroom_id = 2;
+}
+
+message GetLectureAttendanceForDateRangeRequest {
+  string start_date = 1;
+  string end_date = 2;
+  string classroom_id = 3;
+}
+
+message ListLectureAttendanceResponse {
+  repeated LectureAttendanceRecord records = 1;
+}
+
+message Grade {
+  string id = 1;
+  string student_id = 2;
+  string course_id = 3;
+  string course_name = 4;
+  string grade = 5;
+  float score = 6;
+  float max_score = 7;
+  string semester = 8;
+  string academic_year = 9;
+  string timestamp = 10;
+}
+
+message GradeInput {
+  string student_id = 1;
+  string course_id = 2;
+  string course_name = 3;
+  string grade = 4;
+  float score = 5;
+  float max_score = 6;
+  string semester = 7;
+  string academic_year = 8;
+}
+
+message GetGradesRequest {
+  string student_id = 1;
+}
+
+message GetGradesForClassroomRequest {
+  string classroom_id = 1;
+  string course_name = 2;
+}
+
+message ListGradesResponse {
+  repeated Grade grades = 1;
+}
+
+message UpdateStudentGradeRequest {
+  GradeInput grade = 1;
+}
+
+message DeleteStudentGradeRequest {
+  string id = 1;
+}
+
+message ClassroomStudentInfo {
+  string uid = 1;
+  string name = 2;
+  string email = 3;
+  string enrollment_number = 4;
+  string section_or_batch = 5;
+}
+
+message FacultyUser {
+  string uid = 1;
+  string name = 2;
+  string email = 3;
+}
+
+message Classroom {
+  string id = 1;
+  string name = 2;
+  string course_code = 3;
+  string faculty_id = 4;
+  string faculty_name = 5;
+  string academic_year = 6;
+  string semester = 7;
+  repeated ClassroomStudentInfo students = 8;
+  repeated FacultyUser invited_faculty = 9;
+}
+
+message ClassroomInput {
+  string name = 1;
+  string course_code = 2;
+  string faculty_id = 3;
+  string faculty_name = 4;
+  string academic_year = 5;
+  string semester = 6;
+  repeated string student_ids = 7;
+  repeated string invited_faculty_ids = 8;
+}
+
+message GetClassroomsByFacultyRequest {
+  string faculty_id = 1;
+}
+
+message ListClassroomsResponse {
+  repeated Classroom classrooms = 1;
+}
+
+message GetStudentsInClassroomRequest {
+  string classroom_id = 1;
+}
+
+message ListStudentsResponse {
+  repeated ClassroomStudentInfo students = 1;
+}
+
+message CreateClassroomRequest {
+  ClassroomInput classroom = 1;
+}
+
+message AddStudentsToClassroomRequest {
+  string classroom_id = 1;
+  repeated string student_ids = 2;
+}
+
+message RemoveStudentFromClassroomRequest {
+  string classroom_id = 1;
+  string student_id = 2;
+}
+
+message AcademicEvent {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  string date = 4;
+  string start_time = 5;
+  string end_time = 6;
+  string location = 7;
+  string type = 8;
+  repeated string audience = 9;
+  string organizer = 10;
+  string link = 11;
+}
+
+message ListEventsResponse {
+  repeated AcademicEvent events = 1;
+}

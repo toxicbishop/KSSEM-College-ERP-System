@@ -47,3 +47,13 @@ certificates
 .claude
 .vercel
 .env*
+# Go
+bin/
+*.exe
+*.test
+*.out
+vendor/
+
+
+third_party/googleapis/
+

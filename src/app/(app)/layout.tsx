@@ -5,8 +5,7 @@ import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/layout/admin-layout";
 import { FacultyLayout } from "@/components/layout/faculty-layout";
 import { useRouter, usePathname } from "next/navigation";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase/client";
+import { getStudentProfile } from "@/services/profile";
 import {
   Loader2,
   Home,
@@ -61,37 +60,30 @@ export default function AppLayout({
     }
 
     setCheckingRole(true);
-    if (db) {
-      const userDocRef = doc(db, "users", user.uid);
-      getDoc(userDocRef)
-        .then((userDocSnap) => {
-          if (userDocSnap.exists()) {
-            const userData = userDocSnap.data();
-            const roleFromDb = userData.role;
-            if (
-              roleFromDb === "admin" ||
-              roleFromDb === "faculty" ||
-              roleFromDb === "student"
-            ) {
-              setUserRole(roleFromDb);
-            } else {
-              setUserRole("student");
-            }
+    getStudentProfile(user.uid)
+      .then((profile) => {
+        if (profile) {
+          const roleFromDb = profile.role;
+          if (
+            roleFromDb === "admin" ||
+            roleFromDb === "faculty" ||
+            roleFromDb === "student"
+          ) {
+            setUserRole(roleFromDb as UserRole);
           } else {
             setUserRole("student");
           }
-        })
-        .catch((error) => {
-          console.error("Error fetching user role:", error);
+        } else {
           setUserRole("student");
-        })
-        .finally(() => {
-          setCheckingRole(false);
-        });
-    } else {
-      setUserRole("student");
-      setCheckingRole(false);
-    }
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching user role:", error);
+        setUserRole("student");
+      })
+      .finally(() => {
+        setCheckingRole(false);
+      });
   }, [user, loading, router, pathname]);
 
   if (loading || checkingRole || isMobile === undefined) {

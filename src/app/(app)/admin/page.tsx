@@ -54,6 +54,7 @@ import {
   createManagedUser,
   deleteManagedUser,
   updateManagedUser,
+  getAllUsers,
 } from "@/services/admin-users";
 
 const ALL_ROLES_VALUE = "__ALL_ROLES__";
@@ -140,33 +141,21 @@ export default function AdminPage() {
       setCheckingRole(true);
       let userIsCurrentlyAdmin = false;
 
-      if (db) {
+      if (clientAuth?.currentUser) {
         try {
-          const userDocRef = doc(db, "users", user.uid);
-          const userDocSnap = await getDoc(userDocRef);
-
-          if (userDocSnap.exists()) {
-            const userDataFromDb = userDocSnap.data();
-            if (userDataFromDb.role === "admin") {
-              userIsCurrentlyAdmin = true;
-            }
+          const tokenResult = await clientAuth.currentUser.getIdTokenResult();
+          if (tokenResult.claims.role === "admin") {
+            userIsCurrentlyAdmin = true;
           }
         } catch (error) {
-          console.error("Error fetching user role:", error);
+          console.error("Error fetching user claims:", error);
           toast({
             title: "Error",
             description:
-              "Could not verify admin role. Please check Firestore permissions.",
+              "Could not verify admin role.",
             variant: "destructive",
           });
         }
-      } else {
-        toast({
-          title: "Database Error",
-          description:
-            "Firestore is not available. Cannot verify admin role.",
-          variant: "destructive",
-        });
       }
 
       if (userIsCurrentlyAdmin) {
@@ -198,22 +187,21 @@ export default function AdminPage() {
     }
     setLoadingUsers(true);
     try {
-      const usersCollection = collection(db, "users");
-      const usersSnapshot = await getDocs(usersCollection);
+      if (!clientAuth?.currentUser) return;
+      const usersList = await getAllUsers();
       const courses = new Set<string>();
-      const usersList = usersSnapshot.docs.map((docSnap) => {
-        const data = docSnap.data();
-        const courseProgramValue = data.courseProgram || data.major || "";
+      
+      const enrichedUsers = usersList.map((data) => {
+        const courseProgramValue = data.courseProgram || (data as any).major || "";
         if (courseProgramValue) {
           courses.add(courseProgramValue);
         }
         return {
-          id: docSnap.id,
           ...data,
           courseProgram: courseProgramValue,
         } as UserData;
       });
-      setUsersData(usersList);
+      setUsersData(enrichedUsers);
       setUniqueCourses(Array.from(courses).sort());
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -325,9 +313,8 @@ export default function AdminPage() {
     }
 
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
+      if (!clientAuth?.currentUser) return;
       const result = await createManagedUser(
-        idToken,
         {
           ...newUser,
           name: newUser.name,
@@ -377,9 +364,8 @@ export default function AdminPage() {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id, createdAt, ...userDataToUpdate } = editingUser;
-      const idToken = await clientAuth.currentUser.getIdToken();
 
-      await updateManagedUser(idToken, editingUser.id, {
+      await updateManagedUser(editingUser.id, {
         ...userDataToUpdate,
         email: editingUser.email || "",
         name: editingUser.name,
@@ -415,8 +401,7 @@ export default function AdminPage() {
   const handleDeleteUser = async (userId: string) => {
     if (!db || !isAdmin || !clientAuth?.currentUser) return;
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
-      await deleteManagedUser(idToken, userId);
+      await deleteManagedUser(userId);
 
       toast({
         title: "Success",

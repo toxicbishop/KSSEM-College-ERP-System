@@ -45,8 +45,9 @@ import {
 } from "@/components/ui/table";
 import { useAuth } from "@/context/auth-context";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase/client";
+import { db, auth as clientAuth } from "@/lib/firebase/client";
 import type { AuditAction } from "@/services/audit-logs";
+import { getAuditLogs } from "@/services/admin-users";
 
 type AuditLog = {
   id: string;
@@ -128,20 +129,18 @@ export default function AdminAuditLogsPage() {
     const checkAdminAccess = async () => {
       setCheckingRole(true);
       try {
-        if (!db) {
-          throw new Error("Firestore is not available.");
-        }
-
-        const userDocSnap = await getDoc(doc(db, "users", user.uid));
-        if (userDocSnap.exists() && userDocSnap.data().role === "admin") {
-          setIsAdmin(true);
-        } else {
-          toast({
-            title: "Access Denied",
-            description: "You do not have permission to view audit logs.",
-            variant: "destructive",
-          });
-          router.push("/");
+        if (clientAuth?.currentUser) {
+          const tokenResult = await clientAuth.currentUser.getIdTokenResult();
+          if (tokenResult.claims.role === "admin") {
+            setIsAdmin(true);
+          } else {
+            toast({
+              title: "Access Denied",
+              description: "You do not have permission to view audit logs.",
+              variant: "destructive",
+            });
+            router.push("/");
+          }
         }
       } catch (error) {
         console.error("Error verifying admin access:", error);
@@ -164,23 +163,14 @@ export default function AdminAuditLogsPage() {
 
     setLoadingLogs(true);
     try {
-      const logsQuery = query(
-        collection(db, "auditLogs"),
-        orderBy("createdAt", "desc"),
-        limit(100),
-      );
-      const snapshot = await getDocs(logsQuery);
-      const fetchedLogs = snapshot.docs.map((logDoc) => ({
-        id: logDoc.id,
-        ...logDoc.data(),
-      })) as AuditLog[];
+      const fetchedLogs = await getAuditLogs();
       setLogs(fetchedLogs);
     } catch (error) {
       console.error("Error fetching audit logs:", error);
       toast({
         title: "Error Fetching Audit Logs",
         description:
-          "Could not load audit logs. Check Firestore rules and indexes.",
+          "Could not load audit logs. Check the API response.",
         variant: "destructive",
       });
     } finally {
