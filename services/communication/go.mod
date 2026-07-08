@@ -1,11 +1,11 @@
 module github.com/toxicbishop/kssem-college-erp-system/services/communication
 
-go 1.22
+go 1.25.0
 
 require (
 	cloud.google.com/go/firestore v1.22.0
 	firebase.google.com/go/v4 v4.20.0
-	github.com/redis/go-redis/v9 v9.5.1
+	github.com/redis/go-redis/v9 v9.5.5
 	github.com/toxicbishop/kssem-college-erp-system/pkg v0.0.0
 	github.com/toxicbishop/kssem-college-erp-system/proto v0.0.0-00010101000000-000000000000
 	google.golang.org/api v0.287.1
