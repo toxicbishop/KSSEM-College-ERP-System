@@ -1,0 +1,10 @@
+go 1.22
+
+use (
+	./gateway
+	./pkg
+	./proto
+	./services/academic
+	./services/admin
+	./services/communication
+)
