@@ -2,7 +2,7 @@
 
 import { getAttendanceRecords as getAttendanceRecordsService } from "@/services/attendance";
 import { getGradesForStudent as getGradesForStudentService } from "@/services/grades";
-import { analyzeGrades } from "@/ai/flows/analyze-grades-flow";
+
 import type { AttendanceRecord } from "@/services/attendance";
 import type { Grade } from "@/services/grades";
 import type { GradeAnalysisOutput } from "@/services/grades";
@@ -44,7 +44,15 @@ export async function analyzeStudentGradesData(
   grades: Grade[]
 ): Promise<GradeAnalysisOutput> {
   try {
-    return await analyzeGrades(grades);
+    const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080') + '/api/ai/analyze-grades', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ grades }),
+    });
+    if (!res.ok) throw new Error('Failed to analyze');
+    return await res.json();
   } catch (error) {
     console.error("Grade analysis error:", error);
     return {
