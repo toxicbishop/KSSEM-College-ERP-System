@@ -111,15 +111,123 @@ func (s *AcademicServer) GetStudentProfile(ctx context.Context, req *pb.GetStude
 }
 
 func (s *AcademicServer) UpdateStudentProfile(ctx context.Context, req *pb.UpdateStudentProfileRequest) (*pb.StudentProfile, error) {
+	// Build a Firestore-safe merge map from the incoming profile data.
+	// Only fields that are set (non-zero) are included so we don't
+	// accidentally clear existing values.
 	updates := map[string]interface{}{}
-	// Normally we would reflect over the fields of req.ProfileData or check for non-zero values
-	if req.ProfileData.Email != "" {
-		updates["email"] = req.ProfileData.Email
+	p := req.ProfileData
+
+	if p.Email != "" {
+		updates["email"] = p.Email
 	}
-	if req.ProfileData.Name != "" {
-		updates["name"] = req.ProfileData.Name
+	if p.Name != "" {
+		updates["name"] = p.Name
 	}
-	// ... add the rest of the fields here
+	if p.Role != "" {
+		updates["role"] = p.Role
+	}
+	if p.Department != "" {
+		updates["department"] = p.Department
+	}
+	if p.DateOfBirth != "" {
+		updates["dateOfBirth"] = p.DateOfBirth
+	}
+	if p.ContactNumber != "" {
+		updates["contactNumber"] = p.ContactNumber
+	}
+	if p.Gender != "" {
+		updates["gender"] = p.Gender
+	}
+	if p.PermanentAddress != "" {
+		updates["permanentAddress"] = p.PermanentAddress
+	}
+	if p.CurrentAddress != "" {
+		updates["currentAddress"] = p.CurrentAddress
+	}
+	if p.BloodGroup != "" {
+		updates["bloodGroup"] = p.BloodGroup
+	}
+	if p.EmergencyContactName != "" {
+		updates["emergencyContactName"] = p.EmergencyContactName
+	}
+	if p.EmergencyContactNumber != "" {
+		updates["emergencyContactNumber"] = p.EmergencyContactNumber
+	}
+	if p.EnrollmentNumber != "" {
+		updates["enrollmentNumber"] = p.EnrollmentNumber
+	}
+	if p.CourseProgram != "" {
+		updates["courseProgram"] = p.CourseProgram
+	}
+	if p.CurrentYear != 0 {
+		updates["currentYear"] = p.CurrentYear
+	}
+	if p.CurrentSemester != 0 {
+		updates["currentSemester"] = p.CurrentSemester
+	}
+	if p.AcademicAdvisorName != "" {
+		updates["academicAdvisorName"] = p.AcademicAdvisorName
+	}
+	if p.SectionOrBatch != "" {
+		updates["sectionOrBatch"] = p.SectionOrBatch
+	}
+	if p.AdmissionDate != "" {
+		updates["admissionDate"] = p.AdmissionDate
+	}
+	if p.ModeOfAdmission != "" {
+		updates["modeOfAdmission"] = p.ModeOfAdmission
+	}
+	if p.ProfilePhotoUrl != "" {
+		updates["profilePhotoUrl"] = p.ProfilePhotoUrl
+	}
+	if p.ParentEmail != "" {
+		updates["parentEmail"] = p.ParentEmail
+	}
+	if p.IdCardUrl != "" {
+		updates["idCardUrl"] = p.IdCardUrl
+	}
+	if p.AdmissionLetterUrl != "" {
+		updates["admissionLetterUrl"] = p.AdmissionLetterUrl
+	}
+	if p.Marksheet10thUrl != "" {
+		updates["marksheet10thUrl"] = p.Marksheet10thUrl
+	}
+	if p.Marksheet12thUrl != "" {
+		updates["marksheet12thUrl"] = p.Marksheet12thUrl
+	}
+	if p.MigrationCertificateUrl != "" {
+		updates["migrationCertificateUrl"] = p.MigrationCertificateUrl
+	}
+	if p.BonafideCertificateUrl != "" {
+		updates["bonafideCertificateUrl"] = p.BonafideCertificateUrl
+	}
+	if p.UploadedPhotoUrl != "" {
+		updates["uploadedPhotoUrl"] = p.UploadedPhotoUrl
+	}
+	if p.UploadedSignatureUrl != "" {
+		updates["uploadedSignatureUrl"] = p.UploadedSignatureUrl
+	}
+	if p.ExamRegistrationStatus != "" {
+		updates["examRegistrationStatus"] = p.ExamRegistrationStatus
+	}
+	if p.AdmitCardUrl != "" {
+		updates["admitCardUrl"] = p.AdmitCardUrl
+	}
+	if p.InternalExamTimetableUrl != "" {
+		updates["internalExamTimetableUrl"] = p.InternalExamTimetableUrl
+	}
+	if p.ExternalExamTimetableUrl != "" {
+		updates["externalExamTimetableUrl"] = p.ExternalExamTimetableUrl
+	}
+	if p.ResultsAndGradeCardsUrl != "" {
+		updates["resultsAndGradeCardsUrl"] = p.ResultsAndGradeCardsUrl
+	}
+	if p.RevaluationRequestStatus != "" {
+		updates["revaluationRequestStatus"] = p.RevaluationRequestStatus
+	}
+	if p.RevaluationRequestLink != "" {
+		updates["revaluationRequestLink"] = p.RevaluationRequestLink
+	}
 
 	_, err := s.db.Collection("users").Doc(req.Uid).Set(ctx, updates, firestore.MergeAll)
 	if err != nil {
