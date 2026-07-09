@@ -95,10 +95,11 @@ export async function deleteGradeRecord(
  * Server action to get grades for a classroom.
  */
 export async function fetchGradesForClassroom(
-  studentUids: string[]
+  classroomId: string,
+  courseName: string
 ): Promise<Grade[]> {
   try {
-    return await getGradesForClassroom(studentUids);
+    return await getGradesForClassroom(classroomId, courseName);
   } catch (error) {
     console.error("Fetch classroom grades error:", error);
     return [];

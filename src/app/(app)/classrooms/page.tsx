@@ -64,7 +64,6 @@ function StudentClassroomsLoader() {
       const fetchClassrooms = async () => {
         setLoadingClassroomsState(true);
         try {
-          const idToken = await clientAuth!.currentUser!.getIdToken();
           const fetchedClassrooms = isDummyUser
             ? ([
                 {
@@ -146,7 +145,6 @@ function StudentClassroomsLoader() {
     setLoadingClassmatesView(true);
     setClassmatesError(null);
     try {
-      const idToken = await clientAuth!.currentUser!.getIdToken();
       const fetchedClassmates = await fetchClassmates(
         classroom.classroomId,
       );
