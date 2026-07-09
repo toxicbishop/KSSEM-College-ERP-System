@@ -3,8 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
-import { doc, getDoc } from "firebase/firestore";
-import { db, auth as clientAuth } from "@/lib/firebase/client"; // Import db and auth
+import { auth as clientAuth } from "@/lib/firebase/client";
 import {
   ShieldAlert,
   Settings,
@@ -115,19 +114,6 @@ export default function AdminSettingsPage() {
       const fetchSettings = async () => {
         setLoadingSettings(true);
         setErrorSettings(null);
-        if (!db) {
-          // Check db again before service call
-          setErrorSettings(
-            "Database connection is not available for settings.",
-          );
-          setLoadingSettings(false);
-          toast({
-            title: "Database Error",
-            description: "Cannot load system settings.",
-            variant: "destructive",
-          });
-          return;
-        }
         try {
           const currentSettings = await getSystemSettings();
           setSettings(currentSettings);
@@ -158,15 +144,6 @@ export default function AdminSettingsPage() {
     successMessage: string,
   ) => {
     if (!settings || !isAdmin) return; // Ensure user is admin
-    if (!db) {
-      // Check db before service call
-      toast({
-        title: "Database Error",
-        description: "Cannot update settings.",
-        variant: "destructive",
-      });
-      return;
-    }
 
     const newSettings: Partial<SystemSettings> = { [key]: value };
     try {
@@ -184,17 +161,11 @@ export default function AdminSettingsPage() {
         description: `Could not update ${key}. Ensure Firestore rules allow writing to 'systemSettings/appConfiguration' for admins.`,
         variant: "destructive",
       });
-      // Revert UI change on error by refetching if db is available
-      if (db) {
-        const currentSettings = await getSystemSettings();
-        setSettings(currentSettings);
-        if (key === "applicationName")
-          setTempAppName(currentSettings.applicationName);
-        if (key === "announcementTitle")
-          setTempAnnouncementTitle(currentSettings.announcementTitle);
-        if (key === "announcementContent")
-          setTempAnnouncementContent(currentSettings.announcementContent);
-      }
+      const currentSettings = await getSystemSettings();
+      setSettings(currentSettings);
+      if (key === "applicationName") setTempAppName(currentSettings.applicationName);
+      if (key === "announcementTitle") setTempAnnouncementTitle(currentSettings.announcementTitle);
+      if (key === "announcementContent") setTempAnnouncementContent(currentSettings.announcementContent);
     }
   };
 
@@ -570,4 +541,3 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
-

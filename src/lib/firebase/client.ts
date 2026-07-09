@@ -1,10 +1,5 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
-import {
-  getFirestore,
-  type Firestore,
-  enableMultiTabIndexedDbPersistence,
-} from "firebase/firestore";
 
 // IMPORTANT: Ensure you have a .env.local file in the root of your project
 // with your Firebase configuration variables.
@@ -41,7 +36,6 @@ const missingConfigKeys = requiredKeys
 
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
-let db: Firestore | null = null;
 
 if (missingConfigKeys.length > 0) {
   console.error(
@@ -60,26 +54,11 @@ if (missingConfigKeys.length > 0) {
     }
 
     auth = getAuth(app);
-    db = getFirestore(app);
-
-    // --- Enable Offline Persistence ---
-    if (typeof window !== "undefined" && db) {
-      enableMultiTabIndexedDbPersistence(db).catch((err) => {
-        if (err.code === "failed-precondition") {
-          // Multiple tabs open, persistence can only be enabled in one tab at a time.
-          console.warn("Firestore persistence failed: Multiple tabs open");
-        } else if (err.code === "unimplemented") {
-          // The current browser does not support all of the features required to enable persistence
-          console.warn("Firestore persistence failed: Browser not supported");
-        }
-      });
-    }
   } catch (error: any) {
     console.error(`\n--- FIREBASE INITIALIZATION FAILED ---: ${error.message}`);
     app = null;
     auth = null;
-    db = null;
   }
 }
 
-export { app, auth, db };
+export { app, auth };
