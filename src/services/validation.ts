@@ -64,9 +64,6 @@ export const denyProfileChangeRequestSchema = z.object({
   }).min(5, 'Denial reason must be at least 5 characters'),
 });
 
-export type ApproveProfileChangeRequestInput = z.infer<typeof approveProfileChangeRequestSchema>;
-export type DenyProfileChangeRequestInput = z.infer<typeof denyProfileChangeRequestSchema>;
-
 // ---------------------------------------------------------------------------
 // Student Profile Update Validation
 // ---------------------------------------------------------------------------

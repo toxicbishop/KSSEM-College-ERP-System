@@ -1,6 +1,6 @@
 import { auth } from './firebase/client';
 
-const GATEWAY_URL = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:8080';
+const GATEWAY_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:8080';
 
 async function getAuthHeaders() {
   const user = auth?.currentUser;

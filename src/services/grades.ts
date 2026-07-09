@@ -1,4 +1,5 @@
-import { apiGet, apiPost, apiDelete, apiPatch } from '@/lib/api-client';
+import { apiGet, apiPost, apiDelete } from '@/lib/api-client';
+import { gradeInputSchema, formatZodError } from './validation';
 import { z } from "zod";
 
 export const GradeAnalysisInputSchema = z.array(
@@ -42,11 +43,17 @@ export async function getGradesForStudent(
 }
 
 export async function getGradesForClassroom(
-  studentUids: string[],
+  classroomId: string,
+  courseName: string,
 ): Promise<Grade[]> {
-  // Normally this would be a POST to fetch grades for multiple students
+  if (!classroomId || classroomId.trim() === '') {
+    throw new Error('Classroom ID is required');
+  }
+  if (!courseName || courseName.trim() === '') {
+    throw new Error('Course name is required');
+  }
   try {
-    return await apiPost<Grade[]>(`/api/academic/grades/classroom`, { studentIds: studentUids });
+    return await apiPost<Grade[]>(`/api/academic/grades/classroom`, { classroomId, courseName });
   } catch (error) {
     console.error("Error fetching grades for classroom:", error);
     throw new Error("Could not fetch classroom grades.");
@@ -65,6 +72,21 @@ export async function getUniqueCourseNames(): Promise<string[]> {
 export async function updateStudentGrade(
   gradeInfo: Omit<Grade, "id" | "updatedAt" | "facultyId">,
 ): Promise<void> {
+  // Validate on the client side before hitting the gateway.
+  // Note: gradeInputSchema expects some fields that Omit<Grade, ...> might not have,
+  // like courseId, score, maxScore, semester, academicYear.
+  // We'll use a partial validation or ensure the input matches.
+  const validated = gradeInputSchema.partial().safeParse({
+    studentId: gradeInfo.studentId,
+    courseName: gradeInfo.courseName,
+    grade: gradeInfo.grade,
+    maxScore: gradeInfo.maxMarks,
+  });
+
+  if (!validated.success) {
+    throw new Error(`Validation failed: ${formatZodError(validated.error)}`);
+  }
+
   try {
     await apiPost(`/api/academic/grades`, gradeInfo);
   } catch (error) {
@@ -76,6 +98,9 @@ export async function updateStudentGrade(
 export async function deleteStudentGrade(
   gradeId: string,
 ): Promise<void> {
+  if (!gradeId || gradeId.trim() === '') {
+    throw new Error('Grade ID is required');
+  }
   try {
     await apiDelete(`/api/academic/grades/${gradeId}`);
   } catch (error) {

@@ -53,7 +53,7 @@ services:
       - ACADEMIC_SVC_ADDR=academic:8082
       - ADMIN_SVC_ADDR=admin:8084
       - COMMUNICATION_SVC_ADDR=communication:8086
-      - AUTH_MODE=mock
+      - AUTH_MODE=${AUTH_MODE}
       - FIREBASE_PROJECT_ID=${NEXT_PUBLIC_FIREBASE_PROJECT_ID}
     depends_on:
       - academic

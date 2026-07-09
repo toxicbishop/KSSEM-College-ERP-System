@@ -1,5 +1,5 @@
 import { apiGet, apiPost, apiDelete, apiPatch } from '@/lib/api-client';
-import type { StudentProfile } from "./profile";
+import { createClassroomSchema, formatZodError } from './validation';
 
 export interface ClassroomStudentInfo {
   userId: string;
@@ -53,18 +53,31 @@ export async function createClassroom(
   name: string,
   subject: string,
 ): Promise<string> {
-  const result = await apiPost<{ id: string }>(`/api/academic/classrooms`, { name, subject });
+  // Validate on the client side before hitting the gateway.
+  // Note: The schema expects more fields, we'll use a partial or fill defaults
+  const validated = createClassroomSchema.partial().safeParse({
+    name,
+    courseCode: subject,
+  });
+
+  if (!validated.success) {
+    throw new Error(`Validation failed: ${formatZodError(validated.error)}`);
+  }
+
+  const result = await apiPost<{ id: string }>(`/api/academic/classrooms`, {
+    classroom: {
+      name,
+      courseCode: subject,
+    }
+  });
   return result.id;
 }
 
-export async function getClassroomsByFaculty(
-): Promise<Classroom[]> {
+export async function getClassroomsByFaculty(): Promise<Classroom[]> {
   return await apiGet<Classroom[]>(`/api/academic/classrooms`);
 }
 
-export async function getAllFacultyUsers(
-): Promise<FacultyUser[]> {
-  // This might belong to admin service eventually, but Gateway can route it.
+export async function getAllFacultyUsers(): Promise<FacultyUser[]> {
   return await apiGet<FacultyUser[]>(`/api/admin/faculty`);
 }
 
@@ -117,8 +130,7 @@ export async function updateStudentBatchInClassroom(
   await apiPatch(`/api/academic/classrooms/${classroomId}/students/${studentUserId}`, { batch: newBatch });
 }
 
-export async function getStudentClassroomsWithBatchInfo(
-): Promise<StudentClassroomEnrollmentInfo[]> {
+export async function getStudentClassroomsWithBatchInfo(): Promise<StudentClassroomEnrollmentInfo[]> {
   return await apiGet<StudentClassroomEnrollmentInfo[]>(`/api/academic/me/classrooms`);
 }
 

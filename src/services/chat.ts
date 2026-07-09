@@ -18,6 +18,9 @@ export function fromChatWire(message: ChatMessageWire): ChatMessage {
 }
 
 export async function getChatMessages(classroomId: string): Promise<ChatMessage[]> {
+  if (!classroomId || classroomId.trim() === '') {
+    throw new Error('Classroom ID is required');
+  }
   const response = await apiGet<{ messages?: ChatMessageWire[] }>(
     `/api/communication/chat/${encodeURIComponent(classroomId)}/messages?limit=100`,
   );
@@ -25,6 +28,15 @@ export async function getChatMessages(classroomId: string): Promise<ChatMessage[
 }
 
 export async function sendMessage(classroomId: string, text: string): Promise<ChatMessage> {
+  if (!classroomId || classroomId.trim() === '') {
+    throw new Error('Classroom ID is required');
+  }
+  if (!text || text.trim().length === 0) {
+    throw new Error('Message text cannot be empty');
+  }
+  if (text.length > 5000) {
+    throw new Error('Message text must not exceed 5000 characters');
+  }
   const message = await apiPost<ChatMessageWire>(
     `/api/communication/chat/${encodeURIComponent(classroomId)}/messages`,
     { classroomId, text },
