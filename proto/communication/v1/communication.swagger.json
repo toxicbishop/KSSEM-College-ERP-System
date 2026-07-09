@@ -11,6 +11,79 @@
     "application/json"
   ],
   "paths": {
+    "/api/communication/chat/{classroom_id}/messages": {
+      "get": {
+        "operationId": "CommunicationService_GetChatMessages",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListChatMessagesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "classroom_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "CommunicationService"
+        ]
+      },
+      "post": {
+        "operationId": "CommunicationService_SendChatMessage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ChatMessage"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "classroom_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SendChatMessageRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CommunicationService"
+        ]
+      }
+    },
     "/api/communication/notifications": {
       "get": {
         "operationId": "CommunicationService_GetNotifications",
@@ -103,6 +176,40 @@
         }
       }
     },
+    "v1ChatMessage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "classroom_id": {
+          "type": "string"
+        },
+        "sender_id": {
+          "type": "string"
+        },
+        "sender_name": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListChatMessagesResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ChatMessage"
+          }
+        }
+      }
+    },
     "v1ListNotificationsResponse": {
       "type": "object",
       "properties": {
@@ -136,6 +243,17 @@
           "type": "boolean"
         },
         "link": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SendChatMessageRequest": {
+      "type": "object",
+      "properties": {
+        "classroom_id": {
+          "type": "string"
+        },
+        "text": {
           "type": "string"
         }
       }

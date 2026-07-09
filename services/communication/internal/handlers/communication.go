@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"cloud.google.com/go/firestore"
 	"github.com/redis/go-redis/v9"
@@ -14,14 +15,17 @@ import (
 
 type CommunicationServer struct {
 	pb.UnimplementedCommunicationServiceServer
-	db  *firestore.Client
-	rdb *redis.Client
+	db              *firestore.Client
+	rdb             *redis.Client
+	chatMu          sync.RWMutex
+	chatSubscribers map[string]map[chan *pb.ChatMessage]struct{}
 }
 
 func NewCommunicationServer(db *firestore.Client, rdb *redis.Client) *CommunicationServer {
 	return &CommunicationServer{
-		db:  db,
-		rdb: rdb,
+		db:              db,
+		rdb:             rdb,
+		chatSubscribers: make(map[string]map[chan *pb.ChatMessage]struct{}),
 	}
 }
 
@@ -40,15 +44,15 @@ func (s *CommunicationServer) GetNotifications(ctx context.Context, req *pb.GetN
 		if err != nil {
 			break
 		}
-		
+
 		data := doc.Data()
-		
+
 		title, _ := data["title"].(string)
 		message, _ := data["message"].(string)
 		msgType, _ := data["type"].(string)
 		read, _ := data["read"].(bool)
 		link, _ := data["link"].(string)
-		
+
 		var timestampStr string
 		if t, ok := data["timestamp"].(interface{}); ok {
 			timestampStr = fmt.Sprintf("%v", t)
@@ -79,6 +83,6 @@ func (s *CommunicationServer) MarkNotificationRead(ctx context.Context, req *pb.
 	// For now, assume we'll just return a success since this is a mock implementation
 	// To do it properly, we'd need the uid or query across all notifications collections.
 	// We'll skip the actual Firestore update for this demo if uid isn't provided.
-	
+
 	return &emptypb.Empty{}, nil
 }

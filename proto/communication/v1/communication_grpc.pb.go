@@ -25,6 +25,10 @@ const _ = grpc.SupportPackageIsVersion7
 type CommunicationServiceClient interface {
 	GetNotifications(ctx context.Context, in *GetNotificationsRequest, opts ...grpc.CallOption) (*ListNotificationsResponse, error)
 	MarkNotificationRead(ctx context.Context, in *MarkNotificationReadRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	SendChatMessage(ctx context.Context, in *SendChatMessageRequest, opts ...grpc.CallOption) (*ChatMessage, error)
+	GetChatMessages(ctx context.Context, in *GetChatMessagesRequest, opts ...grpc.CallOption) (*ListChatMessagesResponse, error)
+	// The API gateway adapts this gRPC server stream to text/event-stream.
+	StreamChatMessages(ctx context.Context, in *StreamChatMessagesRequest, opts ...grpc.CallOption) (CommunicationService_StreamChatMessagesClient, error)
 }
 
 type communicationServiceClient struct {
@@ -53,12 +57,66 @@ func (c *communicationServiceClient) MarkNotificationRead(ctx context.Context, i
 	return out, nil
 }
 
+func (c *communicationServiceClient) SendChatMessage(ctx context.Context, in *SendChatMessageRequest, opts ...grpc.CallOption) (*ChatMessage, error) {
+	out := new(ChatMessage)
+	err := c.cc.Invoke(ctx, "/communication.v1.CommunicationService/SendChatMessage", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *communicationServiceClient) GetChatMessages(ctx context.Context, in *GetChatMessagesRequest, opts ...grpc.CallOption) (*ListChatMessagesResponse, error) {
+	out := new(ListChatMessagesResponse)
+	err := c.cc.Invoke(ctx, "/communication.v1.CommunicationService/GetChatMessages", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *communicationServiceClient) StreamChatMessages(ctx context.Context, in *StreamChatMessagesRequest, opts ...grpc.CallOption) (CommunicationService_StreamChatMessagesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &CommunicationService_ServiceDesc.Streams[0], "/communication.v1.CommunicationService/StreamChatMessages", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &communicationServiceStreamChatMessagesClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type CommunicationService_StreamChatMessagesClient interface {
+	Recv() (*ChatMessage, error)
+	grpc.ClientStream
+}
+
+type communicationServiceStreamChatMessagesClient struct {
+	grpc.ClientStream
+}
+
+func (x *communicationServiceStreamChatMessagesClient) Recv() (*ChatMessage, error) {
+	m := new(ChatMessage)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // CommunicationServiceServer is the server API for CommunicationService service.
 // All implementations should embed UnimplementedCommunicationServiceServer
 // for forward compatibility
 type CommunicationServiceServer interface {
 	GetNotifications(context.Context, *GetNotificationsRequest) (*ListNotificationsResponse, error)
 	MarkNotificationRead(context.Context, *MarkNotificationReadRequest) (*emptypb.Empty, error)
+	SendChatMessage(context.Context, *SendChatMessageRequest) (*ChatMessage, error)
+	GetChatMessages(context.Context, *GetChatMessagesRequest) (*ListChatMessagesResponse, error)
+	// The API gateway adapts this gRPC server stream to text/event-stream.
+	StreamChatMessages(*StreamChatMessagesRequest, CommunicationService_StreamChatMessagesServer) error
 }
 
 // UnimplementedCommunicationServiceServer should be embedded to have forward compatible implementations.
@@ -70,6 +128,15 @@ func (UnimplementedCommunicationServiceServer) GetNotifications(context.Context,
 }
 func (UnimplementedCommunicationServiceServer) MarkNotificationRead(context.Context, *MarkNotificationReadRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MarkNotificationRead not implemented")
+}
+func (UnimplementedCommunicationServiceServer) SendChatMessage(context.Context, *SendChatMessageRequest) (*ChatMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendChatMessage not implemented")
+}
+func (UnimplementedCommunicationServiceServer) GetChatMessages(context.Context, *GetChatMessagesRequest) (*ListChatMessagesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetChatMessages not implemented")
+}
+func (UnimplementedCommunicationServiceServer) StreamChatMessages(*StreamChatMessagesRequest, CommunicationService_StreamChatMessagesServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamChatMessages not implemented")
 }
 
 // UnsafeCommunicationServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -119,6 +186,63 @@ func _CommunicationService_MarkNotificationRead_Handler(srv interface{}, ctx con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CommunicationService_SendChatMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendChatMessageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommunicationServiceServer).SendChatMessage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/communication.v1.CommunicationService/SendChatMessage",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommunicationServiceServer).SendChatMessage(ctx, req.(*SendChatMessageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CommunicationService_GetChatMessages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetChatMessagesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommunicationServiceServer).GetChatMessages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/communication.v1.CommunicationService/GetChatMessages",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommunicationServiceServer).GetChatMessages(ctx, req.(*GetChatMessagesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CommunicationService_StreamChatMessages_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(StreamChatMessagesRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(CommunicationServiceServer).StreamChatMessages(m, &communicationServiceStreamChatMessagesServer{stream})
+}
+
+type CommunicationService_StreamChatMessagesServer interface {
+	Send(*ChatMessage) error
+	grpc.ServerStream
+}
+
+type communicationServiceStreamChatMessagesServer struct {
+	grpc.ServerStream
+}
+
+func (x *communicationServiceStreamChatMessagesServer) Send(m *ChatMessage) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // CommunicationService_ServiceDesc is the grpc.ServiceDesc for CommunicationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,7 +258,21 @@ var CommunicationService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "MarkNotificationRead",
 			Handler:    _CommunicationService_MarkNotificationRead_Handler,
 		},
+		{
+			MethodName: "SendChatMessage",
+			Handler:    _CommunicationService_SendChatMessage_Handler,
+		},
+		{
+			MethodName: "GetChatMessages",
+			Handler:    _CommunicationService_GetChatMessages_Handler,
+		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "StreamChatMessages",
+			Handler:       _CommunicationService_StreamChatMessages_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "proto/communication/v1/communication.proto",
 }
