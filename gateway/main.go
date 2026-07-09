@@ -3,19 +3,22 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strings"
 
-	"firebase.google.com/go/v4/auth"
 	firebase "firebase.google.com/go/v4"
+	"firebase.google.com/go/v4/auth"
 	"github.com/go-chi/chi/v5"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/toxicbishop/kssem-college-erp-system/pkg/logger"
 	"github.com/toxicbishop/kssem-college-erp-system/pkg/middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/encoding/protojson"
+
 	pb "github.com/toxicbishop/kssem-college-erp-system/proto/academic/v1"
 	adminpb "github.com/toxicbishop/kssem-college-erp-system/proto/admin/v1"
 	commpb "github.com/toxicbishop/kssem-college-erp-system/proto/communication/v1"
@@ -65,13 +68,23 @@ func main() {
 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
 				return
 			}
-			
+
 			token := strings.TrimPrefix(authHeader, "Bearer ")
-			
+
 			if authClient == nil {
 				if os.Getenv("AUTH_MODE") == "mock" {
-					logger.Warn(ctx, "AUTH_MODE=mock bypass triggered! Dummy auth activated.", "token", token)
-					req.Header.Set("X-User-Id", token)
+					parts := strings.SplitN(token, ":", 2)
+					if len(parts) != 2 || !strings.HasPrefix(parts[0], "mock-") || parts[1] == "" {
+						http.Error(w, "Unauthorized: invalid mock token", http.StatusUnauthorized)
+						return
+					}
+					role := strings.TrimPrefix(parts[0], "mock-")
+					if strings.HasPrefix(req.URL.Path, "/api/admin/") && role != "admin" {
+						http.Error(w, "Forbidden: Admin access required", http.StatusForbidden)
+						return
+					}
+					logger.Warn(ctx, "AUTH_MODE=mock enabled", "uid", parts[1], "role", role)
+					req.Header.Set("X-User-Id", parts[1])
 					next.ServeHTTP(w, req)
 					return
 				}
@@ -86,10 +99,10 @@ func main() {
 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
 				return
 			}
-			
+
 			// Attach UID to request header so grpc-gateway can forward it as metadata
 			req.Header.Set("X-User-Id", decoded.UID)
-			
+
 			// Admin Authorization Check
 			if strings.HasPrefix(req.URL.Path, "/api/admin/") {
 				if os.Getenv("AUTH_MODE") != "mock" {
@@ -120,7 +133,7 @@ func main() {
 		}),
 	)
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	
+
 	err = pb.RegisterAcademicServiceHandlerFromEndpoint(ctx, gwmux, academicAddr, opts)
 	if err != nil {
 		logger.Error(ctx, "Failed to register academic handler", "error", err)
@@ -143,6 +156,47 @@ func main() {
 	if err != nil {
 		logger.Error(ctx, "Failed to register communication handler", "error", err)
 	}
+	commConn, err := grpc.NewClient(commAddr, opts...)
+	if err != nil {
+		logger.Error(ctx, "Failed to create communication streaming client", "error", err)
+	}
+	commClient := commpb.NewCommunicationServiceClient(commConn)
+	r.Get("/api/communication/chat/{classroomID}/stream", func(w http.ResponseWriter, req *http.Request) {
+		classroomID := chi.URLParam(req, "classroomID")
+		streamCtx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		streamCtx = metadata.NewOutgoingContext(streamCtx, metadata.Pairs("x-user-id", req.Header.Get("X-User-Id")))
+		stream, streamErr := commClient.StreamChatMessages(streamCtx, &commpb.StreamChatMessagesRequest{ClassroomId: classroomID})
+		if streamErr != nil {
+			http.Error(w, "Unable to open chat stream", http.StatusBadGateway)
+			return
+		}
+		flusher, ok := w.(http.Flusher)
+		if !ok {
+			http.Error(w, "Streaming unsupported", http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "text/event-stream")
+		w.Header().Set("Cache-Control", "no-cache")
+		w.Header().Set("Connection", "keep-alive")
+		fmt.Fprint(w, ": connected\n\n")
+		flusher.Flush()
+		for {
+			message, recvErr := stream.Recv()
+			if recvErr != nil {
+				if recvErr != io.EOF && req.Context().Err() == nil {
+					logger.Warn(req.Context(), "Chat SSE stream closed", "error", recvErr)
+				}
+				return
+			}
+			payload, marshalErr := protojson.Marshal(message)
+			if marshalErr != nil {
+				continue
+			}
+			fmt.Fprintf(w, "event: message\ndata: %s\n\n", payload)
+			flusher.Flush()
+		}
+	})
 
 	// Mount gwmux to chi router
 	r.Mount("/api/", gwmux)
