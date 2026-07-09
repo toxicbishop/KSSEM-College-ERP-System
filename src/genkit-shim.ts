@@ -26,14 +26,13 @@ export function genkit(options: GenkitOptions = {}): any {
   // Stub for definePrompt – returns a prompt object with a placeholder run method
   base.definePrompt = (cfg: any) => ({
     ...cfg,
-    async run(input: any) {
+    async run(_input: any) {
       console.warn('[genkit shim] Prompt run invoked but not implemented.');
       return {};
     },
   });
   // Stub for defineFlow – returns a callable flow that executes the provided implementation
   base.defineFlow = (cfg: any, impl: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const flowFunc = async (input: any) => {
       try {
         return await impl(input);

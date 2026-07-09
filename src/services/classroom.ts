@@ -1,5 +1,4 @@
 import { apiGet, apiPost, apiDelete, apiPatch } from '@/lib/api-client';
-import type { StudentProfile } from "./profile";
 
 export interface ClassroomStudentInfo {
   userId: string;
@@ -50,7 +49,7 @@ export interface ClassmateInfo {
 }
 
 export async function createClassroom(
-  idToken: string,
+  _idToken: string,
   name: string,
   subject: string,
 ): Promise<string> {
@@ -59,13 +58,13 @@ export async function createClassroom(
 }
 
 export async function getClassroomsByFaculty(
-  idToken: string,
+  _idToken: string,
 ): Promise<Classroom[]> {
   return await apiGet<Classroom[]>(`/api/academic/classrooms`);
 }
 
 export async function getAllFacultyUsers(
-  idToken: string,
+  _idToken: string,
 ): Promise<FacultyUser[]> {
   // This might belong to admin service eventually, but Gateway can route it.
   return await apiGet<FacultyUser[]>(`/api/admin/faculty`);
@@ -128,7 +127,7 @@ export async function updateStudentBatchInClassroom(
 }
 
 export async function getStudentClassroomsWithBatchInfo(
-  idToken: string,
+  _idToken: string,
 ): Promise<StudentClassroomEnrollmentInfo[]> {
   return await apiGet<StudentClassroomEnrollmentInfo[]>(`/api/academic/me/classrooms`);
 }
