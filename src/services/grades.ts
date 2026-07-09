@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiDelete, apiPatch } from '@/lib/api-client';
+import { apiGet, apiPost, apiDelete } from '@/lib/api-client';
 import { z } from "zod";
 
 export const GradeAnalysisInputSchema = z.array(
@@ -43,7 +43,7 @@ export async function getGradesForStudent(
 }
 
 export async function getGradesForClassroom(
-  idToken: string,
+  _idToken: string,
   studentUids: string[],
 ): Promise<Grade[]> {
   // Normally this would be a POST to fetch grades for multiple students
@@ -55,7 +55,7 @@ export async function getGradesForClassroom(
   }
 }
 
-export async function getUniqueCourseNames(idToken: string): Promise<string[]> {
+export async function getUniqueCourseNames(_idToken: string): Promise<string[]> {
   try {
     return await apiGet<string[]>(`/api/academic/courses`);
   } catch (error) {
@@ -65,7 +65,7 @@ export async function getUniqueCourseNames(idToken: string): Promise<string[]> {
 }
 
 export async function updateStudentGrade(
-  idToken: string,
+  _idToken: string,
   gradeInfo: Omit<Grade, "id" | "updatedAt" | "facultyId">,
 ): Promise<void> {
   try {
@@ -77,7 +77,7 @@ export async function updateStudentGrade(
 }
 
 export async function deleteStudentGrade(
-  idToken: string,
+  _idToken: string,
   gradeId: string,
 ): Promise<void> {
   try {
