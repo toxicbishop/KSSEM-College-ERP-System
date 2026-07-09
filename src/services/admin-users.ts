@@ -1,4 +1,4 @@
-import { apiPost, apiPatch, apiDelete } from '@/lib/api-client';
+import { apiGet, apiPost, apiPatch, apiDelete } from '@/lib/api-client';
 import type { StudentProfile } from "./profile";
 
 export type ManagedUserProfile = Partial<StudentProfile> & {
@@ -16,7 +16,7 @@ export interface UserData extends StudentProfile {
 
 export async function getAllUsers(): Promise<UserData[]> {
   try {
-    const data = await apiPost<{ users: any[] }>(`/api/admin/users/list`, {});
+    const data = await apiGet<{ users: any[] }>(`/api/admin/users`);
     return (data.users || []).map((u: any) => ({
       ...u,
       id: u.uid,
@@ -29,7 +29,7 @@ export async function getAllUsers(): Promise<UserData[]> {
 
 export async function getAuditLogs(): Promise<any[]> {
   try {
-    const data = await apiPost<{ logs: any[] }>(`/api/admin/audit-logs`, {});
+    const data = await apiGet<{ logs: any[] }>(`/api/admin/audit-logs`);
     return data.logs || [];
   } catch (error) {
     console.error("Failed to fetch audit logs", error);

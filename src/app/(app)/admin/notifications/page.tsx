@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
-import { db, auth as clientAuth } from "@/lib/firebase/client";
+import { auth as clientAuth } from "@/lib/firebase/client";
 import { getAllUsers } from "@/services/admin-users";
 import {
   Card,
@@ -277,4 +277,3 @@ export default function AdminNotificationsPage() {
     </div>
   );
 }
-
