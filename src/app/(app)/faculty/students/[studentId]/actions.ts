@@ -11,11 +11,10 @@ import type { GradeAnalysisOutput } from "@/services/grades";
  * Server action to fetch attendance records for a student.
  */
 export async function fetchAttendanceForStudent(
-  idToken: string,
   studentId: string
 ): Promise<AttendanceRecord[]> {
   try {
-    return await getAttendanceRecordsService(idToken, studentId);
+    return await getAttendanceRecordsService(studentId);
   } catch (error) {
     console.error("Fetch attendance error:", error);
     return [];
@@ -26,11 +25,10 @@ export async function fetchAttendanceForStudent(
  * Server action to fetch grades for a student.
  */
 export async function fetchGradesForStudent(
-  idToken: string,
   studentId: string
 ): Promise<Grade[]> {
   try {
-    return await getGradesForStudentService(idToken, studentId);
+    return await getGradesForStudentService(studentId);
   } catch (error) {
     console.error("Fetch grades error:", error);
     return [];

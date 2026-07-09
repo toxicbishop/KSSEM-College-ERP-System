@@ -13,11 +13,10 @@ import type { AttendanceRecord } from "@/services/attendance";
  * (which require Node.js modules) are only loaded on the server.
  */
 export async function fetchAttendanceRecords(
-  idToken: string,
   studentId?: string
 ): Promise<AttendanceRecord[]> {
   try {
-    return await getAttendanceRecordsService(idToken, studentId);
+    return await getAttendanceRecordsService(studentId);
   } catch (error) {
     console.error("Attendance records fetch error:", error);
     return [];
