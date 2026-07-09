@@ -69,7 +69,10 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(middleware.GRPCCorrelationInterceptor()),
+		grpc.ChainUnaryInterceptor(
+			middleware.GRPCCorrelationInterceptor(),
+			middleware.UnaryValidationInterceptor,
+		),
 	)
 
 	// Register Service

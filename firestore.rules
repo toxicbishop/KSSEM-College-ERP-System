@@ -14,11 +14,11 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      return isSignedIn() && (request.auth.token.role == 'admin' || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
     }
 
     function isFaculty() {
-      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'faculty';
+      return isSignedIn() && (request.auth.token.role == 'faculty' || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'faculty');
     }
 
     // Rules for the 'users' collection
@@ -53,17 +53,17 @@ service cloud.firestore {
         // - Admins can read any classroom.
         // - Faculty can read classrooms they own or are invited to.
         // - Students can read classrooms they are enrolled in (checked via studentUids array).
-        allow read: if isAdmin() || (isFaculty() && (resource.data.ownerFacultyId == request.auth.uid || request.auth.uid in resource.data.invitedFacultyIds)) || (request.auth.uid in resource.data.studentUids);
+        allow read: if isAdmin() || (isFaculty() && (resource.data.facultyId == request.auth.uid || request.auth.uid in resource.data.invitedFacultyIds)) || (request.auth.uid in resource.data.studentUids);
         
         // Create: Only authenticated faculty can create classrooms.
-        allow create: if isFaculty();
+        allow create: if isFaculty() && request.resource.data.facultyId == request.auth.uid;
 
         // Update:
         // - Only faculty who own the classroom or are invited can update it.
-        allow update: if isFaculty() && (resource.data.ownerFacultyId == request.auth.uid || request.auth.uid in resource.data.invitedFacultyIds);
+        allow update: if isAdmin() || (isFaculty() && (resource.data.facultyId == request.auth.uid || request.auth.uid in resource.data.invitedFacultyIds));
 
         // Delete: Only the faculty owner can delete the classroom.
-        allow delete: if isFaculty() && resource.data.ownerFacultyId == request.auth.uid;
+        allow delete: if isAdmin() || (isFaculty() && resource.data.facultyId == request.auth.uid);
         
         // Rules for 'messages' subcollection within a classroom
         match /messages/{messageId} {

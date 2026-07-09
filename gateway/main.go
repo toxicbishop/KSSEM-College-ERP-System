@@ -100,10 +100,13 @@ func main() {
 				return
 			}
 
-			// Attach UID to request header so grpc-gateway can forward it as metadata
-			req.Header.Set("X-User-Id", decoded.UID)
+				// Attach UID and Role to request header so grpc-gateway can forward it as metadata
+				req.Header.Set("X-User-Id", decoded.UID)
+				if role, ok := decoded.Claims["role"].(string); ok {
+					req.Header.Set("X-User-Role", role)
+				}
 
-				// Admin Authorization Check — most /api/admin/* routes require admin role.
+					// Admin Authorization Check — most /api/admin/* routes require admin role.
 				// Exception: students may POST to /api/admin/profile-change-requests to create
 				// their own change requests (the admin service itself validates the field whitelist
 				// and enforces that the UID from X-User-Id matches the request's user_id).
@@ -133,14 +136,14 @@ func main() {
 	})
 
 	// Setup grpc-gateway multiplexer
-	gwmux := runtime.NewServeMux(
-		runtime.WithIncomingHeaderMatcher(func(h string) (string, bool) {
-			if h == "X-User-Id" || h == "X-Correlation-Id" {
-				return h, true
-			}
-			return runtime.DefaultHeaderMatcher(h)
-		}),
-	)
+		gwmux := runtime.NewServeMux(
+			runtime.WithIncomingHeaderMatcher(func(h string) (string, bool) {
+				if h == "X-User-Id" || h == "X-User-Role" || h == "X-Correlation-Id" {
+					return h, true
+				}
+				return runtime.DefaultHeaderMatcher(h)
+			}),
+		)
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 
 	err = pb.RegisterAcademicServiceHandlerFromEndpoint(ctx, gwmux, academicAddr, opts)

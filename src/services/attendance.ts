@@ -1,4 +1,5 @@
 import { apiGet, apiPost, apiDelete } from '@/lib/api-client';
+import { submitAttendanceSchema, formatZodError } from './validation';
 import { z } from "zod";
 
 export const AttendanceAnalysisInputSchema = z.array(
@@ -102,22 +103,21 @@ export async function submitLectureAttendance(
   records: Omit<LectureAttendanceRecord, "id" | "submittedAt">[],
 ): Promise<void> {
   if (records.length === 0) return;
-  // Basic validation of the first record to catch obvious issues early
-  const r = records[0];
-  if (!r.classroomId || r.classroomId.trim() === '') {
-    throw new Error('Classroom ID is required');
-  }
-  if (!r.date || !/^\d{4}-\d{2}-\d{2}$/.test(r.date)) {
-    throw new Error('Date must be in YYYY-MM-DD format');
-  }
+
+  // Validate all records using the schema
   for (const rec of records) {
-    if (!rec.status || (rec.status !== 'present' && rec.status !== 'absent')) {
-      throw new Error('Each record must have status "present" or "absent"');
-    }
-    if (!rec.studentId || rec.studentId.trim() === '') {
-      throw new Error('Each record must have a student ID');
+    const validated = submitAttendanceSchema.safeParse({
+      studentId: rec.studentId,
+      lectureId: rec.lectureName, // Map lectureName to lectureId for validation
+      courseId: rec.classroomId,  // Map classroomId to courseId for validation
+      date: rec.date,
+      status: rec.status,
+    });
+    if (!validated.success) {
+      throw new Error(`Validation failed for student ${rec.studentName}: ${formatZodError(validated.error)}`);
     }
   }
+
   try {
     await apiPost(`/api/academic/attendance/lecture`, { records });
   } catch (error) {
