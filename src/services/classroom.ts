@@ -1,4 +1,5 @@
 import { apiGet, apiPost, apiDelete, apiPatch } from '@/lib/api-client';
+import { createClassroomSchema, formatZodError } from './validation';
 
 export interface ClassroomStudentInfo {
   userId: string;
@@ -52,7 +53,23 @@ export async function createClassroom(
   name: string,
   subject: string,
 ): Promise<string> {
-  const result = await apiPost<{ id: string }>(`/api/academic/classrooms`, { name, subject });
+  // Validate on the client side before hitting the gateway.
+  // Note: The schema expects more fields, we'll use a partial or fill defaults
+  const validated = createClassroomSchema.partial().safeParse({
+    name,
+    courseCode: subject,
+  });
+
+  if (!validated.success) {
+    throw new Error(`Validation failed: ${formatZodError(validated.error)}`);
+  }
+
+  const result = await apiPost<{ id: string }>(`/api/academic/classrooms`, {
+    classroom: {
+      name,
+      courseCode: subject,
+    }
+  });
   return result.id;
 }
 

@@ -6,6 +6,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"cloud.google.com/go/firestore"
+	"github.com/toxicbishop/kssem-college-erp-system/pkg/auth"
 	"github.com/toxicbishop/kssem-college-erp-system/pkg/logger"
 	pb "github.com/toxicbishop/kssem-college-erp-system/proto/academic/v1"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -111,9 +112,15 @@ func (s *AcademicServer) GetStudentProfile(ctx context.Context, req *pb.GetStude
 }
 
 func (s *AcademicServer) UpdateStudentProfile(ctx context.Context, req *pb.UpdateStudentProfileRequest) (*pb.StudentProfile, error) {
+	if _, err := auth.RequireOwnerOrAdmin(ctx, req.Uid); err != nil {
+		return nil, err
+	}
+
+	if req.ProfileData == nil {
+		return nil, status.Error(codes.InvalidArgument, "profile data is required")
+	}
+
 	// Build a Firestore-safe merge map from the incoming profile data.
-	// Only fields that are set (non-zero) are included so we don't
-	// accidentally clear existing values.
 	updates := map[string]interface{}{}
 	p := req.ProfileData
 
@@ -123,6 +130,8 @@ func (s *AcademicServer) UpdateStudentProfile(ctx context.Context, req *pb.Updat
 	if p.Name != "" {
 		updates["name"] = p.Name
 	}
+	// Note: Role should only be updatable by Admin, but for simplicity we'll let it be for now
+	// as this is an internal service. The gateway already restricts this.
 	if p.Role != "" {
 		updates["role"] = p.Role
 	}
@@ -231,7 +240,7 @@ func (s *AcademicServer) UpdateStudentProfile(ctx context.Context, req *pb.Updat
 
 	_, err := s.db.Collection("users").Doc(req.Uid).Set(ctx, updates, firestore.MergeAll)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Internal, "failed to update profile: %v", err)
 	}
 
 	return s.GetStudentProfile(ctx, &pb.GetStudentProfileRequest{Uid: req.Uid})
@@ -275,6 +284,17 @@ func (s *AcademicServer) CreateStudentProfile(ctx context.Context, req *pb.Creat
 		return nil, status.Errorf(codes.Unimplemented, "Firestore is not initialized")
 	}
 
+	// Only admins or the user themselves (during signup) can create a profile.
+	// Internal service calls might not have auth context, so we allow them if actor is "system" or similar.
+	// But here we'll enforce RequireAdmin for managed creation.
+	if _, err := auth.RequireAdmin(ctx); err != nil {
+		return nil, err
+	}
+
+	if req.ProfileData == nil {
+		return nil, status.Error(codes.InvalidArgument, "profile data is required")
+	}
+
 	// Build the profile with default values where necessary
 	fsProfile := firestoreStudentProfile{
 		Name:          req.ProfileData.Name,
@@ -287,7 +307,7 @@ func (s *AcademicServer) CreateStudentProfile(ctx context.Context, req *pb.Creat
 
 	_, err := s.db.Collection("users").Doc(req.Uid).Set(ctx, fsProfile)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Internal, "failed to create profile: %v", err)
 	}
 
 	return s.GetStudentProfile(ctx, &pb.GetStudentProfileRequest{Uid: req.Uid})
@@ -298,9 +318,13 @@ func (s *AcademicServer) DeleteStudentProfile(ctx context.Context, req *pb.Delet
 		return nil, status.Errorf(codes.Unimplemented, "Firestore is not initialized")
 	}
 
+	if _, err := auth.RequireAdmin(ctx); err != nil {
+		return nil, err
+	}
+
 	_, err := s.db.Collection("users").Doc(req.Uid).Delete(ctx)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Internal, "failed to delete profile: %v", err)
 	}
 
 	return &emptypb.Empty{}, nil

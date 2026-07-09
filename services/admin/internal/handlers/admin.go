@@ -6,6 +6,7 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"firebase.google.com/go/v4/auth"
+	"github.com/toxicbishop/kssem-college-erp-system/pkg/auth"
 	"github.com/toxicbishop/kssem-college-erp-system/pkg/logger"
 	academicpb "github.com/toxicbishop/kssem-college-erp-system/proto/academic/v1"
 	pb "github.com/toxicbishop/kssem-college-erp-system/proto/admin/v1"
@@ -342,30 +343,35 @@ func (s *AdminServer) CreateProfileChangeRequest(ctx context.Context, req *pb.Cr
 		return nil, status.Errorf(codes.Unimplemented, "Firestore is not initialized")
 	}
 
-	actor := actorUID(ctx)
-	if actor == "system" {
-		return nil, status.Errorf(codes.Unauthenticated, "User identity not provided")
+	user, err := auth.GetUserContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Ensure the user is creating a request for themselves, unless they are an admin
+	if user.UID != req.UserId && user.Role != "admin" {
+		return nil, status.Error(codes.PermissionDenied, "cannot create profile change request for another user")
 	}
 
 	// Validate the requested field is one a student is allowed to change
 	if !allowedProfileFields[req.FieldName] {
-		return nil, status.Errorf(codes.InvalidArgument, "Field '%s' cannot be changed via a profile change request", req.FieldName)
+		return nil, status.Errorf(codes.InvalidArgument, "field '%s' cannot be changed via a profile change request", req.FieldName)
 	}
 
 	// Validate old and new values are not identical
 	if req.OldValue == req.NewValue {
-		return nil, status.Errorf(codes.InvalidArgument, "Old and new values must differ")
+		return nil, status.Errorf(codes.InvalidArgument, "old and new values must differ")
 	}
 
 	// Validate new value is not empty for required fields
 	if req.NewValue == "" && (req.FieldName == "name" || req.FieldName == "email" || req.FieldName == "contactNumber") {
-		return nil, status.Errorf(codes.InvalidArgument, "Field '%s' cannot be set to empty", req.FieldName)
+		return nil, status.Errorf(codes.InvalidArgument, "field '%s' cannot be set to empty", req.FieldName)
 	}
 
 	// Fetch the user document to get name and email for display
 	userDoc, err := s.db.Collection("users").Doc(req.UserId).Get(ctx)
 	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "User not found: %s", req.UserId)
+		return nil, status.Errorf(codes.NotFound, "user not found: %s", req.UserId)
 	}
 	userData := userDoc.Data()
 
@@ -400,7 +406,10 @@ func (s *AdminServer) GetProfileChangeRequests(ctx context.Context, req *emptypb
 		return nil, status.Errorf(codes.Unimplemented, "Firestore is not initialized")
 	}
 
-	actor := actorUID(ctx)
+	user, err := auth.GetUserContext(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	iter := s.db.Collection("profileChangeRequests").OrderBy("requestedAt", firestore.Desc).Documents(ctx)
 	defer iter.Stop()
@@ -413,15 +422,12 @@ func (s *AdminServer) GetProfileChangeRequests(ctx context.Context, req *emptypb
 		}
 
 		data := doc.Data()
+		reqStatus, _ := data["status"].(string)
+		userID, _ := data["userId"].(string)
 
-		status, _ := data["status"].(string)
-
-		// Non-admin users can only see their own pending requests
-		if status == "pending" {
-			userID, _ := data["userId"].(string)
-			if userID != "" && actor != "system" && userID != actor {
-				continue
-			}
+		// Non-admin users can only see their own requests
+		if user.Role != "admin" && userID != user.UID {
+			continue
 		}
 
 		requestedAtTS := data["requestedAt"]
@@ -436,17 +442,25 @@ func (s *AdminServer) GetProfileChangeRequests(ctx context.Context, req *emptypb
 			resolvedAtStr = fmt.Sprintf("%v", ts)
 		}
 
+		// Use safe helper to get string from map
+		getStr := func(m map[string]interface{}, key string) string {
+			if v, ok := m[key].(string); ok {
+				return v
+			}
+			return ""
+		}
+
 		requests = append(requests, &pb.ProfileChangeRequest{
 			Id:          doc.Ref.ID,
-			UserId:      data["userId"].(string),
-			UserName:    data["userName"].(string),
-			UserEmail:   data["userEmail"].(string),
-			FieldName:   data["fieldName"].(string),
-			OldValue:    data["oldValue"].(string),
-			NewValue:    data["newValue"].(string),
+			UserId:      userID,
+			UserName:    getStr(data, "userName"),
+			UserEmail:   getStr(data, "userEmail"),
+			FieldName:   getStr(data, "fieldName"),
+			OldValue:    getStr(data, "oldValue"),
+			NewValue:    getStr(data, "newValue"),
 			RequestedAt: requestedAtStr,
-			Status:      status,
-			AdminNotes:  data["adminNotes"].(string),
+			Status:      reqStatus,
+			AdminNotes:  getStr(data, "adminNotes"),
 			ResolvedAt:  resolvedAtStr,
 		})
 	}
@@ -459,30 +473,35 @@ func (s *AdminServer) ApproveProfileChangeRequest(ctx context.Context, req *pb.A
 		return nil, status.Errorf(codes.Unimplemented, "Firestore is not initialized")
 	}
 
-	actor := actorUID(ctx)
-	if actor == "system" {
-		return nil, status.Errorf(codes.Unauthenticated, "User identity not provided")
+	user, err := auth.RequireAdmin(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	if req.RequestId == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "Request ID is required")
+		return nil, status.Errorf(codes.InvalidArgument, "request ID is required")
 	}
 
 	// Fetch the request document
 	requestDoc, err := s.db.Collection("profileChangeRequests").Doc(req.RequestId).Get(ctx)
 	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "Profile change request not found: %s", req.RequestId)
+		return nil, status.Errorf(codes.NotFound, "profile change request not found: %s", req.RequestId)
 	}
 	requestData := requestDoc.Data()
 
 	requestStatus, _ := requestData["status"].(string)
 	if requestStatus != "pending" {
-		return nil, status.Errorf(codes.FailedPrecondition, "Request %s is already %s", req.RequestId, requestStatus)
+		return nil, status.Errorf(codes.FailedPrecondition, "request %s is already %s", req.RequestId, requestStatus)
 	}
 
 	requestedUserId, _ := requestData["userId"].(string)
 	fieldName, _ := requestData["fieldName"].(string)
 	newValue, _ := requestData["newValue"].(string)
+
+	// Double check the field is allowed (extra safety)
+	if !allowedProfileFields[fieldName] {
+		return nil, status.Errorf(codes.InvalidArgument, "field '%s' is not allowed to be changed", fieldName)
+	}
 
 	// Use the confirmed new value from the request body (safety check)
 	approvedValue := req.NewValue
@@ -506,15 +525,15 @@ func (s *AdminServer) ApproveProfileChangeRequest(ctx context.Context, req *pb.A
 	})
 
 	if err := batch.Commit(ctx); err != nil {
-		return nil, status.Errorf(codes.Internal, "Failed to approve request: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to approve request: %v", err)
 	}
 
 	adminNotes := req.AdminNotes
 	if adminNotes == "" {
-		adminNotes = fmt.Sprintf("Approved by admin (%s).", actor)
+		adminNotes = fmt.Sprintf("Approved by admin (%s).", user.UID)
 	}
 
-	s.writeAuditLog(ctx, "PROFILE_CHANGE_REQUEST_APPROVED", "profileChangeRequest", req.RequestId, actor,
+	s.writeAuditLog(ctx, "PROFILE_CHANGE_REQUEST_APPROVED", "profileChangeRequest", req.RequestId, user.UID,
 		fmt.Sprintf("Approved %s change request for user %s (old: %s, new: %s). Notes: %s",
 			fieldName, requestedUserId, requestData["oldValue"], approvedValue, adminNotes))
 
@@ -526,29 +545,29 @@ func (s *AdminServer) DenyProfileChangeRequest(ctx context.Context, req *pb.Deny
 		return nil, status.Errorf(codes.Unimplemented, "Firestore is not initialized")
 	}
 
-	actor := actorUID(ctx)
-	if actor == "system" {
-		return nil, status.Errorf(codes.Unauthenticated, "User identity not provided")
+	user, err := auth.RequireAdmin(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	if req.RequestId == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "Request ID is required")
+		return nil, status.Errorf(codes.InvalidArgument, "request ID is required")
 	}
 
 	if req.AdminNotes == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "Admin notes are required for denial")
+		return nil, status.Errorf(codes.InvalidArgument, "admin notes are required for denial")
 	}
 
 	// Fetch the request document
 	requestDoc, err := s.db.Collection("profileChangeRequests").Doc(req.RequestId).Get(ctx)
 	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "Profile change request not found: %s", req.RequestId)
+		return nil, status.Errorf(codes.NotFound, "profile change request not found: %s", req.RequestId)
 	}
 	requestData := requestDoc.Data()
 
 	requestStatus, _ := requestData["status"].(string)
 	if requestStatus != "pending" {
-		return nil, status.Errorf(codes.FailedPrecondition, "Request %s is already %s", req.RequestId, requestStatus)
+		return nil, status.Errorf(codes.FailedPrecondition, "request %s is already %s", req.RequestId, requestStatus)
 	}
 
 	// Update the request to denied
@@ -558,10 +577,10 @@ func (s *AdminServer) DenyProfileChangeRequest(ctx context.Context, req *pb.Deny
 		"adminNotes": req.AdminNotes,
 	})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Failed to deny request: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to deny request: %v", err)
 	}
 
-	s.writeAuditLog(ctx, "PROFILE_CHANGE_REQUEST_DENIED", "profileChangeRequest", req.RequestId, actor,
+	s.writeAuditLog(ctx, "PROFILE_CHANGE_REQUEST_DENIED", "profileChangeRequest", req.RequestId, user.UID,
 		fmt.Sprintf("Denied change request: %s. Reason: %s", req.RequestId, req.AdminNotes))
 
 	return &emptypb.Empty{}, nil

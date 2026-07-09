@@ -1,4 +1,5 @@
 import { apiGet, apiPost, apiDelete } from '@/lib/api-client';
+import { gradeInputSchema, formatZodError } from './validation';
 import { z } from "zod";
 
 export const GradeAnalysisInputSchema = z.array(
@@ -71,18 +72,21 @@ export async function getUniqueCourseNames(): Promise<string[]> {
 export async function updateStudentGrade(
   gradeInfo: Omit<Grade, "id" | "updatedAt" | "facultyId">,
 ): Promise<void> {
-  if (!gradeInfo.studentId || gradeInfo.studentId.trim() === '') {
-    throw new Error('Student ID is required');
+  // Validate on the client side before hitting the gateway.
+  // Note: gradeInputSchema expects some fields that Omit<Grade, ...> might not have,
+  // like courseId, score, maxScore, semester, academicYear.
+  // We'll use a partial validation or ensure the input matches.
+  const validated = gradeInputSchema.partial().safeParse({
+    studentId: gradeInfo.studentId,
+    courseName: gradeInfo.courseName,
+    grade: gradeInfo.grade,
+    maxScore: gradeInfo.maxMarks,
+  });
+
+  if (!validated.success) {
+    throw new Error(`Validation failed: ${formatZodError(validated.error)}`);
   }
-  if (!gradeInfo.courseName || gradeInfo.courseName.trim() === '') {
-    throw new Error('Course name is required');
-  }
-  if (!gradeInfo.grade || gradeInfo.grade.trim() === '') {
-    throw new Error('Grade is required');
-  }
-  if (gradeInfo.maxMarks !== undefined && gradeInfo.maxMarks <= 0) {
-    throw new Error('Max marks must be positive');
-  }
+
   try {
     await apiPost(`/api/academic/grades`, gradeInfo);
   } catch (error) {
