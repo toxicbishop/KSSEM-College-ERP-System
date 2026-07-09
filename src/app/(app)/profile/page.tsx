@@ -123,7 +123,7 @@ const InfoItem = ({
   fieldName: keyof StudentProfile;
   isEditable?: boolean;
   isEditMode: boolean;
-  onEditRequest?: (fieldName: keyof StudentProfile, label: string) => void;
+  onEditRequest?: (fieldName: CreateProfileChangeRequestInput["fieldName"], label: string) => void;
   editModeRender?: (
     currentValue: any,
     handleChange: (
@@ -189,7 +189,7 @@ const InfoItem = ({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => onEditRequest(fieldName, label)}
+          onClick={() => onEditRequest(fieldName as CreateProfileChangeRequestInput["fieldName"], label)}
           className="whitespace-nowrap bg-kssem-gold text-kssem-navy border-kssem-gold hover:bg-[#c4a030] transition-all shadow-md font-bold uppercase tracking-wider text-[10px]">
           <Send className="mr-2 h-3 w-3" /> Request Change
         </Button>
@@ -291,7 +291,7 @@ function ProfileDetailsLoader() {
 
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [requestFieldInfo, setRequestFieldInfo] = useState<{
-    key: keyof StudentProfile;
+    key: CreateProfileChangeRequestInput["fieldName"];
     label: string;
   } | null>(null);
   const [requestOldValue, setRequestOldValue] = useState("");
@@ -324,7 +324,6 @@ function ProfileDetailsLoader() {
         setClassroomsError(null);
 
         try {
-          const idToken = await clientAuth!.currentUser!.getIdToken();
           const fetchedProfile = await getStudentProfile(user.uid);
           if (fetchedProfile) {
             const enrichedProfile = {
@@ -396,7 +395,6 @@ function ProfileDetailsLoader() {
     if (!profile || !user || !clientAuth || !clientAuth.currentUser) return;
     setIsSubmitting(true);
     try {
-      const idToken = await clientAuth.currentUser.getIdToken();
       await updateStudentProfile(user.uid, editableProfile);
       // Optimistically update the main profile state
       setProfile((prev) => (prev ? { ...prev, ...editableProfile } : null));
@@ -416,7 +414,7 @@ function ProfileDetailsLoader() {
     }
   };
 
-  const openRequestModal = (fieldName: keyof StudentProfile, label: string) => {
+  const openRequestModal = (fieldName: CreateProfileChangeRequestInput["fieldName"], label: string) => {
     if (!profile || !user) return;
     setRequestFieldInfo({ key: fieldName, label });
     setRequestOldValue(String(profile[fieldName] ?? "N/A"));

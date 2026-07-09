@@ -64,7 +64,6 @@ function StudentClassroomsLoader() {
       const fetchClassrooms = async () => {
         setLoadingClassroomsState(true);
         try {
-          const idToken = await clientAuth!.currentUser!.getIdToken();
           const fetchedClassrooms = isDummyUser
             ? ([
                 {
@@ -110,7 +109,7 @@ function StudentClassroomsLoader() {
                   studentBatchInClassroom: "Batch A",
                 },
               ] as any)
-            : await fetchStudentClassrooms(idToken);
+            : await fetchStudentClassrooms();
           setEnrolledClassrooms(fetchedClassrooms);
         } catch (err) {
           console.error("Failed to fetch student classroom data:", err);
@@ -146,9 +145,7 @@ function StudentClassroomsLoader() {
     setLoadingClassmatesView(true);
     setClassmatesError(null);
     try {
-      const idToken = await clientAuth!.currentUser!.getIdToken();
       const fetchedClassmates = await fetchClassmates(
-        idToken,
         classroom.classroomId,
       );
       setClassmates(fetchedClassmates);

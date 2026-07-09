@@ -39,8 +39,7 @@ export default function FacultyViewStudentsPage() {
     try {
       const currentUser = clientAuth?.currentUser;
       if (!currentUser) return;
-      const idToken = await currentUser.getIdToken();
-      const fetchedClassrooms = await fetchFacultyClassroomsData(idToken);
+      const fetchedClassrooms = await fetchFacultyClassroomsData();
       setClassrooms(fetchedClassrooms);
     } catch {
       toast({ title: "Error", description: "Could not load your classrooms.", variant: "destructive" });
@@ -55,8 +54,7 @@ export default function FacultyViewStudentsPage() {
     try {
       const currentUser = clientAuth?.currentUser;
       if (!currentUser) return;
-      const idToken = await currentUser.getIdToken();
-      const students = await fetchStudentsInClassroomData(idToken, classroomId);
+      const students = await fetchStudentsInClassroomData(classroomId);
         const sortedStudents = students.sort((a, b) => 
             (a.studentIdNumber || '').localeCompare(b.studentIdNumber || '', undefined, { numeric: true })
         );

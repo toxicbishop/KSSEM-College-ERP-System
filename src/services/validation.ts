@@ -47,6 +47,9 @@ export type CreateProfileChangeRequestInput = z.infer<typeof createProfileChange
 // Approve / Deny Request Validation
 // ---------------------------------------------------------------------------
 
+export type ApproveProfileChangeRequestInput = z.infer<typeof approveProfileChangeRequestSchema>;
+export type DenyProfileChangeRequestInput = z.infer<typeof denyProfileChangeRequestSchema>;
+
 export const approveProfileChangeRequestSchema = z.object({
   requestId: z.string({
     required_error: 'Request ID is required',
