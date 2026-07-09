@@ -46,7 +46,6 @@ export interface AttendanceRecord {
 }
 
 export async function getAttendanceRecords(
-  idToken: string,
   studentId?: string,
 ): Promise<AttendanceRecord[]> {
   try {
@@ -60,10 +59,15 @@ export async function getAttendanceRecords(
 }
 
 export async function getLectureAttendanceForDate(
-  idToken: string,
   classroomId: string,
   date: string,
 ): Promise<LectureAttendanceRecord[]> {
+  if (!classroomId || classroomId.trim() === '') {
+    throw new Error('Classroom ID is required');
+  }
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    throw new Error('Date must be in YYYY-MM-DD format');
+  }
   try {
     return await apiGet<LectureAttendanceRecord[]>(`/api/academic/attendance/lecture?classroomId=${classroomId}&date=${date}`);
   } catch (error) {
@@ -73,11 +77,19 @@ export async function getLectureAttendanceForDate(
 }
 
 export async function getLectureAttendanceForDateRange(
-  idToken: string,
   classroomId: string,
   startDate: string,
   endDate: string,
 ): Promise<LectureAttendanceRecord[]> {
+  if (!classroomId || classroomId.trim() === '') {
+    throw new Error('Classroom ID is required');
+  }
+  if (!startDate || !/^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
+    throw new Error('Start date must be in YYYY-MM-DD format');
+  }
+  if (!endDate || !/^\d{4}-\d{2}-\d{2}$/.test(endDate)) {
+    throw new Error('End date must be in YYYY-MM-DD format');
+  }
   try {
     return await apiGet<LectureAttendanceRecord[]>(`/api/academic/attendance/lecture/range?classroomId=${classroomId}&startDate=${startDate}&endDate=${endDate}`);
   } catch (error) {
@@ -90,6 +102,22 @@ export async function submitLectureAttendance(
   records: Omit<LectureAttendanceRecord, "id" | "submittedAt">[],
 ): Promise<void> {
   if (records.length === 0) return;
+  // Basic validation of the first record to catch obvious issues early
+  const r = records[0];
+  if (!r.classroomId || r.classroomId.trim() === '') {
+    throw new Error('Classroom ID is required');
+  }
+  if (!r.date || !/^\d{4}-\d{2}-\d{2}$/.test(r.date)) {
+    throw new Error('Date must be in YYYY-MM-DD format');
+  }
+  for (const rec of records) {
+    if (!rec.status || (rec.status !== 'present' && rec.status !== 'absent')) {
+      throw new Error('Each record must have status "present" or "absent"');
+    }
+    if (!rec.studentId || rec.studentId.trim() === '') {
+      throw new Error('Each record must have a student ID');
+    }
+  }
   try {
     await apiPost(`/api/academic/attendance/lecture`, { records });
   } catch (error) {
@@ -99,10 +127,15 @@ export async function submitLectureAttendance(
 }
 
 export async function deleteLectureAttendance(
-  idToken: string,
   classroomId: string,
   date: string,
 ): Promise<void> {
+  if (!classroomId || classroomId.trim() === '') {
+    throw new Error('Classroom ID is required');
+  }
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    throw new Error('Date must be in YYYY-MM-DD format');
+  }
   try {
     await apiDelete(`/api/academic/attendance/lecture?classroomId=${classroomId}&date=${date}`);
   } catch (error) {

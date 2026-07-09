@@ -52,6 +52,34 @@ service AdminService {
       body: "settings"
     };
   }
+
+  // Profile Change Request RPCs — migrated from Next.js server actions to the Admin microservice
+  rpc CreateProfileChangeRequest(CreateProfileChangeRequestRequest) returns (CreateProfileChangeRequestResponse) {
+    option (google.api.http) = {
+      post: "/api/admin/profile-change-requests"
+      body: "*"
+    };
+  }
+
+  rpc GetProfileChangeRequests(google.protobuf.Empty) returns (ListProfileChangeRequestsResponse) {
+    option (google.api.http) = {
+      get: "/api/admin/profile-change-requests"
+    };
+  }
+
+  rpc ApproveProfileChangeRequest(ApproveProfileChangeRequestRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/admin/profile-change-requests/{request_id}/approve"
+      body: "*"
+    };
+  }
+
+  rpc DenyProfileChangeRequest(DenyProfileChangeRequestRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/admin/profile-change-requests/{request_id}/deny"
+      body: "*"
+    };
+  }
 }
 
 // ---------------------------------------------------------
@@ -129,4 +157,48 @@ message SystemSettings {
 
 message UpdateSystemSettingsRequest {
   SystemSettings settings = 1;
+}
+
+// ---------------------------------------------------------
+// Profile Change Request Messages
+// ---------------------------------------------------------
+
+message ProfileChangeRequest {
+  string id = 1;
+  string user_id = 2;
+  string user_name = 3;
+  string user_email = 4;
+  string field_name = 5;
+  string old_value = 6;
+  string new_value = 7;
+  string requested_at = 8;
+  string status = 9;       // "pending" | "approved" | "denied"
+  string admin_notes = 10;
+  string resolved_at = 11;
+}
+
+message CreateProfileChangeRequestRequest {
+  string user_id = 1;           // from gateway X-User-Id header
+  string field_name = 2;
+  string old_value = 3;
+  string new_value = 4;
+}
+
+message CreateProfileChangeRequestResponse {
+  string id = 1;
+}
+
+message ListProfileChangeRequestsResponse {
+  repeated ProfileChangeRequest requests = 1;
+}
+
+message ApproveProfileChangeRequestRequest {
+  string request_id = 1;
+  string admin_notes = 2;
+  string new_value = 3;  // confirmation of the new value
+}
+
+message DenyProfileChangeRequestRequest {
+  string request_id = 1;
+  string admin_notes = 2;
 }

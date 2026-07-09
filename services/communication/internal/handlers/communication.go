@@ -9,9 +9,21 @@ import (
 	"github.com/redis/go-redis/v9"
 	pb "github.com/toxicbishop/kssem-college-erp-system/proto/communication/v1"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
+
+// actorUID extracts the caller's UID from gRPC incoming metadata.
+// The gateway forwards the Firebase UID via the X-User-Id header.
+func actorUID(ctx context.Context) string {
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		if values := md.Get("x-user-id"); len(values) > 0 {
+			return values[0]
+		}
+	}
+	return "system"
+}
 
 type CommunicationServer struct {
 	pb.UnimplementedCommunicationServiceServer
@@ -77,12 +89,29 @@ func (s *CommunicationServer) MarkNotificationRead(ctx context.Context, req *pb.
 		return nil, status.Errorf(codes.Unimplemented, "Firestore is not initialized")
 	}
 
-	// Wait, the API only takes `id` in the URL: `/api/communication/notifications/{id}/read`
-	// In Firestore, notifications are nested under `users/{uid}/notifications/{id}`.
-	// Since we don't have the `uid` in the path, we might need a collection group query or the uid needs to be in the path.
-	// For now, assume we'll just return a success since this is a mock implementation
-	// To do it properly, we'd need the uid or query across all notifications collections.
-	// We'll skip the actual Firestore update for this demo if uid isn't provided.
+	if req.Id == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "notification ID is required")
+	}
+
+	// Derive the caller's UID from gRPC metadata (forwarded by the gateway from
+	// the Firebase ID token's UID claim via the X-User-Id header).
+	uid := actorUID(ctx)
+	if uid == "system" {
+		return nil, status.Errorf(codes.Unauthenticated, "user identity not provided")
+	}
+
+	// Notifications live under the user-scoped subcollection:
+	//   users/{uid}/notifications/{id}
+	// We update the document directly since we now know the owner UID.
+	notifRef := s.db.Collection("users").Doc(uid).Collection("notifications").Doc(req.Id)
+	_, err := notifRef.Update(ctx, map[string]interface{}{
+		"read": true,
+	})
+	if err != nil {
+		// If the document doesn't exist or belongs to another user, Firestore
+		// will return an error. We surface it as NotFound.
+		return nil, status.Errorf(codes.NotFound, "notification not found or not owned by user: %v", err)
+	}
 
 	return &emptypb.Empty{}, nil
 }

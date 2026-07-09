@@ -19,47 +19,30 @@ export interface Announcement {
    * Optional category (e.g., 'Exams', 'Finance', 'Events').
    */
   category?: string;
+  /**
+   * Optional author name.
+   */
+  authorName?: string;
 }
 
 /**
- * Asynchronously retrieves recent announcements.
+ * Asynchronously retrieves recent announcements from the API gateway.
  *
- * @returns A promise that resolves to an array of Announcement objects.
+ * The Academic service currently does not expose an announcements endpoint,
+ * so this function falls back to mock data.  When the backend implementation
+ * is available, replace the fallback with an actual `apiGet` call:
+ *
+ *   ```
+ *   return await apiGet<Announcement[]>('/api/academic/announcements');
+ *   ```
  */
 export async function getAnnouncements(): Promise<Announcement[]> {
-  // TODO: Implement this by calling an API.
-
-  // Returning mock data similar to the screenshot's Lorem Ipsum content
-  return [
-    {
-      id: "1",
-      date: "2024-08-28",
-      title: "Recent Announcement",
-      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    },
-    {
-      id: "2",
-      date: "2024-08-27",
-      title: "Recent Announcement",
-      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    },
-    {
-      id: "3",
-      date: "2024-08-26",
-      title: "Recent Announcement",
-      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    },
-    {
-      id: "4",
-      date: "2024-08-25",
-      title: "Recent Announcement",
-      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    },
-    {
-      id: "5",
-      date: "2024-08-24",
-      title: "Recent Announcement",
-      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    },
-  ];
+  try {
+    // TODO: Replace with real API call once the backend endpoint is available.
+    // return await apiGet<Announcement[]>('/api/academic/announcements');
+    return [];
+  } catch (error) {
+    console.error('Failed to fetch announcements:', error);
+    return [];
+  }
 }
