@@ -1,6 +1,7 @@
 import { GraphQLClient } from 'graphql-request';
 
-const endpoint = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT || 'http://localhost:8080/query';
+const GATEWAY_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:8080';
+const endpoint = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT || `${GATEWAY_URL}/query`;
 
 export const client = new GraphQLClient(endpoint);
 
