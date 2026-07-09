@@ -50,7 +50,6 @@ export interface ClassmateInfo {
 }
 
 export async function createClassroom(
-  idToken: string,
   name: string,
   subject: string,
 ): Promise<string> {
@@ -59,27 +58,23 @@ export async function createClassroom(
 }
 
 export async function getClassroomsByFaculty(
-  idToken: string,
 ): Promise<Classroom[]> {
   return await apiGet<Classroom[]>(`/api/academic/classrooms`);
 }
 
 export async function getAllFacultyUsers(
-  idToken: string,
 ): Promise<FacultyUser[]> {
   // This might belong to admin service eventually, but Gateway can route it.
   return await apiGet<FacultyUser[]>(`/api/admin/faculty`);
 }
 
 export async function getStudentsInClassroom(
-  idToken: string,
   classroomId: string,
 ): Promise<ClassroomStudentInfo[]> {
   return await apiGet<ClassroomStudentInfo[]>(`/api/academic/classrooms/${classroomId}/students`);
 }
 
 export async function addStudentsToClassroom(
-  idToken: string,
   classroomId: string,
   studentsToAdd: StudentSearchResultItem[],
 ): Promise<void> {
@@ -88,7 +83,6 @@ export async function addStudentsToClassroom(
 }
 
 export async function removeStudentFromClassroom(
-  idToken: string,
   classroomId: string,
   studentUserId: string,
 ): Promise<void> {
@@ -96,7 +90,6 @@ export async function removeStudentFromClassroom(
 }
 
 export async function searchStudents(
-  idToken: string,
   classroomId: string,
   searchTerm: string,
 ): Promise<StudentSearchResultItem[]> {
@@ -104,7 +97,6 @@ export async function searchStudents(
 }
 
 export async function addInvitedFacultyToClassroom(
-  idToken: string,
   classroomId: string,
   facultyToInviteId: string,
 ): Promise<void> {
@@ -112,14 +104,12 @@ export async function addInvitedFacultyToClassroom(
 }
 
 export async function deleteClassroom(
-  idToken: string,
   classroomId: string,
 ): Promise<void> {
   await apiDelete(`/api/academic/classrooms/${classroomId}`);
 }
 
 export async function updateStudentBatchInClassroom(
-  idToken: string,
   classroomId: string,
   studentUserId: string,
   newBatch: string,
@@ -128,13 +118,11 @@ export async function updateStudentBatchInClassroom(
 }
 
 export async function getStudentClassroomsWithBatchInfo(
-  idToken: string,
 ): Promise<StudentClassroomEnrollmentInfo[]> {
   return await apiGet<StudentClassroomEnrollmentInfo[]>(`/api/academic/me/classrooms`);
 }
 
 export async function getClassmatesInfo(
-  idToken: string,
   classroomId: string,
 ): Promise<ClassmateInfo[]> {
   const students = await apiGet<ClassroomStudentInfo[]>(`/api/academic/classrooms/${classroomId}/students`);

@@ -14,11 +14,9 @@ import type { Grade } from "@/services/grades";
 /**
  * Server action to fetch classrooms for a faculty member.
  */
-export async function fetchFacultyClassrooms(
-  idToken: string
-): Promise<Classroom[]> {
+export async function fetchFacultyClassrooms(): Promise<Classroom[]> {
   try {
-    return await getClassroomsByFaculty(idToken);
+    return await getClassroomsByFaculty();
   } catch (error) {
     console.error("Fetch classrooms error:", error);
     return [];
@@ -29,11 +27,10 @@ export async function fetchFacultyClassrooms(
  * Server action to fetch students in a classroom.
  */
 export async function fetchStudentsForClassroom(
-  idToken: string,
   classroomId: string
 ): Promise<ClassroomStudentInfo[]> {
   try {
-    return await getStudentsInClassroom(idToken, classroomId);
+    return await getStudentsInClassroom(classroomId);
   } catch (error) {
     console.error("Fetch students error:", error);
     return [];
@@ -57,11 +54,9 @@ export async function fetchStudentGradesForFaculty(
 /**
  * Server action to get unique course names.
  */
-export async function getUniqueCoursesForFaculty(
-  idToken: string
-): Promise<string[]> {
+export async function getUniqueCoursesForFaculty(): Promise<string[]> {
   try {
-    return await getUniqueCourseNames(idToken);
+    return await getUniqueCourseNames();
   } catch (error) {
     console.error("Fetch unique courses error:", error);
     return [];
@@ -72,11 +67,10 @@ export async function getUniqueCoursesForFaculty(
  * Server action to update a student's grade.
  */
 export async function updateGradeForStudent(
-  idToken: string,
   gradeData: { studentId: string; courseName: string; grade: string; maxMarks?: number }
 ): Promise<void> {
   try {
-    return await updateStudentGrade(idToken, gradeData);
+    return await updateStudentGrade(gradeData);
   } catch (error) {
     console.error("Update grade error:", error);
     throw error;
@@ -87,11 +81,10 @@ export async function updateGradeForStudent(
  * Server action to delete a student's grade.
  */
 export async function deleteGradeRecord(
-  idToken: string,
   gradeId: string
 ): Promise<void> {
   try {
-    return await deleteStudentGrade(idToken, gradeId);
+    return await deleteStudentGrade(gradeId);
   } catch (error) {
     console.error("Delete grade error:", error);
     throw error;
@@ -102,11 +95,10 @@ export async function deleteGradeRecord(
  * Server action to get grades for a classroom.
  */
 export async function fetchGradesForClassroom(
-  idToken: string,
   studentUids: string[]
 ): Promise<Grade[]> {
   try {
-    return await getGradesForClassroom(idToken, studentUids);
+    return await getGradesForClassroom(studentUids);
   } catch (error) {
     console.error("Fetch classroom grades error:", error);
     return [];
