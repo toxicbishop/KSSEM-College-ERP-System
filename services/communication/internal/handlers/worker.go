@@ -61,23 +61,26 @@ func (s *CommunicationServer) StartWorker(ctx context.Context) {
 
 func (s *CommunicationServer) processMessage(ctx context.Context, msg redis.XMessage) {
 	logger.Info(ctx, "Received message from grades:events", "msg_id", msg.ID, "values", msg.Values)
-	
+
 	studentId, ok := msg.Values["studentId"].(string)
 	if !ok {
 		return
 	}
-	
+
 	// Example message format: action: "GRADE_PUBLISHED", details: "..."
 	action, _ := msg.Values["action"].(string)
-	
+
 	title := "New Notification"
 	messageBody := fmt.Sprintf("Event: %s", action)
-	
+
 	if action == "GRADE_PUBLISHED" {
+		gradeID, _ := msg.Values["gradeId"].(string)
+		courseName, _ := msg.Values["courseName"].(string)
+		grade, _ := msg.Values["grade"].(string)
 		title = "New Grades Published"
-		messageBody = "Your grades have been published and are available to view."
+		messageBody = fmt.Sprintf("Your grade for %s is %s (grade ID: %s).", courseName, grade, gradeID)
 	}
-	
+
 	// Create a notification in Firestore
 	if s.db != nil {
 		_, _, err := s.db.Collection("users").Doc(studentId).Collection("notifications").Add(ctx, map[string]interface{}{
@@ -85,10 +88,10 @@ func (s *CommunicationServer) processMessage(ctx context.Context, msg redis.XMes
 			"message":   messageBody,
 			"type":      "system",
 			"read":      false,
-			"link":      "/student/results",
+			"link":      fmt.Sprintf("/student/results?gradeId=%v", msg.Values["gradeId"]),
 			"timestamp": time.Now(),
 		})
-		
+
 		if err != nil {
 			logger.Error(ctx, "Failed to create notification", "error", err)
 		} else {

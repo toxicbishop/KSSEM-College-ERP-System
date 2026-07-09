@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
-import { db as clientDb, auth as clientAuth } from "@/lib/firebase/client"; // clientDb for user role check, clientAuth for token
-import { doc, getDoc } from "firebase/firestore";
+import { auth as clientAuth } from "@/lib/firebase/client";
 import {
   Card,
   CardHeader,
@@ -68,11 +67,10 @@ export default function AdminRequestsPage() {
     const checkAdminAccess = async () => {
       setCheckingRole(true);
       let userIsCurrentlyAdmin = false;
-      if (clientDb) {
+      if (clientAuth?.currentUser) {
         try {
-          const userDocRef = doc(clientDb, "users", user.uid);
-          const userDocSnap = await getDoc(userDocRef);
-          if (userDocSnap.exists() && userDocSnap.data().role === "admin") {
+          const tokenResult = await clientAuth.currentUser.getIdTokenResult();
+          if (tokenResult.claims.role === "admin") {
             userIsCurrentlyAdmin = true;
           }
         } catch (error) {
@@ -83,12 +81,6 @@ export default function AdminRequestsPage() {
             variant: "destructive",
           });
         }
-      } else {
-        toast({
-          title: "Database Error",
-          description: "Firestore is not available. Cannot verify admin role.",
-          variant: "destructive",
-        });
       }
       if (userIsCurrentlyAdmin) setIsAdmin(true);
       else {
@@ -495,4 +487,3 @@ export default function AdminRequestsPage() {
     </div>
   );
 }
-

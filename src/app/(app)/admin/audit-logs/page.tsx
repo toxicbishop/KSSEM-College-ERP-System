@@ -2,16 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  limit,
-  orderBy,
-  query,
-  Timestamp,
-} from "firebase/firestore";
 import { format } from "date-fns";
 import {
   ClipboardList,
@@ -45,7 +35,7 @@ import {
 } from "@/components/ui/table";
 import { useAuth } from "@/context/auth-context";
 import { useToast } from "@/hooks/use-toast";
-import { db, auth as clientAuth } from "@/lib/firebase/client";
+import { auth as clientAuth } from "@/lib/firebase/client";
 import type { AuditAction } from "@/services/audit-logs";
 import { getAuditLogs } from "@/services/admin-users";
 
@@ -59,7 +49,7 @@ type AuditLog = {
   targetId: string;
   targetEmail?: string;
   details?: Record<string, unknown>;
-  createdAt?: Timestamp;
+  createdAt?: string;
 };
 
 const actionMeta: Record<
@@ -88,9 +78,9 @@ const actionMeta: Record<
   },
 };
 
-function formatTimestamp(timestamp?: Timestamp) {
+function formatTimestamp(timestamp?: string) {
   if (!timestamp) return "Pending timestamp";
-  return format(timestamp.toDate(), "dd MMM yyyy, hh:mm a");
+  return format(new Date(timestamp), "dd MMM yyyy, hh:mm a");
 }
 
 function formatDetails(details?: Record<string, unknown>) {
@@ -159,7 +149,7 @@ export default function AdminAuditLogsPage() {
   }, [authLoading, router, toast, user]);
 
   const fetchAuditLogs = useCallback(async () => {
-    if (!db || !isAdmin) return;
+    if (!isAdmin) return;
 
     setLoadingLogs(true);
     try {

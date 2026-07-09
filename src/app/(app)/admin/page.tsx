@@ -3,14 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
-import { db } from "@/lib/firebase/client";
 import { auth as clientAuth } from "@/lib/firebase/client";
-import {
-  doc,
-  getDoc,
-  collection,
-  getDocs,
-} from "firebase/firestore";
 import {
   Card,
   CardHeader,
@@ -175,12 +168,9 @@ export default function AdminPage() {
   }, [user, authLoading, router, toast]);
 
   const fetchUsers = async () => {
-    if (!db || !isAdmin) {
+    if (!isAdmin) {
       if (!isAdmin && !checkingRole) {
         // console.log("User is not admin, skipping fetchUsers.");
-      }
-      if (!db) {
-        console.error("Firestore DB instance is not available in fetchUsers.");
       }
       setLoadingUsers(false);
       return;
@@ -301,7 +291,7 @@ export default function AdminPage() {
   };
 
   const handleCreateUser = async () => {
-    if (!db || !isAdmin || !clientAuth?.currentUser) return;
+    if (!isAdmin || !clientAuth?.currentUser) return;
     if (!validateUserProfile(newUser)) return;
     if (newUserPassword.length < 6) {
       toast({
@@ -358,7 +348,7 @@ export default function AdminPage() {
   };
 
   const handleUpdateUser = async () => {
-    if (!db || !isAdmin || !editingUser || !editingUser.id || !clientAuth?.currentUser) return;
+    if (!isAdmin || !editingUser || !editingUser.id || !clientAuth?.currentUser) return;
     if (!validateUserProfile(editingUser)) return;
 
     try {
@@ -399,7 +389,7 @@ export default function AdminPage() {
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (!db || !isAdmin || !clientAuth?.currentUser) return;
+    if (!isAdmin || !clientAuth?.currentUser) return;
     try {
       await deleteManagedUser(userId);
 
