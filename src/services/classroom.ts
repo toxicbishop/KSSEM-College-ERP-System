@@ -53,6 +53,7 @@ export async function createClassroom(
   name: string,
   subject: string,
 ): Promise<string> {
+  void _idToken;
   const result = await apiPost<{ id: string }>(`/api/academic/classrooms`, { name, subject });
   return result.id;
 }
@@ -60,6 +61,7 @@ export async function createClassroom(
 export async function getClassroomsByFaculty(
   _idToken: string,
 ): Promise<Classroom[]> {
+  void _idToken;
   return await apiGet<Classroom[]>(`/api/academic/classrooms`);
 }
 
@@ -129,6 +131,7 @@ export async function updateStudentBatchInClassroom(
 export async function getStudentClassroomsWithBatchInfo(
   _idToken: string,
 ): Promise<StudentClassroomEnrollmentInfo[]> {
+  void _idToken;
   return await apiGet<StudentClassroomEnrollmentInfo[]>(`/api/academic/me/classrooms`);
 }
 

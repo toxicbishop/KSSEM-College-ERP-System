@@ -39,6 +39,7 @@ export async function getGradesForStudent(
   facultyIdToken: string,
   studentId: string,
 ): Promise<Grade[]> {
+  void facultyIdToken;
   return getGrades(studentId);
 }
 
@@ -46,6 +47,7 @@ export async function getGradesForClassroom(
   _idToken: string,
   studentUids: string[],
 ): Promise<Grade[]> {
+  void _idToken;
   // Normally this would be a POST to fetch grades for multiple students
   try {
     return await apiPost<Grade[]>(`/api/academic/grades/classroom`, { studentIds: studentUids });
@@ -56,6 +58,7 @@ export async function getGradesForClassroom(
 }
 
 export async function getUniqueCourseNames(_idToken: string): Promise<string[]> {
+  void _idToken;
   try {
     return await apiGet<string[]>(`/api/academic/courses`);
   } catch (error) {
@@ -68,6 +71,7 @@ export async function updateStudentGrade(
   _idToken: string,
   gradeInfo: Omit<Grade, "id" | "updatedAt" | "facultyId">,
 ): Promise<void> {
+  void _idToken;
   try {
     await apiPost(`/api/academic/grades`, gradeInfo);
   } catch (error) {
@@ -80,6 +84,7 @@ export async function deleteStudentGrade(
   _idToken: string,
   gradeId: string,
 ): Promise<void> {
+  void _idToken;
   try {
     await apiDelete(`/api/academic/grades/${gradeId}`);
   } catch (error) {
