@@ -325,8 +325,7 @@ export default function FacultyAttendancePage() {
     }
     setLoadingClassrooms(true);
     try {
-      const idToken = await clientAuth?.currentUser.getIdToken();
-      const fetchedClassrooms = await fetchClassroomsByFaculty(idToken);
+      const fetchedClassrooms = await fetchClassroomsByFaculty();
       setClassrooms(fetchedClassrooms);
     } catch (error) {
       console.error("Error fetching faculty classrooms:", error);
@@ -359,9 +358,7 @@ export default function FacultyAttendancePage() {
     }
     setLoadingStudents(true);
     try {
-      const idToken = await clientAuth?.currentUser.getIdToken();
       const students: ClassroomStudentInfo[] = await fetchStudentsInClassroom(
-        idToken,
         classroomId,
       );
       setCurrentStudents(students);
@@ -422,10 +419,8 @@ export default function FacultyAttendancePage() {
 
     setLoadingPreviousAttendance(true);
     try {
-      const idToken = await clientAuth?.currentUser.getIdToken();
       const dateString = format(selectedDate, "yyyy-MM-dd");
       const previousRecords = await getAttendanceForDate(
-        idToken,
         selectedClassroomId,
         dateString,
       );
@@ -658,9 +653,8 @@ export default function FacultyAttendancePage() {
     }
     setIsDeleting(true);
     try {
-      const idToken = await clientAuth?.currentUser.getIdToken();
       const dateString = format(selectedDate, "yyyy-MM-dd");
-      await deleteAttendance(idToken, selectedClassroomId, dateString);
+      await deleteAttendance(selectedClassroomId, dateString);
       toast({
         title: "Attendance Deleted",
         description: `All attendance records for this classroom on ${format(selectedDate, "PPP")} have been deleted.`,
@@ -716,9 +710,7 @@ export default function FacultyAttendancePage() {
     setReportRecords([]);
     setAnalysisResult(null);
     try {
-      const idToken = await clientAuth?.currentUser.getIdToken();
       const fetchedRecords = await getAttendanceForDateRange(
-        idToken,
         selectedClassroomId,
         format(startDate, "yyyy-MM-dd"),
         format(endDate, "yyyy-MM-dd"),
