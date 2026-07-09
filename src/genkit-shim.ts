@@ -27,6 +27,7 @@ export function genkit(options: GenkitOptions = {}): any {
   base.definePrompt = (cfg: any) => ({
     ...cfg,
     async run(_input: any) {
+      void _input;
       console.warn('[genkit shim] Prompt run invoked but not implemented.');
       return {};
     },
