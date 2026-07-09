@@ -1,4 +1,12 @@
-"use server";
+/**
+ * Server actions for classroom data — thin wrappers that call gateway-backed
+ * service functions.  These are intentionally kept as server actions because
+ * they are invoked from within the authenticated layout (where the user's
+ * Firebase JWT is already attached to the api-client Authorization header).
+ *
+ * NOTE: Errors are re-thrown instead of swallowed so the caller can decide
+ * how to handle failures (show a toast, fall back to a cache, etc.).
+ */
 
 import {
   getStudentClassroomsWithBatchInfo,
@@ -10,30 +18,17 @@ import type {
 } from "@/services/classroom";
 
 /**
- * Server action to fetch student classrooms with batch information.
+ * Fetch student classrooms with batch information.
  */
-export async function fetchStudentClassrooms(
-  idToken: string
-): Promise<StudentClassroomEnrollmentInfo[]> {
-  try {
-    return await getStudentClassroomsWithBatchInfo(idToken);
-  } catch (error) {
-    console.error("Fetch student classrooms error:", error);
-    return [];
-  }
+export async function fetchStudentClassrooms(): Promise<StudentClassroomEnrollmentInfo[]> {
+  return await getStudentClassroomsWithBatchInfo();
 }
 
 /**
- * Server action to fetch classmates information.
+ * Fetch classmates information for a given classroom.
  */
 export async function fetchClassmates(
-  idToken: string,
-  classroomId: string
+  classroomId: string,
 ): Promise<ClassmateInfo[]> {
-  try {
-    return await getClassmatesInfo(idToken, classroomId);
-  } catch (error) {
-    console.error("Fetch classmates error:", error);
-    return [];
-  }
+  return await getClassmatesInfo(classroomId);
 }

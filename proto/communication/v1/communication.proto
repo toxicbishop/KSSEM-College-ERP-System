@@ -11,6 +11,9 @@ service CommunicationService {
   rpc GetNotifications(GetNotificationsRequest) returns (ListNotificationsResponse) {
     option (google.api.http) = {
       get: "/api/communication/notifications"
+      additional_bindings {
+        get: "/api/communication/notifications/{user_id}"
+      }
     };
   }
 

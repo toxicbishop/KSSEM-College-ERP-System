@@ -39,8 +39,7 @@ function AttendanceTableLoader() {
         setLoading(true);
         setError(null);
         try {
-          const idToken = await clientAuth!.currentUser!.getIdToken();
-          const fetchedRecords = await fetchAttendanceRecords(idToken);
+          const fetchedRecords = await fetchAttendanceRecords();
           setRecords(fetchedRecords);
         } catch (err) {
           console.error("Failed to fetch attendance records:", err);

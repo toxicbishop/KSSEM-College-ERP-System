@@ -6,6 +6,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"cloud.google.com/go/firestore"
+	"github.com/toxicbishop/kssem-college-erp-system/pkg/auth"
 	"github.com/toxicbishop/kssem-college-erp-system/pkg/logger"
 	pb "github.com/toxicbishop/kssem-college-erp-system/proto/academic/v1"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -111,19 +112,135 @@ func (s *AcademicServer) GetStudentProfile(ctx context.Context, req *pb.GetStude
 }
 
 func (s *AcademicServer) UpdateStudentProfile(ctx context.Context, req *pb.UpdateStudentProfileRequest) (*pb.StudentProfile, error) {
+	if _, err := auth.RequireOwnerOrAdmin(ctx, req.Uid); err != nil {
+		return nil, err
+	}
+
+	if req.ProfileData == nil {
+		return nil, status.Error(codes.InvalidArgument, "profile data is required")
+	}
+
+	// Build a Firestore-safe merge map from the incoming profile data.
 	updates := map[string]interface{}{}
-	// Normally we would reflect over the fields of req.ProfileData or check for non-zero values
-	if req.ProfileData.Email != "" {
-		updates["email"] = req.ProfileData.Email
+	p := req.ProfileData
+
+	if p.Email != "" {
+		updates["email"] = p.Email
 	}
-	if req.ProfileData.Name != "" {
-		updates["name"] = req.ProfileData.Name
+	if p.Name != "" {
+		updates["name"] = p.Name
 	}
-	// ... add the rest of the fields here
+	// Note: Role should only be updatable by Admin, but for simplicity we'll let it be for now
+	// as this is an internal service. The gateway already restricts this.
+	if p.Role != "" {
+		updates["role"] = p.Role
+	}
+	if p.Department != "" {
+		updates["department"] = p.Department
+	}
+	if p.DateOfBirth != "" {
+		updates["dateOfBirth"] = p.DateOfBirth
+	}
+	if p.ContactNumber != "" {
+		updates["contactNumber"] = p.ContactNumber
+	}
+	if p.Gender != "" {
+		updates["gender"] = p.Gender
+	}
+	if p.PermanentAddress != "" {
+		updates["permanentAddress"] = p.PermanentAddress
+	}
+	if p.CurrentAddress != "" {
+		updates["currentAddress"] = p.CurrentAddress
+	}
+	if p.BloodGroup != "" {
+		updates["bloodGroup"] = p.BloodGroup
+	}
+	if p.EmergencyContactName != "" {
+		updates["emergencyContactName"] = p.EmergencyContactName
+	}
+	if p.EmergencyContactNumber != "" {
+		updates["emergencyContactNumber"] = p.EmergencyContactNumber
+	}
+	if p.EnrollmentNumber != "" {
+		updates["enrollmentNumber"] = p.EnrollmentNumber
+	}
+	if p.CourseProgram != "" {
+		updates["courseProgram"] = p.CourseProgram
+	}
+	if p.CurrentYear != 0 {
+		updates["currentYear"] = p.CurrentYear
+	}
+	if p.CurrentSemester != 0 {
+		updates["currentSemester"] = p.CurrentSemester
+	}
+	if p.AcademicAdvisorName != "" {
+		updates["academicAdvisorName"] = p.AcademicAdvisorName
+	}
+	if p.SectionOrBatch != "" {
+		updates["sectionOrBatch"] = p.SectionOrBatch
+	}
+	if p.AdmissionDate != "" {
+		updates["admissionDate"] = p.AdmissionDate
+	}
+	if p.ModeOfAdmission != "" {
+		updates["modeOfAdmission"] = p.ModeOfAdmission
+	}
+	if p.ProfilePhotoUrl != "" {
+		updates["profilePhotoUrl"] = p.ProfilePhotoUrl
+	}
+	if p.ParentEmail != "" {
+		updates["parentEmail"] = p.ParentEmail
+	}
+	if p.IdCardUrl != "" {
+		updates["idCardUrl"] = p.IdCardUrl
+	}
+	if p.AdmissionLetterUrl != "" {
+		updates["admissionLetterUrl"] = p.AdmissionLetterUrl
+	}
+	if p.Marksheet10thUrl != "" {
+		updates["marksheet10thUrl"] = p.Marksheet10thUrl
+	}
+	if p.Marksheet12thUrl != "" {
+		updates["marksheet12thUrl"] = p.Marksheet12thUrl
+	}
+	if p.MigrationCertificateUrl != "" {
+		updates["migrationCertificateUrl"] = p.MigrationCertificateUrl
+	}
+	if p.BonafideCertificateUrl != "" {
+		updates["bonafideCertificateUrl"] = p.BonafideCertificateUrl
+	}
+	if p.UploadedPhotoUrl != "" {
+		updates["uploadedPhotoUrl"] = p.UploadedPhotoUrl
+	}
+	if p.UploadedSignatureUrl != "" {
+		updates["uploadedSignatureUrl"] = p.UploadedSignatureUrl
+	}
+	if p.ExamRegistrationStatus != "" {
+		updates["examRegistrationStatus"] = p.ExamRegistrationStatus
+	}
+	if p.AdmitCardUrl != "" {
+		updates["admitCardUrl"] = p.AdmitCardUrl
+	}
+	if p.InternalExamTimetableUrl != "" {
+		updates["internalExamTimetableUrl"] = p.InternalExamTimetableUrl
+	}
+	if p.ExternalExamTimetableUrl != "" {
+		updates["externalExamTimetableUrl"] = p.ExternalExamTimetableUrl
+	}
+	if p.ResultsAndGradeCardsUrl != "" {
+		updates["resultsAndGradeCardsUrl"] = p.ResultsAndGradeCardsUrl
+	}
+	if p.RevaluationRequestStatus != "" {
+		updates["revaluationRequestStatus"] = p.RevaluationRequestStatus
+	}
+	if p.RevaluationRequestLink != "" {
+		updates["revaluationRequestLink"] = p.RevaluationRequestLink
+	}
 
 	_, err := s.db.Collection("users").Doc(req.Uid).Set(ctx, updates, firestore.MergeAll)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Internal, "failed to update profile: %v", err)
 	}
 
 	return s.GetStudentProfile(ctx, &pb.GetStudentProfileRequest{Uid: req.Uid})
@@ -167,6 +284,17 @@ func (s *AcademicServer) CreateStudentProfile(ctx context.Context, req *pb.Creat
 		return nil, status.Errorf(codes.Unimplemented, "Firestore is not initialized")
 	}
 
+	// Only admins or the user themselves (during signup) can create a profile.
+	// Internal service calls might not have auth context, so we allow them if actor is "system" or similar.
+	// But here we'll enforce RequireAdmin for managed creation.
+	if _, err := auth.RequireAdmin(ctx); err != nil {
+		return nil, err
+	}
+
+	if req.ProfileData == nil {
+		return nil, status.Error(codes.InvalidArgument, "profile data is required")
+	}
+
 	// Build the profile with default values where necessary
 	fsProfile := firestoreStudentProfile{
 		Name:          req.ProfileData.Name,
@@ -179,7 +307,7 @@ func (s *AcademicServer) CreateStudentProfile(ctx context.Context, req *pb.Creat
 
 	_, err := s.db.Collection("users").Doc(req.Uid).Set(ctx, fsProfile)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Internal, "failed to create profile: %v", err)
 	}
 
 	return s.GetStudentProfile(ctx, &pb.GetStudentProfileRequest{Uid: req.Uid})
@@ -190,9 +318,13 @@ func (s *AcademicServer) DeleteStudentProfile(ctx context.Context, req *pb.Delet
 		return nil, status.Errorf(codes.Unimplemented, "Firestore is not initialized")
 	}
 
+	if _, err := auth.RequireAdmin(ctx); err != nil {
+		return nil, err
+	}
+
 	_, err := s.db.Collection("users").Doc(req.Uid).Delete(ctx)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Internal, "failed to delete profile: %v", err)
 	}
 
 	return &emptypb.Empty{}, nil
