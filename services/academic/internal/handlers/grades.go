@@ -50,15 +50,20 @@ func (s *AcademicServer) UpdateStudentGrade(ctx context.Context, req *pb.UpdateS
 	}
 
 	// Publish event to Redis Stream for Communication service
-	s.rdb.XAdd(ctx, &redis.XAddArgs{
+	if _, err := s.rdb.XAdd(ctx, &redis.XAddArgs{
 		Stream: "grades:events",
 		Values: map[string]interface{}{
-			"studentId": grade.StudentId,
-			"courseId":  grade.CourseId,
-			"gradeId":   grade.Id,
-			"grade":     grade.Grade,
+			"action":     "GRADE_PUBLISHED",
+			"studentId":  grade.StudentId,
+			"courseId":   grade.CourseId,
+			"courseName": grade.CourseName,
+			"gradeId":    grade.Id,
+			"grade":      grade.Grade,
 		},
-	})
+	}).Result(); err != nil {
+		logger.Error(ctx, "Failed to publish grade event", "gradeId", grade.Id, "error", err)
+		return nil, err
+	}
 
 	return grade, nil
 }

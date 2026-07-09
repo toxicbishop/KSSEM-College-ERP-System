@@ -10,6 +10,7 @@ import (
 	academicpb "github.com/toxicbishop/kssem-college-erp-system/proto/academic/v1"
 	pb "github.com/toxicbishop/kssem-college-erp-system/proto/admin/v1"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -19,6 +20,15 @@ type AdminServer struct {
 	db             *firestore.Client
 	authClient     *auth.Client
 	academicClient academicpb.AcademicServiceClient
+}
+
+func actorUID(ctx context.Context) string {
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		if values := md.Get("x-user-id"); len(values) > 0 {
+			return values[0]
+		}
+	}
+	return "system"
 }
 
 func NewAdminServer(db *firestore.Client, authClient *auth.Client, academicClient academicpb.AcademicServiceClient) *AdminServer {
@@ -64,7 +74,7 @@ func (s *AdminServer) writeAuditLog(ctx context.Context, action string, entity s
 	if performedBy == "" {
 		performedBy = "system"
 	}
-	
+
 	logEntry := map[string]interface{}{
 		"action":      action,
 		"entity":      entity,
@@ -73,7 +83,7 @@ func (s *AdminServer) writeAuditLog(ctx context.Context, action string, entity s
 		"details":     details,
 		"timestamp":   firestore.ServerTimestamp,
 	}
-	
+
 	_, _, err := s.db.Collection("auditLogs").Add(ctx, logEntry)
 	if err != nil {
 		logger.Error(ctx, "Failed to write audit log", "error", err)
@@ -127,12 +137,8 @@ func (s *AdminServer) CreateManagedUser(ctx context.Context, req *pb.CreateManag
 		}
 	}
 
-	// Extract performedBy from context if available (Correlation ID middleware might inject something, but typically Auth middleware does)
-	// For now, we'll just use a placeholder
-	performedBy := "admin" // TODO: Extract from context metadata
-
 	// 4. Write audit log
-	s.writeAuditLog(ctx, "USER_CREATED", "user", uid, performedBy, "Created user: "+req.Profile.Email)
+	s.writeAuditLog(ctx, "USER_CREATED", "user", uid, actorUID(ctx), "Created user: "+req.Profile.Email)
 
 	return &pb.CreateManagedUserResponse{Uid: uid, AuthUserCreated: true}, nil
 }
@@ -147,7 +153,7 @@ func (s *AdminServer) UpdateManagedUser(ctx context.Context, req *pb.UpdateManag
 		if err != nil {
 			logger.Error(ctx, "Failed to update Firebase Auth user", "uid", req.Uid, "error", err)
 		}
-		
+
 		// Update custom claims if role changed
 		if req.Profile.Role == "admin" {
 			_ = s.authClient.SetCustomUserClaims(ctx, req.Uid, map[string]interface{}{"role": "admin"})
@@ -176,8 +182,7 @@ func (s *AdminServer) UpdateManagedUser(ctx context.Context, req *pb.UpdateManag
 		}
 	}
 
-	performedBy := "admin"
-	s.writeAuditLog(ctx, "USER_UPDATED", "user", req.Uid, performedBy, "Updated user: "+req.Profile.Email)
+	s.writeAuditLog(ctx, "USER_UPDATED", "user", req.Uid, actorUID(ctx), "Updated user: "+req.Profile.Email)
 
 	return &pb.UpdateManagedUserResponse{Profile: req.Profile}, nil
 }
@@ -197,8 +202,7 @@ func (s *AdminServer) DeleteManagedUser(ctx context.Context, req *pb.DeleteManag
 		}
 	}
 
-	performedBy := "admin"
-	s.writeAuditLog(ctx, "USER_DELETED", "user", req.Uid, performedBy, "Deleted user")
+	s.writeAuditLog(ctx, "USER_DELETED", "user", req.Uid, actorUID(ctx), "Deleted user")
 
 	return &emptypb.Empty{}, nil
 }
@@ -217,15 +221,15 @@ func (s *AdminServer) GetAuditLogs(ctx context.Context, req *emptypb.Empty) (*pb
 		if err != nil {
 			break
 		}
-		
+
 		data := doc.Data()
-		
+
 		action, _ := data["action"].(string)
 		entity, _ := data["entity"].(string)
 		entityId, _ := data["entityId"].(string)
 		performedBy, _ := data["performedBy"].(string)
 		details, _ := data["details"].(string)
-		
+
 		// Handle timestamp which could be a time.Time from Firestore
 		var timestampStr string
 		if t, ok := data["timestamp"].(interface{}); ok {
@@ -233,13 +237,13 @@ func (s *AdminServer) GetAuditLogs(ctx context.Context, req *emptypb.Empty) (*pb
 		}
 
 		logs = append(logs, &pb.AuditLog{
-			Id:              doc.Ref.ID,
-			Action:          action,
-			Entity:          entity,
-			EntityId:        entityId,
-			PerformedBy:     performedBy,
-			Timestamp:       timestampStr,
-			Details:         details,
+			Id:          doc.Ref.ID,
+			Action:      action,
+			Entity:      entity,
+			EntityId:    entityId,
+			PerformedBy: performedBy,
+			Timestamp:   timestampStr,
+			Details:     details,
 		})
 	}
 
@@ -255,10 +259,10 @@ func (s *AdminServer) GetSystemSettings(ctx context.Context, req *emptypb.Empty)
 	if err != nil {
 		// Return default settings if not found
 		return &pb.SystemSettings{
-			InstitutionName: "KSSEM",
-			AcademicYear:    "2023-2024",
-			CurrentSemester: "Odd",
-			Timezone:        "UTC",
+			InstitutionName:      "KSSEM",
+			AcademicYear:         "2023-2024",
+			CurrentSemester:      "Odd",
+			Timezone:             "UTC",
 			NotificationSettings: &pb.NotificationSettings{},
 		}, nil
 	}
