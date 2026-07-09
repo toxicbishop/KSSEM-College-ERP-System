@@ -70,8 +70,7 @@ export default function FacultyClassroomsPage() {
         setLoadingClassrooms(false);
         return;
       }
-      const idToken = await currentUser.getIdToken();
-      const fetchedClassrooms = await fetchFacultyClassroomsList(idToken);
+      const fetchedClassrooms = await fetchFacultyClassroomsList();
       setClassrooms(fetchedClassrooms);
       console.log(`[FacultyClassroomsPage:fetchClassrooms] Fetched ${fetchedClassrooms.length} classrooms.`);
     } catch (error) {
@@ -109,8 +108,7 @@ export default function FacultyClassroomsPage() {
     try {
       const currentUser = clientAuth?.currentUser;
       if (!currentUser) throw new Error('Not authenticated');
-      const idToken = await currentUser.getIdToken();
-      await createNewClassroom(idToken, newClassroomName, newClassroomSubject);
+      await createNewClassroom(newClassroomName, newClassroomSubject);
       toast({ title: "Success", description: `Classroom "${newClassroomName}" created.` });
       setIsCreateModalOpen(false);
       setNewClassroomName('');
@@ -136,8 +134,7 @@ export default function FacultyClassroomsPage() {
     try {
       const currentUser = clientAuth?.currentUser;
       if (!currentUser) throw new Error('Not authenticated');
-      const idToken = await currentUser.getIdToken();
-        const facultyList = await getAllFacultyUsersList(idToken);
+        const facultyList = await getAllFacultyUsersList();
         const ownerId = user?.uid; 
         const alreadyInvitedIds = classroom.invitedFacultyIds || [];
         const eligibleFaculty = facultyList.filter(f => f.uid !== ownerId && !alreadyInvitedIds.includes(f.uid));
@@ -159,8 +156,7 @@ export default function FacultyClassroomsPage() {
     try {
       const currentUser = clientAuth?.currentUser;
       if (!currentUser) throw new Error('Not authenticated');
-      const idToken = await currentUser.getIdToken();
-        await addFacultyToClassroom(idToken, classroomToInviteTo.id, selectedFacultyToInvite);
+        await addFacultyToClassroom(classroomToInviteTo.id, selectedFacultyToInvite);
         toast({ title: "Success", description: `Faculty invited to ${classroomToInviteTo.name}.` });
         setIsInviteModalOpen(false);
         setSelectedFacultyToInvite(undefined);
@@ -181,8 +177,7 @@ export default function FacultyClassroomsPage() {
     try {
       const currentUser = clientAuth?.currentUser;
       if (!currentUser) throw new Error('Not authenticated');
-      const idToken = await currentUser.getIdToken();
-      await deleteClassroomRecord(idToken, classroomToDelete.id);
+      await deleteClassroomRecord(classroomToDelete.id);
       toast({ title: "Classroom Deleted", description: `Classroom "${classroomToDelete.name}" has been deleted.` });
       fetchClassrooms(); // Refresh the list
     } catch (error) {

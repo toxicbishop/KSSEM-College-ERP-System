@@ -42,7 +42,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import type { StudentProfile } from "@/services/profile";
+
 
 export default function AdminRequestsPage() {
   const { user, loading: authLoading } = useAuth();

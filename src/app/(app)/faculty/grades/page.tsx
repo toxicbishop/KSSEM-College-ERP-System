@@ -93,8 +93,7 @@ export default function ManageGradesPage() {
     try {
       const currentUser = clientAuth?.currentUser;
       if (!currentUser) return;
-      const idToken = await currentUser.getIdToken();
-      const fetchedClassrooms = await fetchFacultyClassrooms(idToken);
+      const fetchedClassrooms = await fetchFacultyClassrooms();
       setClassrooms(fetchedClassrooms as unknown as Classroom[]);
     } catch {
       toast({
@@ -112,8 +111,7 @@ export default function ManageGradesPage() {
     try {
       const currentUser = clientAuth?.currentUser;
       if (!currentUser) return;
-      const idToken = await currentUser.getIdToken();
-      const courses = await getUniqueCoursesForFaculty(idToken);
+      const courses = await getUniqueCoursesForFaculty();
       setUniqueCourses(courses);
     } catch {
       toast({
@@ -145,8 +143,7 @@ export default function ManageGradesPage() {
     try {
       const currentUser = clientAuth?.currentUser;
       if (!currentUser) return;
-      const idToken = await currentUser.getIdToken();
-      const students = await fetchStudentsForClassroom(idToken, classroomId);
+      const students = await fetchStudentsForClassroom(classroomId);
       const sortedStudents = students.sort((a, b) =>
         (a.studentIdNumber || "").localeCompare(
           b.studentIdNumber || "",
@@ -204,8 +201,7 @@ export default function ManageGradesPage() {
     try {
       const currentUser = clientAuth?.currentUser;
       if (!currentUser) return;
-      const idToken = await currentUser.getIdToken();
-      await updateGradeForStudent(idToken, {
+      await updateGradeForStudent({
         studentId,
         courseName: courseName.trim(),
         grade,
@@ -243,8 +239,7 @@ export default function ManageGradesPage() {
     try {
       const currentUser = clientAuth?.currentUser;
       if (!currentUser) return;
-      const idToken = await currentUser.getIdToken();
-      await deleteGradeRecord(idToken, gradeId);
+      await deleteGradeRecord(gradeId);
       toast({
         title: "Grade Deleted",
         description: "The grade has been successfully deleted.",
@@ -267,9 +262,9 @@ export default function ManageGradesPage() {
       try {
         const currentUser = clientAuth?.currentUser;
         if (!currentUser) return;
-        const idToken = await currentUser.getIdToken();
-        const studentUids = studentsInClassroom.map((s) => s.userId);
-        const grades = await fetchGradesForClassroom(idToken, studentUids);
+        const classroom = classrooms.find(c => c.id === selectedClassroomId);
+        if (!classroom || !selectedClassroomId) return;
+        const grades = await fetchGradesForClassroom(selectedClassroomId, classroom.name);
         setClassroomGrades(grades);
       } catch {
         toast({
