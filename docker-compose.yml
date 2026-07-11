@@ -1,61 +1,14 @@
 version: '3.8'
 
 services:
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-
-  academic:
+  server:
     build:
-      context: .
-      dockerfile: ./services/academic/Dockerfile
-    environment:
-      FIRESTORE_PROJECT_ID: ${NEXT_PUBLIC_FIREBASE_PROJECT_ID}
-      GOOGLE_APPLICATION_CREDENTIALS_B64: ${GOOGLE_APPLICATION_CREDENTIALS_B64}
-      REDIS_ADDR: redis:6379
-      PORT: 8082
-    depends_on:
-      - redis
-
-  admin:
-    build:
-      context: .
-      dockerfile: ./services/admin/Dockerfile
-    environment:
-      FIRESTORE_PROJECT_ID: ${NEXT_PUBLIC_FIREBASE_PROJECT_ID}
-      GOOGLE_APPLICATION_CREDENTIALS_B64: ${GOOGLE_APPLICATION_CREDENTIALS_B64}
-      PORT: 8084
-      ACADEMIC_SERVICE_ADDR: academic:8082
-    depends_on:
-      - academic
-
-  communication:
-    build:
-      context: .
-      dockerfile: ./services/communication/Dockerfile
-    environment:
-      FIRESTORE_PROJECT_ID: ${NEXT_PUBLIC_FIREBASE_PROJECT_ID}
-      GOOGLE_APPLICATION_CREDENTIALS_B64: ${GOOGLE_APPLICATION_CREDENTIALS_B64}
-      REDIS_ADDR: redis:6379
-      PORT: 8086
-    depends_on:
-      - redis
-
-  gateway:
-    build:
-      context: .
-      dockerfile: ./gateway/Dockerfile
+      context: ./server
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     environment:
       - PORT=8080
-      - ACADEMIC_SVC_ADDR=academic:8082
-      - ADMIN_SVC_ADDR=admin:8084
-      - COMMUNICATION_SVC_ADDR=communication:8086
-      - AUTH_MODE=${AUTH_MODE}
-      - FIREBASE_PROJECT_ID=${NEXT_PUBLIC_FIREBASE_PROJECT_ID}
-    depends_on:
-      - academic
-      - admin
-      - communication
+      - FIRESTORE_PROJECT_ID=${FIRESTORE_PROJECT_ID}
+      - GOOGLE_APPLICATION_CREDENTIALS_B64=${GOOGLE_APPLICATION_CREDENTIALS_B64}
+    restart: unless-stopped
