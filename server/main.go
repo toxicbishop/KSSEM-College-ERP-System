@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
@@ -40,8 +41,14 @@ func main() {
 	r.Use(middleware.HTTPCorrelationMiddleware)
 
 	// CORS Setup
+	allowedOriginsStr := os.Getenv("CORS_ALLOWED_ORIGINS")
+	var allowedOrigins []string
+	if allowedOriginsStr != "" {
+		allowedOrigins = strings.Split(allowedOriginsStr, ",")
+	}
+
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"https://*", "http://*"}, // Allows wildcard subdomains for vercel, and local dev
+		AllowedOrigins:   allowedOrigins,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "X-Correlation-ID"},
 		ExposedHeaders:   []string{"Link"},
