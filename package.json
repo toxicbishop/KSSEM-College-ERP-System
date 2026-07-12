@@ -14,7 +14,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@apollo/server": "^5.5.1",
     "@as-integrations/next": "^4.1.0",
     "@genkit-ai/googleai": "^1.28.0",
     "@genkit-ai/next": "^1.39.0",
