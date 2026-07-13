@@ -1,16 +1,16 @@
 # <img src="public/Favicon/collage-logo.png" width="40" height="40" align="center" style="margin-right: 10px;"> KSSEM College ERP System
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-<!-- You can replace the badge below with your live Vercel Status Badge from Vercel Settings > Git > Deploy Hook & Badges -->
 ![Vercel Deployment Status](https://img.shields.io/badge/Vercel-Deployed-black?logo=vercel&logoColor=white)
+![Render Deployment](https://img.shields.io/badge/Render-Deployed-46E3B7?logo=render&logoColor=white)
 ![Next JS](https://img.shields.io/badge/Next-black?logo=next.js&logoColor=white)
+![Go](https://img.shields.io/badge/Go-00ADD8?logo=go&logoColor=white)
 ![React](https://img.shields.io/badge/react-%2320232a.svg?logo=react&logoColor=%2361DAFB)
 ![Firebase](https://img.shields.io/badge/firebase-%23039BE5.svg?logo=firebase)
 ![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?logo=tailwind-css&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?logo=typescript&logoColor=white)
-![GraphQL](https://img.shields.io/badge/-GraphQL-E10098?logo=graphql&logoColor=white)
 
-This guide will walk you through setting up the KSSEM College ERP System on your computer. This application helps manage student information and provides a dashboard for students, faculty, and administrators.
+A full-stack College ERP system for managing student records, attendance, grades, real-time classroom chat, and admin operations — built for KSSEM, Bengaluru.
 
 ## System Preview
 
@@ -22,376 +22,216 @@ This guide will walk you through setting up the KSSEM College ERP System on your
 | :------------------------------------------: | :---------------------------------------: |
 | ![Fee Payment](public/assets/FeePayment.png) | ![Classroom](public/assets/Classroom.png) |
 
-## System Architecture
+## Architecture
 
-The KSSEM ERP follows a modern serverless architecture built on the Next.js and Firebase ecosystems.
+This is a two-part system:
 
-![System Architecture](public/KSSEM-College-ERP-System-Architecture.png)
+- **Frontend** — Next.js + React + TypeScript + TailwindCSS, deployed on **Vercel**. Handles UI, client-side Firebase Auth, and calls the backend over REST.
+- **Backend** — a single Go module (`server/`) deployed on **Render**, backed by Cloud Firestore and Firebase Auth. Handles all data access, business logic, and authorization.
 
+The frontend never talks to Firestore for application data (profiles, grades, attendance, admin operations, chat) — every one of those goes through the Go backend's REST API. The one deliberate exception is the app's display name in the root layout, which reads Firestore directly (cached, read-only, revalidated hourly) purely to avoid an extra network round-trip on every page load — this is why the frontend, not just the backend, needs its own Firebase service account credentials (see setup below).
+
+Real-time chat runs over Server-Sent Events (SSE) from an in-memory event hub inside the Go backend — no external message broker.
+
+Admin authorization is enforced via **Firebase custom claims** on the JWT, not the Firestore `role` field directly — see [Promoting a User to Admin](#promoting-a-user-to-admin) below.
+
+See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the full breakdown, including the migration history and real bugs found along the way.
 
 ## What You'll Need (Prerequisites)
 
-Before you start, make sure you have the following:
-
-- **A Computer:** Running Windows, macOS, or Linux.
-- **Internet Connection:** To download software and connect to Firebase.
-- **A Web Browser:** Such as Chrome, Firefox, Edge, or Safari.
-- **A Google Account:** You'll need this to create a Firebase project, which acts as the backend for the app.
-- **An Email Account (for sending notifications):** You'll need SMTP credentials from an email provider like Gmail (using an App Password), SendGrid, or another email service to send notifications.
-- **Patience:** Setting up software can sometimes be tricky, but follow these steps carefully, and you'll get there!
+- **Node.js** (LTS) and `pnpm`
+- **Go** (1.22+) — for running the backend locally
+- **A Google Account** — to create a Firebase project
+- **An Email Account (SMTP)** — for sending notifications (Gmail App Password, SendGrid, etc.)
 
 ## Understanding a Few Basic Terms
 
-- **Firebase:** Think of Firebase as the "brain" and "memory" for our application. It's a service provided by Google that will store user accounts, data (like student profiles, settings), and help with other background tasks.
-- **Node.js & npm:** Node.js is an environment that lets the application code run on your computer. `npm` (Node Package Manager) is a tool that comes with Node.js and helps install and manage the different "parts" or "packages" the application needs to work.
-- **Terminal (or Command Prompt/PowerShell):** This is a text-based window where you can type commands to tell your computer what to do. We'll provide the exact commands you need to type.
-  - On **Windows:** It's usually called "Command Prompt" or "PowerShell".
-  - On **macOS or Linux:** It's usually called "Terminal".
-- **`.env.local` file:** A special file in your project where you store secret keys and configuration specific to your local setup (like your Firebase project details). This file is **not** shared publicly.
-- **Service Account Key:** A JSON file that gives server-side code (like our Next.js backend features) administrative access to your Firebase project. This is also kept secret.
-- **SMTP:** Simple Mail Transfer Protocol. These are the credentials (host, port, user, password) your application needs to connect to an email server to send emails.
+- **Firebase Auth** — handles user accounts and login (email/password).
+- **Cloud Firestore** — the database. Owned and accessed exclusively by the Go backend, except for the one cached read described above.
+- **Go backend (`server/`)** — a single Go binary exposing REST endpoints (`/api/academic/*`, `/api/admin/*`, `/api/communication/*`) plus an SSE endpoint for chat.
+- **Service Account Key** — a JSON credential giving server-side code admin access to Firebase. Needed by **both** the frontend and the backend, for different reasons (see above).
+- **Custom Claims** — a piece of data attached to a user's Firebase Auth token (separate from their Firestore document) that the backend checks to decide if they're an admin.
 
 ## Initial Setup Guide
 
-Follow these steps in order for a fresh setup.
+### Step 1: Install Node.js, pnpm, and Go
 
-### Step 1: Install Node.js (which includes npm)
-
-Node.js is essential for running the application.
-
-1.  Go to the official Node.js website: [https://nodejs.org/](https://nodejs.org/)
-2.  Download the installer for the **LTS (Long Term Support)** version. It should be clearly marked on the homepage. Choose the version for your operating system (Windows, macOS).
-3.  Once downloaded, run the installer. Follow the on-screen instructions, accepting the default options. This will install both Node.js and npm.
-4.  **Check if it's installed:**
-    - Open your Terminal (or Command Prompt/PowerShell).
-    - Type `node -v` and press Enter. You should see a version number like `v18.x.x` or `v20.x.x`.
-    - Then, type `npm -v` and press Enter. You should see another version number.
-    - If you see version numbers for both, Node.js and npm are installed!
+1. Install Node.js LTS from [nodejs.org](https://nodejs.org/).
+2. Install pnpm: `npm install -g pnpm`
+3. Install Go 1.22+ from [go.dev/dl](https://go.dev/dl/).
+4. Verify: `node -v`, `pnpm -v`, `go version`.
 
 ### Step 2: Get the Application Code
 
-1.  If you received the application code as a **ZIP file**:
-    - Find the ZIP file on your computer.
-    - Extract its contents to a new folder. For example, you can create a folder named `StudentApp` on your Desktop and extract the files there.
-2.  If you received the application code as a **folder**:
-    - Simply ensure the folder is in a convenient location on your computer, like your Desktop or Documents folder. Let's assume you've named this folder `StudentApp`.
+Clone or extract the repository into a folder, e.g. `College-ERP`.
 
-### Step 3: Add the College Logo (Important!)
+### Step 3: Add the College Logo
 
-1.  You should have received a college logo image (e.g., from the project maintainer).
-2.  Save this image file as `placeholder-logo.svg` inside the `public` folder within your `StudentApp` directory.
-    - The `StudentApp` folder is the main folder containing all the application code.
-    - Inside `StudentApp`, you'll find a folder named `public`.
-    - Place your `placeholder-logo.svg` file directly into this `public` folder.
-    - The final path should look something like: `StudentApp/public/placeholder-logo.svg`.
+Save your college logo as `placeholder-logo.svg` inside the `public/` folder.
 
-### Step 4: Open the Application Folder in Your Terminal
+### Step 4: Install Frontend Dependencies
 
-You need to tell your Terminal to work "inside" the application folder.
+```bash
+cd College-ERP
+pnpm install
+```
 
-1.  Open your Terminal (or Command Prompt/PowerShell) as described in Step 1.
-2.  Type `cd ` (that's `c`, `d`, then a **space**).
-3.  Drag the `StudentApp` folder (or whatever you named it) from your computer's file explorer (like Windows Explorer or macOS Finder) directly into the Terminal window. This should paste the full path to the folder after `cd `.
-4.  Press Enter. Your Terminal prompt should change, indicating you are now "in" that folder.
+### Step 5: Create Your Firebase Project
 
-### Step 5: Install the Application's Parts (Dependencies)
+1. Go to [console.firebase.google.com](https://console.firebase.google.com/).
+2. **Add project** → name it → disable Analytics if you don't need it → **Create project**.
 
-The application relies on several pre-built code packages. `npm` will download and install them.
+### Step 6: Add a Web App to Firebase
 
-1.  Make sure your Terminal is still in the `StudentApp` folder (from Step 4).
-2.  Type the following command exactly and press Enter:
-    ```bash
-    npm install
-    ```
-3.  This step might take a few minutes. Wait for it to complete.
+1. On the Project Overview page, click the **`</>`** (Web) icon.
+2. Give it a nickname, **uncheck** Firebase Hosting, click **Register app**.
+3. Copy the `firebaseConfig` values shown — you'll need them next.
 
-### Step 6: Create Your Firebase Project
+### Step 7: Configure the Frontend — `.env.local`
 
-Firebase will be the backend for your application.
+Create `.env.local` in the repo root:
 
-1.  Go to the Firebase website: [https://console.firebase.google.com/](https://console.firebase.google.com/)
-2.  Sign in with your Google Account.
-3.  Click on "**Add project**" or "**Create a project**".
-4.  **Project Name:** Give your project a name (e.g., `MyStudentAppFirebase`).
-5.  **Google Analytics:** You can choose to **disable** Google Analytics for this Firebase project if you wish (toggle the switch off or choose "Not now"). Click **Continue**.
-6.  Click **Create project**. Wait for Firebase to create your project.
+```env
+# Firebase Client Config — from Step 6
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
 
-### Step 7: Add a Web App to Your Firebase Project
+# Points the frontend at your Go backend (Step 12 covers running it locally)
+NEXT_PUBLIC_API_URL=http://localhost:8080
 
-Tell Firebase that a web application will be connecting to it.
+# Needed for the frontend's own direct Firestore read (app display name only —
+# see Architecture section above). Same value as Step 10 below.
+GOOGLE_APPLICATION_CREDENTIALS_B64=
 
-1.  On your Firebase project's "Project Overview" page, look for an icon that looks like **`</>`** (Web). Click this icon.
-2.  **App nickname:** Give your web app a nickname (e.g., `StudentAppWeb`).
-3.  **Firebase Hosting:** **Uncheck** the box for "Also set up Firebase Hosting for this app."
-4.  Click **Register app**.
-5.  **Add Firebase SDK:** Firebase will show you configuration values (your `firebaseConfig`). **COPY THESE VALUES CAREFULLY!** You'll need them for the `.env.local` file.
-6.  After copying, click **Continue to console**.
+# AI features (Genkit) — from https://aistudio.google.com/app/apikey
+GOOGLE_GENAI_API_KEY=
 
-### Step 8: Configure API Keys in the `.env.local` File
+# Email notifications
+SMTP_HOST=
+SMTP_PORT=
+SMTP_USER=
+SMTP_PASS=
+SMTP_FROM_ADDRESS=
+```
 
-Your local application needs to know how to connect to _your_ Firebase project and other services.
+### Step 8: Enable Email/Password Authentication
 
-1.  In your `StudentApp` folder, create a file named `.env.local`.
-    - Open a simple text editor.
-    - Copy and paste the following template into the new file:
+Firebase Console → **Authentication** → **Get started** → enable **Email/Password**.
 
-      ```env
-      # Firebase Client Configuration - REQUIRED
-      # Get these from: Firebase Console > Project Settings > General > Your apps > Web app > SDK setup and configuration
-      NEXT_PUBLIC_FIREBASE_API_KEY=
-      NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
-      NEXT_PUBLIC_FIREBASE_PROJECT_ID=
-      NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
-      NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
-      NEXT_PUBLIC_FIREBASE_APP_ID=
-      # NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID= # Optional, only if you enabled Google Analytics for Firebase
+### Step 9: Set Up Firestore
 
-      # Google Analytics 4 (GA4) Configuration - OPTIONAL
-      # Get this from your GA4 Property > Data Streams > Web Stream Details
-      # NEXT_PUBLIC_GA_MEASUREMENT_ID=
+Firebase Console → **Firestore Database** → **Create database** → production mode → pick a location.
 
-      # Genkit AI Features API Key - REQUIRED for AI features
-      # Get this from Google AI Studio: https://aistudio.google.com/app/apikey
-      # For Vercel, also set this in Project Settings > Environment Variables.
-      GOOGLE_GENAI_API_KEY=
+### Step 10: Generate a Service Account Key
 
-      # Email Notification (SMTP) Credentials - REQUIRED for sending emails
-      # Get these from your email provider (e.g., Gmail App Password, SendGrid, etc.)
-      # For Vercel, also set these in Project Settings > Environment Variables.
-      SMTP_HOST=
-      SMTP_PORT=
-      SMTP_USER=
-      SMTP_PASS=
-      SMTP_FROM_ADDRESS=
+1. Firebase Console → Project Settings (gear icon) → **Service accounts** → **Generate new private key**.
+2. Convert it to base64:
+   - macOS/Linux: `base64 -w 0 /path/to/key.json`
+   - Windows PowerShell: `[Convert]::ToBase64String([IO.File]::ReadAllBytes("/path/to/key.json"))`
+3. Paste the result into `GOOGLE_APPLICATION_CREDENTIALS_B64` in **both**:
+   - `.env.local` (frontend, Step 7)
+   - `server/.env` (backend, Step 12)
 
-      # Firebase Admin SDK (Server-Side) - REQUIRED (Use one method below)
-      # For Vercel, set this in Project Settings > Environment Variables.
-      # For local development, this is the recommended way.
-      # This should be the Base64 encoded string of your service account JSON file.
-      # See Step 9 for how to generate this.
-      GOOGLE_APPLICATION_CREDENTIALS_B64=
+### Step 11: Deploy Firestore Security Rules
 
-      # DEPRECATED: Raw JSON string (less reliable, use Base64 above)
-      # GOOGLE_APPLICATION_CREDENTIALS_JSON=
-      ```
+```bash
+npm install -g firebase-tools
+firebase login
+firebase use --add   # select your project
+firebase deploy --only firestore:rules
+```
 
-2.  **Fill in the values:**
-    - Replace the empty values after each variable with the keys and credentials you obtained.
-    - For `GOOGLE_APPLICATION_CREDENTIALS_B64`, you will generate the Base64 string in the next step.
-3.  Save the `.env.local` file in the root of your `StudentApp` folder.
+### Step 12: Run the Go Backend Locally
 
-### Step 9: Configure Server-Side Firebase Admin Access (Service Account)
+Create `server/.env`:
 
-For server-side features (like some advanced data operations or Genkit flows that interact with Firebase Admin), the application needs admin credentials. **We will use a Base64 encoded string which is more reliable.**
+```env
+PORT=8080
+FIRESTORE_PROJECT_ID=your-firebase-project-id
+GOOGLE_APPLICATION_CREDENTIALS_B64=   # same value as Step 10
+CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:9002
+```
 
-1.  **Generate a Service Account Key:**
-    - In the Firebase console, go to your Project Settings (click the gear icon near "Project Overview").
-    - Go to the **Service accounts** tab.
-    - Click on **Generate new private key**. Confirm by clicking **Generate key**.
-    - A JSON file will be downloaded. **Keep this file secure; it grants admin access.** Save it somewhere safe on your computer.
+Then run it:
 
-2.  **Convert the JSON key to Base64:**
-    - You can use a simple online tool or a local command to do this.
-    - **Online Tool (Simple):** Go to [https://www.base64encode.net/](https://www.base64encode.net/).
-      - Select **"Encode files into Base64 format"**.
-      - Click the box to upload your downloaded JSON file.
-      - Click the **"ENCODE"** button.
-      - Copy the resulting long string of text from the output box.
-    - **Local Command (Advanced):** Open your terminal.
-      - On **macOS/Linux**: `base64 -w 0 /path/to/your/downloaded-key.json`
-      - On **Windows (PowerShell)**: `[Convert]::ToBase64String([IO.File]::ReadAllBytes("/path/to/your/downloaded-key.json"))`
-      - Replace `/path/to/your/downloaded-key.json` with the actual path to your file. Copy the output.
+```bash
+cd server
+go build -o app .
+./app
+```
 
-3.  **Provide Credentials to the App:**
-    - Go back to your `.env.local` file.
-    - Paste the entire **Base64 string** you copied as the value for `GOOGLE_APPLICATION_CREDENTIALS_B64`.
-    - **For Vercel Deployment:** When deploying, you must also copy this variable and its full Base64 value into your Vercel project's **Environment Variables** settings.
+Or via Docker:
 
-### Step 10: Enable Email/Password Authentication in Firebase
+```bash
+docker-compose up --build
+```
 
-1.  In the Firebase console, under **Build**, click **Authentication**.
-2.  Click **Get started**.
-3.  Select **Email/Password** from the sign-in providers.
-4.  Toggle **Enable** to ON. Click **Save**.
+Confirm it's up: `curl http://localhost:8080/health` should return `{"status":"ok"}`.
 
-### Step 11: Set Up Firestore Database
+### Step 13: Run the Frontend
 
-1.  In the Firebase console, under **Build**, click **Firestore Database**.
-2.  Click **Create database**.
-3.  Choose **Start in production mode**. Click **Next**.
-4.  Select a Cloud Firestore location. **This cannot be changed later.** Click **Enable**.
+```bash
+pnpm dev
+```
 
-### Step 12: Install Firebase Command Line Tools (CLI)
+Open `http://localhost:9002` (or `https://localhost:9002` if you've set up local HTTPS — see below).
 
-1.  Open your Terminal. Type:
-    ```bash
-    npm install -g firebase-tools
-    ```
-    _(On macOS/Linux, you might need `sudo npm install -g firebase-tools`. On Windows, run Command Prompt as Administrator.)_
+### Step 14: Create Your First User
 
-### Step 13: Log In to Firebase with the CLI
+Sign up through the app normally. This creates both a Firebase Auth account and a matching Firestore `users` document — **in that order, together** — via the backend's `/api/academic/profile` endpoint.
 
-1.  In the Terminal, type:
-    ```bash
-    firebase login
-    ```
-2.  Follow prompts to sign in with the Google Account used for your Firebase project.
+### Step 15: Promoting a User to Admin
 
-### Step 14: Connect Local App to Your Firebase Project
+Your Firestore `users.role` field and the backend's actual authorization check are **two different things** — setting one doesn't automatically set the other.
 
-1.  Ensure your Terminal is "inside" your `StudentApp` folder. Type:
-    ```bash
-    firebase use --add
-    ```
-2.  Use arrow keys to select your Firebase project. Press Enter.
-3.  For "alias," press Enter (or type a short name like `studentapp`). This creates/updates a `.firebaserc` file.
+1. **Firestore Console** → `users` collection → find their document (Document ID = their Firebase Auth UID) → set `role` to `"admin"`.
+2. **Sync the claim** — from the repo root, with `server/.env`'s credentials copied into a local `.env`:
+```bash
+   node scripts/backfill_admin_claims.js
+```
+   This finds every Firestore doc with `role: "admin"` and sets the matching Firebase Auth **custom claim** — which is what the backend actually checks on `/api/admin/*` routes.
+3. Have that user **sign out and sign back in** — custom claims only take effect on a freshly issued token.
 
-### Step 15: Deploy Firestore Security Rules
+If you suspect a user's Auth account and Firestore profile are out of sync (e.g. a signup partially failed), run:
+```bash
+node scripts/find_missing_profiles.js
+```
 
-1.  In your Terminal (still in `StudentApp` folder), type:
-    ```bash
-    firebase deploy --only firestore:rules
-    ```
-2.  Wait for "Deploy complete!"
+### Step 16 (Optional): Google Analytics 4
 
-### Step 16: (Optional) Set Up Google Analytics 4 (GA4)
+Same as before — create a GA4 property, add a Web data stream, and set `NEXT_PUBLIC_GA_MEASUREMENT_ID` in `.env.local`.
 
-1.  Go to [Google Analytics](https://analytics.google.com/).
-2.  Create an Account and a new **Google Analytics 4 Property**.
-    - **Property name:** e.g., "Student ERP GA4".
-    - Set time zone and currency.
-3.  **Set up a Data Stream:** Choose **Web**.
-    - **Website URL:** `http://localhost:9002` (or your local dev port).
-    - **Stream name:** e.g., "Student ERP Web Stream".
-    - Click **Create stream**.
-4.  Find your **MEASUREMENT ID** (starts with "G-", e.g., `G-XXXXXXXXXX`). Copy it.
-5.  Open your `.env.local` file. Find the line:
-    ```env
-    # NEXT_PUBLIC_GA_MEASUREMENT_ID=
-    ```
-    Uncomment it and paste your Measurement ID after the `=`. Save the file.
-6.  Restart your app if it's running.
+### Step 17 (Optional): Local HTTPS
 
-### Step 17: (Optional) Enable HTTPS for Local Development
+```bash
+# macOS
+brew install mkcert
+# Windows (Scoop)
+scoop install mkcert
+mkcert -install
+```
+`pnpm dev` already includes `--experimental-https` and will auto-generate certs.
 
-The dev server supports HTTPS via locally-trusted certificates. This is useful if your browser blocks Firebase requests over plain HTTP (e.g., Brave with Shields enabled).
+## Deploying
 
-1.  **Install `mkcert`** (generates trusted local certificates):
-    - **Windows (Scoop):** `scoop install mkcert`
-    - **Windows (Chocolatey, run as Admin):** `choco install mkcert -y`
-    - **macOS:** `brew install mkcert`
-    - **Linux:** `sudo apt install mkcert` (or see [mkcert docs](https://github.com/nicedoc/mkcert))
+- **Frontend → Vercel.** Set all `.env.local` variables above as Vercel Environment Variables, with `NEXT_PUBLIC_API_URL` pointing at your deployed Render backend.
+- **Backend → Render.** Root Directory: `server`. Set `PORT`, `FIRESTORE_PROJECT_ID`, `GOOGLE_APPLICATION_CREDENTIALS_B64`, and `CORS_ALLOWED_ORIGINS` (your Vercel URL) as Render Environment Variables.
 
-2.  **Install the root certificate authority** (run once, may need Admin/sudo):
-
-    ```bash
-    mkcert -install
-    ```
-
-3.  That's it! The `npm run dev` script includes `--experimental-https`, which will auto-generate certificates in a `certificates/` folder using `mkcert`. Your app will be available at `https://localhost:9002`.
-
-> **Note:** The `certificates/` directory is already in `.gitignore` and should never be committed. Each developer generates their own local certificates.
-
-### Step 18: Run the Application!
-
-1.  In your Terminal (in `StudentApp` folder), type:
-    ```bash
-    npm run dev
-    ```
-2.  Open your web browser to the address shown (e.g., `https://localhost:9002` if HTTPS is set up, or `http://localhost:9002`).
-
-### Step 19: Create Your First User (Admin)
-
-1.  In the app, click **Sign Up**.
-    - **Full Name:** "Admin User"
-    - **Student ID:** "admin001"
-    - **Major:** "Administration"
-    - **Email:** use the email address you want for the first administrator
-    - **Password:** Choose a strong password.
-    - **Parent's Email:** `parent@example.com` (dummy)
-2.  Click **Sign Up**.
-
-### Step 20: Manually Set Admin Role in Firestore
-
-1.  Go to the Firebase console > **Authentication**. Copy the **User UID** for the administrator account you just created.
-2.  Go to **Firestore Database**. Click the `users` collection.
-3.  Find the document whose ID matches the User UID. Click it.
-4.  On the right, find/add the field `role`.
-    - If `role` exists, click the pencil icon, change its value from `student` to `admin`. Click **Update**.
-    - If `role` does **not** exist: Click **+ Add field**. Field name: `role`, Type: `string`, Value: `admin`. Click **Add**.
-5.  That user is now an admin.
-
-### Step 21: Sign In as Admin
-
-1.  Go back to your app. Logout if logged in.
-2.  Sign in with the administrator email and password.
-3.  You should see the Admin Dashboard or admin features.
-4.  If using Brave browser and HTTPS is not set up, you may need to disable Brave Shields for localhost.
-
-**Congratulations! Initial setup is complete.**
+Deploying to different domains? Both frontend and backend need to be redeployed if you change `NEXT_PUBLIC_API_URL` or `CORS_ALLOWED_ORIGINS`.
 
 ## Changing the Linked Firebase Project
 
-If you need to switch the application to a different Firebase project (e.g., from a test project to a production project), follow these steps:
-
-1.  **Create the New Firebase Project (if not done):**
-    - Follow **Step 6** from the "Initial Setup Guide" to create your new Firebase project.
-2.  **Add a Web App to the New Project:**
-    - Follow **Step 7** to add a web app configuration to your _new_ Firebase project. Critically, copy the new `firebaseConfig` values.
-3.  **Update Client-Side Configuration (`.env.local`):**
-    - Open your existing `.env.local` file.
-    - Carefully replace the values for `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, etc., with the new configuration values obtained from your _new_ Firebase project (from step 2 above).
-    - Save the `.env.local` file.
-4.  **Update Server-Side Admin Configuration (Service Account):**
-    - Go to your _new_ Firebase project in the Firebase console.
-    - Follow **Step 9** to generate a new Base64-encoded service account key string for this _new_ project.
-    - Update your `GOOGLE_APPLICATION_CREDENTIALS_B64` environment variable with this new string.
-      - **For Vercel:** Update this in your Vercel project's Environment Variables settings.
-      - **For local development:** Update the `GOOGLE_APPLICATION_CREDENTIALS_B64` in your `.env.local`.
-5.  **Update Firebase CLI Association:**
-    - Open your Terminal in the `StudentApp` folder.
-    - Run: `firebase use --add`
-    - Select your _new_ Firebase project from the list and give it an alias (or use `default`). This updates your `.firebaserc` file to point the Firebase CLI to the new project for this local directory.
-6.  **Enable Authentication Methods in New Project:**
-    - In your _new_ Firebase project's console, go to **Authentication** > **Sign-in method**.
-    - Ensure **Email/Password** (and any other providers you use) are enabled. (Similar to **Step 10**).
-7.  **Set Up Firestore in New Project:**
-    - In your _new_ Firebase project's console, go to **Firestore Database**.
-    - Click **Create database**, choose production mode, and select a location. (Similar to **Step 11**).
-8.  **Deploy Firestore Rules to New Project:**
-    - In your Terminal (in `StudentApp` folder, now associated with the new project), run:
-      ```bash
-      firebase deploy --only firestore:rules
-      ```
-    - If you have custom indexes, also deploy them:
-      ```bash
-      firebase deploy --only firestore:indexes
-      ```
-9.  **Recreate Admin User (if necessary):**
-    - The users from your old Firebase project will not automatically be in the new one.
-    - You will likely need to sign up an administrator account again in the application (which now points to the new project) and then manually set its role to `admin` in the _new_ project's Firestore database (as described in **Steps 18 & 19**).
-10. **Check Other API Keys:**
-    - Update any other keys in your `.env.local` file (like `GOOGLE_GENAI_API_KEY` or `SMTP_...` credentials) if they are tied to the old project or need to be different for the new environment.
-11. **Restart Your Application:**
-    - Stop your local development server (Ctrl+C) and restart it (`npm run dev`).
-    - If deployed on Vercel, you'll need to redeploy for environment variable changes to take full effect.
-
-After these steps, your application should be connected to the new Firebase project.
-
-## GraphQL API
-
-The backend has been upgraded with a GraphQL API.
-
-- **Endpoint**: `/api/graphql`
-- **Schema**: Defined in `schema.graphql` at the project root.
-- **Resolvers**: Route handlers at `src/app/api/graphql/resolvers.ts` connect GraphQL queries/mutations to existing services.
-- **Client**: A lightweight `graphql-request` client is available at `src/lib/graphql-client.ts` to call the endpoint from frontend pages.
-
-### Authentication
-Include the Firebase ID Token in the `Authorization` header as a Bearer token:
-```http
-Authorization: Bearer <firebase_id_token>
-```
+1. Create the new project and add a Web App (Steps 5–6).
+2. Update `.env.local`'s `NEXT_PUBLIC_FIREBASE_*` values and `GOOGLE_APPLICATION_CREDENTIALS_B64`.
+3. Update `server/.env`'s `FIRESTORE_PROJECT_ID` and `GOOGLE_APPLICATION_CREDENTIALS_B64` to match.
+4. Update Vercel and Render environment variables if deployed.
+5. `firebase use --add` to repoint the CLI, then `firebase deploy --only firestore:rules`.
+6. Enable Email/Password auth in the new project (Step 8).
+7. Sign up a fresh admin account and promote them (Step 15) — users don't carry over between Firebase projects.
 
 ## License
 
