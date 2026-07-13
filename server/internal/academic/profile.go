@@ -185,7 +185,7 @@ func CreateStudentProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err := auth.RequireAdmin(ctx); err != nil {
+	if _, err := auth.RequireOwnerOrAdmin(ctx, uid); err != nil {
 		WriteError(w, http.StatusForbidden, err.Error())
 		return
 	}
