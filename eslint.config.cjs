@@ -1,5 +1,10 @@
-const nextVitals = require("eslint-config-next/core-web-vitals");
-const nextTypescript = require("eslint-config-next/typescript");
+const { FlatCompat } = require("@eslint/eslintrc");
+
+
+// FlatCompat bridges legacy "extends"-based configs into ESLint v9 flat config.
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+});
 
 module.exports = [
   {
@@ -12,8 +17,7 @@ module.exports = [
       "*.tsbuildinfo",
     ],
   },
-  ...nextVitals,
-  ...nextTypescript,
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     rules: {
       "@typescript-eslint/no-explicit-any": "off",

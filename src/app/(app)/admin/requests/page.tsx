@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import {
@@ -109,7 +109,7 @@ export default function AdminRequestsPage() {
   // Data fetching — now calls the gateway (no ID token needed)
   // -----------------------------------------------------------------------
 
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     if (!isAdmin) return;
     setLoadingRequests(true);
     try {
@@ -125,13 +125,13 @@ export default function AdminRequestsPage() {
     } finally {
       setLoadingRequests(false);
     }
-  };
+  }, [isAdmin, toast]);
 
   useEffect(() => {
     if (isAdmin && !authLoading && !checkingRole) {
       fetchRequests();
     }
-  }, [isAdmin, authLoading, checkingRole]);
+  }, [isAdmin, authLoading, checkingRole, fetchRequests]);
 
   // -----------------------------------------------------------------------
   // Approve / Deny — gateway-backed
