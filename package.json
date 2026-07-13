@@ -83,12 +83,16 @@
     "tailwindcss": "^3.4.19",
     "typescript": "^5.9.3"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "protobufjs",
-      "sharp",
-      "@google/genai"
-    ]
+  "overrides": {
+    "@opentelemetry/auto-instrumentations-node": ">=0.75.0",
+    "@opentelemetry/sdk-node": ">=0.217.0",
+    "uuid": ">=11.1.1",
+    "postcss": ">=8.5.10"
+  },
+  "resolutions": {
+    "@opentelemetry/auto-instrumentations-node": ">=0.75.0",
+    "@opentelemetry/sdk-node": ">=0.217.0",
+    "uuid": ">=11.1.1",
+    "postcss": ">=8.5.10"
   }
 }
