@@ -116,7 +116,14 @@ if (!_getApps().length) {
 
     } catch (error: any) {
         adminInitializationErrorInstance = new Error(`[AdminServer] CRITICAL Exception during Firebase Admin SDK initialization attempt with ${credSource}: ${error.message}`);
-        console.error(adminInitializationErrorInstance.message, error.stack);
+        
+        const hasFirebaseEnv = !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID && !!process.env.NEXT_PUBLIC_FIREBASE_APP_ID;
+        if (!hasFirebaseEnv && (process.env.CI || process.env.VERCEL || process.env.GITHUB_ACTIONS)) {
+            console.warn("[AdminServer] Skipping initialization failure log during build context (missing env vars).");
+        } else {
+            console.error(adminInitializationErrorInstance.message, error.stack);
+        }
+        
         adminAppInstance = undefined;
     }
 
@@ -140,7 +147,12 @@ if (!_getApps().length) {
 
 // Final status logging and export
 if (adminInitializationErrorInstance) {
-    console.error(`[AdminServer] FINAL STATUS: Initialization FAILED. Error: "${adminInitializationErrorInstance.message}"`);
+    const hasFirebaseEnv = !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID && !!process.env.NEXT_PUBLIC_FIREBASE_APP_ID;
+    if (!hasFirebaseEnv && (process.env.CI || process.env.VERCEL || process.env.GITHUB_ACTIONS)) {
+        console.warn("[AdminServer] FINAL STATUS: Initialization FAILED, but skipping error log in build environment.");
+    } else {
+        console.error(`[AdminServer] FINAL STATUS: Initialization FAILED. Error: "${adminInitializationErrorInstance.message}"`);
+    }
     adminAppInstance = undefined;
     adminAuthInstance = null;
     adminDbInstance = null;
