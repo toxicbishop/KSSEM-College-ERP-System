@@ -37,14 +37,22 @@ const missingConfigKeys = requiredKeys
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
 
+const hasFirebaseEnv =
+  !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID &&
+  !!process.env.NEXT_PUBLIC_FIREBASE_APP_ID;
+
 if (missingConfigKeys.length > 0) {
-  console.error(
-    `\n--- FIREBASE CONFIGURATION ERROR ---` +
-      `\nFirebase initialization failed due to missing or incomplete environment variables.` +
-      `\nPlease ensure the following environment variables are correctly set in your .env.local file:` +
-      `\n${missingConfigKeys.join("\n")}` +
-      `\n---------------------------------------\n`,
-  );
+  if (!hasFirebaseEnv && (process.env.CI || process.env.VERCEL || process.env.GITHUB_ACTIONS)) {
+    console.warn("[Firebase Client] Skipping initialization during build context (missing env vars).");
+  } else {
+    console.error(
+      `\n--- FIREBASE CONFIGURATION ERROR ---` +
+        `\nFirebase initialization failed due to missing or incomplete environment variables.` +
+        `\nPlease ensure the following environment variables are correctly set in your .env.local file:` +
+        `\n${missingConfigKeys.join("\n")}` +
+        `\n---------------------------------------\n`,
+    );
+  }
 } else {
   try {
     if (!getApps().length) {
