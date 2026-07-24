@@ -5,8 +5,6 @@ on:
     branches: ["master"]
   pull_request:
     branches: ["master"]
-  release:
-    types: [published]
 
 env:
   REGISTRY: ghcr.io
@@ -38,8 +36,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=ref,event=branch
-            type=semver,pattern={{version}}
+            type=raw,value=latest,enable={{is_default_branch}}
             type=sha,format=long
 
       - name: Build and push Docker image

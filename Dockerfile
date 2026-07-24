@@ -22,6 +22,9 @@ COPY . .
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV GOOGLE_CLOUD_PROJECT=dummy
+ENV GCLOUD_PROJECT=dummy
+ENV FIREBASE_CONFIG='{"projectId":"dummy"}'
 
 RUN pnpm run build
 
