@@ -20,13 +20,13 @@ importers:
     dependencies:
       '@as-integrations/next':
         specifier: ^4.1.0
-        version: 4.1.0(@apollo/server@5.5.1(graphql@16.14.2))(next@15.5.21(@opentelemetry/api@1.9.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
+        version: 4.1.0(@apollo/server@5.5.1(graphql@16.14.2))(next@15.5.21(@opentelemetry/api@1.9.1)(@types/node@26.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
       '@genkit-ai/googleai':
         specifier: ^1.28.0
         version: 1.28.0(genkit@1.39.0(@google-cloud/firestore@7.11.6)(firebase-admin@14.1.0)(firebase@12.16.0))
       '@genkit-ai/next':
         specifier: ^1.39.0
-        version: 1.39.0(genkit@1.39.0(@google-cloud/firestore@7.11.6)(firebase-admin@14.1.0)(firebase@12.16.0))(next@15.5.21(@opentelemetry/api@1.9.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(zod@3.25.76)
+        version: 1.39.0(genkit@1.39.0(@google-cloud/firestore@7.11.6)(firebase-admin@14.1.0)(firebase@12.16.0))(next@15.5.21(@opentelemetry/api@1.9.1)(@types/node@26.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(zod@3.25.76)
       '@google-cloud/firestore':
         specifier: ^7.11.6
         version: 7.11.6
@@ -40,8 +40,8 @@ importers:
         specifier: ^5.4.0
         version: 5.4.0(react-hook-form@7.81.0(react@18.3.1))
       '@next/bundle-analyzer':
-        specifier: ^16.2.10
-        version: 16.2.10
+        specifier: ^16.2.11
+        version: 16.2.11
       '@radix-ui/react-accordion':
         specifier: ^1.2.16
         version: 1.2.16(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -110,10 +110,10 @@ importers:
         version: 5.101.2(react@18.3.1)
       '@vercel/analytics':
         specifier: ^2.0.1
-        version: 2.0.1(next@15.5.21(@opentelemetry/api@1.9.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 2.0.1(next@15.5.21(@opentelemetry/api@1.9.1)(@types/node@26.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@vercel/speed-insights':
         specifier: ^2.0.0
-        version: 2.0.0(next@15.5.21(@opentelemetry/api@1.9.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 2.0.0(next@15.5.21(@opentelemetry/api@1.9.1)(@types/node@26.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -149,7 +149,7 @@ importers:
         version: 0.475.0(react@18.3.1)
       next:
         specifier: ^15.5.21
-        version: 15.5.21(@opentelemetry/api@1.9.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 15.5.21(@opentelemetry/api@1.9.1)(@types/node@26.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       nodemailer:
         specifier: ^9.0.3
         version: 9.0.3
@@ -970,8 +970,8 @@ packages:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
 
-  '@next/bundle-analyzer@16.2.10':
-    resolution: {integrity: sha512-KcepWhb3IVniZgm00GSSCQDEUQqZXuXtuXRh8J6e3Un342TcQ77iK4DedeEkct+fcx7yFEDL2J6z4Jeho5JDAw==}
+  '@next/bundle-analyzer@16.2.11':
+    resolution: {integrity: sha512-C5228wy1RC0g7uOSvmQhrZXCuEeLIPureKkqramAkySmqY2Y0yw6K+TyAxXXvtrYe4uehnZs3YMFfJcorBRwpg==}
 
   '@next/env@15.5.21':
     resolution: {integrity: sha512-hjJI/GfrjWHgNguRIBzItjRRu0m3Nrz17GhxsjuHfjIvg9hyg3239REd2dpI+bpMTFuVrVprHzEQ19m++cDtbw==}
@@ -5142,8 +5142,8 @@ packages:
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
 
-  ws@7.5.11:
-    resolution: {integrity: sha512-zS54Oen9bITtp7kp2XM3AydrCIq1D+HwJOuH+c+e4LfpL/lotP5osijd+UoMnxwAam1GN8R4KtLAyIrIcBNpiA==}
+  ws@7.5.13:
+    resolution: {integrity: sha512-rsKI6xDBFVf4r/x8XyChGK04QR/XHroxs/jUcoWvtEZM8TPU/X/uIY9B1CsSzYws9ZJb/6bbBu7dPhFW00CAoA==}
     engines: {node: '>=8.3.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -5313,10 +5313,10 @@ snapshots:
 
   '@apollo/utils.withrequired@3.0.0': {}
 
-  '@as-integrations/next@4.1.0(@apollo/server@5.5.1(graphql@16.14.2))(next@15.5.21(@opentelemetry/api@1.9.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))':
+  '@as-integrations/next@4.1.0(@apollo/server@5.5.1(graphql@16.14.2))(next@15.5.21(@opentelemetry/api@1.9.1)(@types/node@26.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))':
     dependencies:
       '@apollo/server': 5.5.1(graphql@16.14.2)
-      next: 15.5.21(@opentelemetry/api@1.9.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 15.5.21(@opentelemetry/api@1.9.1)(@types/node@26.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
   '@babel/runtime@7.29.7': {}
 
@@ -5850,10 +5850,10 @@ snapshots:
       - encoding
       - supports-color
 
-  '@genkit-ai/next@1.39.0(genkit@1.39.0(@google-cloud/firestore@7.11.6)(firebase-admin@14.1.0)(firebase@12.16.0))(next@15.5.21(@opentelemetry/api@1.9.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(zod@3.25.76)':
+  '@genkit-ai/next@1.39.0(genkit@1.39.0(@google-cloud/firestore@7.11.6)(firebase-admin@14.1.0)(firebase@12.16.0))(next@15.5.21(@opentelemetry/api@1.9.1)(@types/node@26.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(zod@3.25.76)':
     dependencies:
       genkit: 1.39.0(@google-cloud/firestore@7.11.6)(firebase-admin@14.1.0)(firebase@12.16.0)
-      next: 15.5.21(@opentelemetry/api@1.9.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 15.5.21(@opentelemetry/api@1.9.1)(@types/node@26.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       zod: 3.25.76
 
   '@google-cloud/common@5.0.2':
@@ -6247,7 +6247,7 @@ snapshots:
       '@tybys/wasm-util': 0.10.3
     optional: true
 
-  '@next/bundle-analyzer@16.2.10':
+  '@next/bundle-analyzer@16.2.11':
     dependencies:
       webpack-bundle-analyzer: 4.10.1
     transitivePeerDependencies:
@@ -8049,14 +8049,14 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
 
-  '@vercel/analytics@2.0.1(next@15.5.21(@opentelemetry/api@1.9.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
+  '@vercel/analytics@2.0.1(next@15.5.21(@opentelemetry/api@1.9.1)(@types/node@26.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
     optionalDependencies:
-      next: 15.5.21(@opentelemetry/api@1.9.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 15.5.21(@opentelemetry/api@1.9.1)(@types/node@26.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
 
-  '@vercel/speed-insights@2.0.0(next@15.5.21(@opentelemetry/api@1.9.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
+  '@vercel/speed-insights@2.0.0(next@15.5.21(@opentelemetry/api@1.9.1)(@types/node@26.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
     optionalDependencies:
-      next: 15.5.21(@opentelemetry/api@1.9.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 15.5.21(@opentelemetry/api@1.9.1)(@types/node@26.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
 
   '@whatwg-node/promise-helpers@1.3.2':
@@ -10070,7 +10070,7 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  next@15.5.21(@opentelemetry/api@1.9.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  next@15.5.21(@opentelemetry/api@1.9.1)(@types/node@26.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@next/env': 15.5.21
       '@swc/helpers': 0.5.15
@@ -11190,7 +11190,7 @@ snapshots:
       opener: 1.5.2
       picocolors: 1.1.1
       sirv: 2.0.4
-      ws: 7.5.11
+      ws: 7.5.13
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -11296,7 +11296,7 @@ snapshots:
 
   wrappy@1.0.2: {}
 
-  ws@7.5.11: {}
+  ws@7.5.13: {}
 
   ws@8.21.0: {}
 
