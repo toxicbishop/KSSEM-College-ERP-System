@@ -1,6 +1,6 @@
 import { auth } from './firebase/client';
 
-const GATEWAY_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:8080';
+const GATEWAY_URL = process.env.NEXT_PUBLIC_GATEWAY_URL || 'https://college-erp-system-l7ij.onrender.com';
 
 async function getAuthHeaders() {
   const user = auth?.currentUser;
