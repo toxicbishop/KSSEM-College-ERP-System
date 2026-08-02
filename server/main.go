@@ -39,6 +39,7 @@ func main() {
 	// Base Middlewares
 	r.Use(chiMiddleware.Recoverer)
 	r.Use(middleware.HTTPCorrelationMiddleware)
+	r.Use(middleware.SecurityHeadersMiddleware)
 
 	// CORS Setup
 	allowedOriginsStr := os.Getenv("CORS_ALLOWED_ORIGINS")

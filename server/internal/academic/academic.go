@@ -21,19 +21,24 @@ func RegisterRoutes(r chi.Router) {
 		r.Post("/attendance", SubmitLectureAttendance)
 		r.Get("/attendance/lecture", GetLectureAttendanceForDate) // expects ?date=&classroomId=
 		r.Get("/attendance/lecture/range", GetLectureAttendanceForDateRange)
+		r.Delete("/attendance", DeleteLectureAttendance) // expects ?classroomId=&date=
 
 		// Classroom
-		r.Get("/classrooms", GetClassroomsByFaculty) // expects ?facultyId=
+		r.Get("/classrooms", GetClassroomsByFaculty) // expects ?facultyId= (faculty/admin only)
+		r.Get("/classrooms/my", GetStudentClassrooms) // student-facing: list my classrooms
 		r.Post("/classrooms", CreateClassroom)
 		r.Get("/classrooms/{classroomId}/students", GetStudentsInClassroom)
 		r.Post("/classrooms/{classroomId}/students", AddStudentsToClassroom)
-		r.Delete("/classrooms/{classroomId}/students", RemoveStudentFromClassroom)
+		r.Delete("/classrooms/{classroomId}/students/{studentUserId}", RemoveStudentFromClassroom)
 
 		// Events
 		r.Get("/events", GetAcademicCalendarEvents)
 
 		// Grades
 		r.Post("/grades", UpdateStudentGrade)
+		r.Get("/grades/student/{studentId}", GetStudentGrades)
+		r.Get("/grades/classroom/{classroomId}", GetClassroomGrades)
+		r.Delete("/grades/{gradeId}", DeleteGrade)
 	})
 }
 

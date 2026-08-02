@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/toxicbishop/kssem-college-erp-system/server/pkg/auth"
 	"github.com/toxicbishop/kssem-college-erp-system/server/pkg/firebase"
+	"github.com/toxicbishop/kssem-college-erp-system/server/pkg/logger"
 	"google.golang.org/api/iterator"
 )
 
@@ -32,6 +33,21 @@ type Classroom struct {
 	StudentUids  []string               `json:"-" firestore:"studentUids"`
 }
 
+// isClassroomMember checks if the given UID is the owner faculty or a student in the classroom.
+func isClassroomMember(data map[string]interface{}, uid string) bool {
+	ownerID, _ := data["facultyId"].(string)
+	if ownerID == uid {
+		return true
+	}
+	studentUIDs, _ := data["studentUids"].([]interface{})
+	for _, id := range studentUIDs {
+		if idStr, ok := id.(string); ok && idStr == uid {
+			return true
+		}
+	}
+	return false
+}
+
 func GetClassroomsByFaculty(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	user, err := auth.GetUserContext(ctx)
@@ -45,6 +61,7 @@ func GetClassroomsByFaculty(w http.ResponseWriter, r *http.Request) {
 		facultyID = user.UID
 	}
 
+	// Faculty can only list their own classrooms; admin can list any
 	if user.UID != facultyID && user.Role != "admin" {
 		WriteError(w, http.StatusForbidden, "cannot list classrooms for another faculty")
 		return
@@ -65,6 +82,7 @@ func GetClassroomsByFaculty(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		if err != nil {
+			logger.Error(ctx, "Failed to fetch classrooms", "error", err)
 			WriteError(w, http.StatusInternalServerError, "failed to fetch classrooms")
 			return
 		}
@@ -74,6 +92,57 @@ func GetClassroomsByFaculty(w http.ResponseWriter, r *http.Request) {
 		}
 		cls.Id = doc.Ref.ID
 		classrooms = append(classrooms, cls)
+	}
+
+	if classrooms == nil {
+		classrooms = make([]Classroom, 0)
+	}
+
+	WriteJSON(w, http.StatusOK, map[string]interface{}{"classrooms": classrooms})
+}
+
+// GetStudentClassrooms returns all classrooms a student is enrolled in.
+func GetStudentClassrooms(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	user, err := auth.GetUserContext(ctx)
+	if err != nil {
+		WriteError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	if firebase.Firestore == nil {
+		WriteError(w, http.StatusNotImplemented, "Firestore is not initialized")
+		return
+	}
+
+	iter := firebase.Firestore.Collection("classrooms").Documents(ctx)
+	defer iter.Stop()
+
+	var classrooms []Classroom
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			logger.Error(ctx, "Failed to iterate classrooms", "error", err)
+			WriteError(w, http.StatusInternalServerError, "failed to fetch classrooms")
+			return
+		}
+
+		data := doc.Data()
+		if isClassroomMember(data, user.UID) {
+			var cls Classroom
+			if err := doc.DataTo(&cls); err != nil {
+				continue
+			}
+			cls.Id = doc.Ref.ID
+			classrooms = append(classrooms, cls)
+		}
+	}
+
+	if classrooms == nil {
+		classrooms = make([]Classroom, 0)
 	}
 
 	WriteJSON(w, http.StatusOK, map[string]interface{}{"classrooms": classrooms})
@@ -107,6 +176,7 @@ func CreateClassroom(w http.ResponseWriter, r *http.Request) {
 
 	_, err = firebase.Firestore.Collection("classrooms").Doc(id).Set(ctx, cls)
 	if err != nil {
+		logger.Error(ctx, "Failed to create classroom", "error", err)
 		WriteError(w, http.StatusInternalServerError, "failed to create classroom")
 		return
 	}
@@ -115,6 +185,12 @@ func CreateClassroom(w http.ResponseWriter, r *http.Request) {
 
 func GetStudentsInClassroom(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	user, err := auth.GetUserContext(ctx)
+	if err != nil {
+		WriteError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
 	classroomId := chi.URLParam(r, "classroomId")
 
 	if firebase.Firestore == nil {
@@ -125,6 +201,14 @@ func GetStudentsInClassroom(w http.ResponseWriter, r *http.Request) {
 	doc, err := firebase.Firestore.Collection("classrooms").Doc(classroomId).Get(ctx)
 	if err != nil {
 		WriteError(w, http.StatusNotFound, "classroom not found")
+		return
+	}
+
+	data := doc.Data()
+
+	// Only the classroom owner (faculty) or an enrolled student can view the roster
+	if !isClassroomMember(data, user.UID) && user.Role != "admin" {
+		WriteError(w, http.StatusForbidden, "not a member of this classroom")
 		return
 	}
 
@@ -171,6 +255,11 @@ func AddStudentsToClassroom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(reqData.StudentIds) == 0 {
+		WriteError(w, http.StatusBadRequest, "studentIds array cannot be empty")
+		return
+	}
+
 	var students []ClassroomStudentInfo
 	var studentUIDs []string
 	for _, id := range reqData.StudentIds {
@@ -201,28 +290,33 @@ func AddStudentsToClassroom(w http.ResponseWriter, r *http.Request) {
 			{Path: "studentUids", Value: firestore.ArrayUnion(studentUIDs)},
 		})
 		if err != nil {
+			logger.Error(ctx, "Failed to add students to classroom", "error", err)
 			WriteError(w, http.StatusInternalServerError, "failed to add students")
 			return
 		}
 	}
 
 	// Fetch updated
-	updatedDoc, _ := firebase.Firestore.Collection("classrooms").Doc(classroomId).Get(ctx)
+	updatedDoc, err := firebase.Firestore.Collection("classrooms").Doc(classroomId).Get(ctx)
+	if err != nil {
+		WriteError(w, http.StatusInternalServerError, "failed to fetch updated classroom")
+		return
+	}
 	var cls Classroom
 	updatedDoc.DataTo(&cls)
 	cls.Id = updatedDoc.Ref.ID
 	WriteJSON(w, http.StatusOK, cls)
 }
 
+// RemoveStudentFromClassroom accepts studentId as a path parameter instead of body.
+// Route: DELETE /classrooms/{classroomId}/students/{studentUserId}
 func RemoveStudentFromClassroom(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	classroomId := chi.URLParam(r, "classroomId")
+	studentUserId := chi.URLParam(r, "studentUserId")
 
-	var reqData struct {
-		StudentId string `json:"studentId"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&reqData); err != nil {
-		WriteError(w, http.StatusBadRequest, "Invalid JSON payload")
+	if studentUserId == "" {
+		WriteError(w, http.StatusBadRequest, "studentUserId path parameter is required")
 		return
 	}
 
@@ -250,14 +344,14 @@ func RemoveStudentFromClassroom(w http.ResponseWriter, r *http.Request) {
 	var newStudents []ClassroomStudentInfo
 	var newStudentUIDs []string
 	for _, st := range cls.Students {
-		if st.Uid != reqData.StudentId {
+		if st.Uid != studentUserId {
 			newStudents = append(newStudents, st)
 			newStudentUIDs = append(newStudentUIDs, st.Uid)
 		}
 	}
 
 	if len(newStudents) == 0 {
-		newStudents = []ClassroomStudentInfo{} // Empty slice instead of nil for firestore update? Doesn't matter much
+		newStudents = []ClassroomStudentInfo{}
 	}
 
 	_, err = firebase.Firestore.Collection("classrooms").Doc(classroomId).Update(ctx, []firestore.Update{
@@ -265,6 +359,7 @@ func RemoveStudentFromClassroom(w http.ResponseWriter, r *http.Request) {
 		{Path: "studentUids", Value: newStudentUIDs},
 	})
 	if err != nil {
+		logger.Error(ctx, "Failed to remove student from classroom", "error", err)
 		WriteError(w, http.StatusInternalServerError, "failed to remove student")
 		return
 	}

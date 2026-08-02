@@ -3,9 +3,11 @@ package communication
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/toxicbishop/kssem-college-erp-system/server/pkg/firebase"
+	"github.com/toxicbishop/kssem-college-erp-system/server/pkg/logger"
 	"github.com/toxicbishop/kssem-college-erp-system/server/pkg/middleware"
 	"google.golang.org/api/iterator"
 )
@@ -27,6 +29,11 @@ func handleGetNotifications(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if firebase.Firestore == nil {
+		writeError(w, http.StatusServiceUnavailable, "database unavailable")
+		return
+	}
+
 	iter := firebase.Firestore.Collection("users").Doc(user.UID).Collection("notifications").
 		OrderBy("timestamp", firestore.Desc).Limit(50).Documents(r.Context())
 	defer iter.Stop()
@@ -38,6 +45,7 @@ func handleGetNotifications(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		if err != nil {
+			logger.Error(r.Context(), "Failed to read notifications", "error", err)
 			writeError(w, http.StatusInternalServerError, "failed to read notifications")
 			return
 		}
@@ -49,11 +57,13 @@ func handleGetNotifications(w http.ResponseWriter, r *http.Request) {
 		read, _ := data["read"].(bool)
 		link, _ := data["link"].(string)
 
-		var timestampStr string
-		if t, ok := data["timestamp"].(interface{}); ok {
-			// Try to handle timestamp correctly if possible
-			timestampStr = ""
-			_ = t
+		// Properly extract and format the timestamp
+		timestampStr := ""
+		switch ts := data["timestamp"].(type) {
+		case time.Time:
+			timestampStr = ts.Format(time.RFC3339)
+		case string:
+			timestampStr = ts
 		}
 
 		notifications = append(notifications, &Notification{
@@ -95,11 +105,17 @@ func handleMarkNotificationRead(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if firebase.Firestore == nil {
+		writeError(w, http.StatusServiceUnavailable, "database unavailable")
+		return
+	}
+
 	notifRef := firebase.Firestore.Collection("users").Doc(user.UID).Collection("notifications").Doc(req.ID)
 	_, err := notifRef.Update(r.Context(), []firestore.Update{
 		{Path: "read", Value: true},
 	})
 	if err != nil {
+		logger.Error(r.Context(), "Failed to mark notification as read", "uid", user.UID, "notificationId", req.ID, "error", err)
 		writeError(w, http.StatusNotFound, "notification not found or not owned by user")
 		return
 	}

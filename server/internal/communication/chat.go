@@ -10,6 +10,7 @@ import (
 	"cloud.google.com/go/firestore"
 	"google.golang.org/api/iterator"
 	"github.com/toxicbishop/kssem-college-erp-system/server/pkg/firebase"
+	"github.com/toxicbishop/kssem-college-erp-system/server/pkg/logger"
 	"github.com/toxicbishop/kssem-college-erp-system/server/pkg/middleware"
 )
 
@@ -21,6 +22,7 @@ func writeError(w http.ResponseWriter, status int, msg string) {
 }
 
 // checkClassroomAccess returns the UserContext if the user is a member of the classroom, else an error.
+// Matches the classroom data model which uses "facultyId" (not "ownerFacultyId").
 func checkClassroomAccess(r *http.Request, classroomID string) (*middleware.UserContext, error) {
 	user, ok := r.Context().Value(middleware.UserContextKey).(*middleware.UserContext)
 	if !ok {
@@ -31,17 +33,24 @@ func checkClassroomAccess(r *http.Request, classroomID string) (*middleware.User
 		return user, nil
 	}
 
+	if firebase.Firestore == nil {
+		return nil, fmt.Errorf("database unavailable")
+	}
+
 	doc, err := firebase.Firestore.Collection("classrooms").Doc(classroomID).Get(r.Context())
 	if err != nil {
 		return nil, fmt.Errorf("classroom not found")
 	}
 
 	data := doc.Data()
-	ownerID, _ := data["ownerFacultyId"].(string)
+
+	// The classroom model stores the owner under "facultyId"
+	ownerID, _ := data["facultyId"].(string)
 	if ownerID == user.UID {
 		return user, nil
 	}
 
+	// Check invited faculty
 	invited, _ := data["invitedFacultyIds"].([]interface{})
 	for _, id := range invited {
 		if idStr, ok := id.(string); ok && idStr == user.UID {
@@ -49,6 +58,7 @@ func checkClassroomAccess(r *http.Request, classroomID string) (*middleware.User
 		}
 	}
 
+	// Check enrolled students
 	students, _ := data["studentUids"].([]interface{})
 	for _, id := range students {
 		if idStr, ok := id.(string); ok && idStr == user.UID {
@@ -60,6 +70,11 @@ func checkClassroomAccess(r *http.Request, classroomID string) (*middleware.User
 }
 
 func handleSendChatMessage(w http.ResponseWriter, r *http.Request) {
+	if firebase.Firestore == nil {
+		writeError(w, http.StatusServiceUnavailable, "database unavailable")
+		return
+	}
+
 	var req struct {
 		ClassroomID string `json:"classroomId"`
 		Text        string `json:"text"`
@@ -97,6 +112,7 @@ func handleSendChatMessage(w http.ResponseWriter, r *http.Request) {
 		"timestamp":   now,
 	})
 	if err != nil {
+		logger.Error(r.Context(), "Failed to save chat message", "error", err)
 		writeError(w, http.StatusInternalServerError, "failed to save message")
 		return
 	}
@@ -124,6 +140,11 @@ func handleGetChatMessages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if firebase.Firestore == nil {
+		writeError(w, http.StatusServiceUnavailable, "database unavailable")
+		return
+	}
+
 	if _, err := checkClassroomAccess(r, classroomID); err != nil {
 		writeError(w, http.StatusForbidden, err.Error())
 		return
@@ -139,6 +160,7 @@ func handleGetChatMessages(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		if err != nil {
+			logger.Error(r.Context(), "Failed to read chat messages", "error", err)
 			writeError(w, http.StatusInternalServerError, "failed to read messages")
 			return
 		}
@@ -187,7 +209,6 @@ func handleStreamChatMessages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ch := hub.Subscribe(classroomID)
-	// Cleanup happens properly on disconnect due to r.Context().Done()
 	defer hub.Unsubscribe(classroomID, ch)
 
 	for {

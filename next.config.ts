@@ -1,22 +1,19 @@
 import type { NextConfig } from "next";
 import withBundleAnalyzer from "@next/bundle-analyzer";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const nextConfig: NextConfig = {
   output: "standalone",
   devIndicators: false,
   images: {
     remotePatterns: [
+      // Firebase Storage for user-uploaded profile photos and documents
       {
         protocol: "https",
-        hostname: "picsum.photos",
+        hostname: "firebasestorage.googleapis.com",
         port: "",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "placehold.co",
-        port: "",
-        pathname: "/**",
+        pathname: "/v0/b/**",
       },
     ],
   },
@@ -35,17 +32,17 @@ const nextConfig: NextConfig = {
     // For local development
     "http://localhost:9002",
     "http://localhost:9003",
-    "http://localhost:9004", // Added for the new port
+    "http://localhost:9004",
     "http://localhost:*",
 
-    // Specific IDX Preview URLs from warning (ensure both http/https for completeness, though https is typical)
+    // Specific IDX Preview URLs from warning
     "https://9003-idx-studio-1746445170503.cluster-44kx2eiocbhe2tyk3zoyo3ryuo.cloudworkstations.dev",
     "http://9003-idx-studio-1746445170503.cluster-44kx2eiocbhe2tyk3zoyo3ryuo.cloudworkstations.dev",
-    "https://9004-idx-studio-1746445170503.cluster-44kx2eiocbhe2tyk3zoyo3ryuo.cloudworkstations.dev", // Added for new port
-    "http://9004-idx-studio-1746445170503.cluster-44kx2eiocbhe2tyk3zoyo3ryuo.cloudworkstations.dev", // Added for new port
+    "https://9004-idx-studio-1746445170503.cluster-44kx2eiocbhe2tyk3zoyo3ryuo.cloudworkstations.dev",
+    "http://9004-idx-studio-1746445170503.cluster-44kx2eiocbhe2tyk3zoyo3ryuo.cloudworkstations.dev",
 
     // Original broader wildcards for IDX (keeping these for general IDX usage)
-    "https://idx-studio-1746445170503.cluster-44kx2eiocbhe2tyk3zoyo3ryuo.cloudworkstations.dev", // without port as subdomain
+    "https://idx-studio-1746445170503.cluster-44kx2eiocbhe2tyk3zoyo3ryuo.cloudworkstations.dev",
     "https://*.cluster-44kx2eiocbhe2tyk3zoyo3ryuo.cloudworkstations.dev",
     "https://*.cloudworkstations.dev",
   ],
@@ -69,7 +66,6 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // Apply these headers to all routes in your application.
         source: "/(.*)",
         headers: [
           {
@@ -90,7 +86,21 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://apis.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' blob: data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://firebasestorage.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com wss://*.cloudworkstations.dev https://*.cloudworkstations.dev http://localhost:* ws://localhost:* https://*.onrender.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none';",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://apis.google.com https://www.gstatic.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "img-src 'self' blob: data: https:",
+              "font-src 'self' data: https://fonts.gstatic.com",
+              // Only allow localhost connections in development
+              ...(isProduction
+                ? ["connect-src 'self' https://firebasestorage.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.onrender.com"]
+                : ["connect-src 'self' https://firebasestorage.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com wss://*.cloudworkstations.dev https://*.cloudworkstations.dev http://localhost:* ws://localhost:* https://*.onrender.com"]),
+              "frame-ancestors 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "object-src 'none'",
+            ].join("; "),
           },
         ],
       },
