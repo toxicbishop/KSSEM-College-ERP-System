@@ -1,6 +1,0 @@
-onlyBuiltDependencies:
-  - "@apollo/protobufjs"
-  - "@firebase/util"
-  - protobufjs
-  - sharp
-  - unrs-resolver
