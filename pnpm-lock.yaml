@@ -28,10 +28,10 @@ importers:
         version: 4.1.0(@apollo/server@5.5.1(graphql@16.14.2)(supports-color@7.2.0))(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
       '@genkit-ai/googleai':
         specifier: ^1.28.0
-        version: 1.28.0(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0))(supports-color@7.2.0)
+        version: 1.28.0(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(supports-color@7.2.0))(supports-color@7.2.0)
       '@genkit-ai/next':
         specifier: ^1.39.0
-        version: 1.40.1(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0))(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(zod@3.25.76)
+        version: 1.40.1(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(supports-color@7.2.0))(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(zod@3.25.76)
       '@google-cloud/firestore':
         specifier: ^7.11.6
         version: 7.11.6(supports-color@7.2.0)
@@ -109,7 +109,7 @@ importers:
         version: 1.2.16(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack-query-firebase/react':
         specifier: ^2.1.1
-        version: 2.1.1(@tanstack/react-query@5.101.4(react@18.3.1))(firebase@12.17.0)
+        version: 2.1.1(@tanstack/react-query@5.101.4(react@18.3.1))(firebase@12.17.1)
       '@tanstack/react-query':
         specifier: ^5.101.2
         version: 5.101.4(react@18.3.1)
@@ -129,8 +129,8 @@ importers:
         specifier: ^4.4.0
         version: 4.4.0
       firebase:
-        specifier: ^12.16.0
-        version: 12.17.0
+        specifier: ^12.17.1
+        version: 12.17.1
       firebase-admin:
         specifier: ^14.1.0
         version: 14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0)
@@ -139,7 +139,7 @@ importers:
         version: 12.43.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       genkit:
         specifier: ^1.39.0
-        version: 1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0)
+        version: 1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(supports-color@7.2.0)
       graphql:
         specifier: ^16.14.2
         version: 16.14.2
@@ -471,13 +471,25 @@ packages:
     resolution: {integrity: sha512-tLpOaaCol9ugUIYp2R3CbWPPA8Ajg/papX/XHEy8U52b/QXH3BbX8tTJX9aShDCjp+9sMAxMLD94i7lresdugQ==}
     engines: {node: '>=20.0.0'}
 
-  '@firebase/data-connect@0.7.2':
-    resolution: {integrity: sha512-Z64TRTp5KsvZtuCS1BhEg0H63TTDIi6k7idGG+z1ImAnP2qHv+xt0S5rzAONpiO7Z1geldWhpu1iY/ju+l3a3w==}
+  '@firebase/data-connect@0.7.3':
+    resolution: {integrity: sha512-nHBFk3Ntl+NZCRIUG2d5j7I69P0otjyQ/duhVKLbw4+5cNke/F6RK1pdE5Jnf831/QOTs2Bd00LlxlZ+jNsb9w==}
     peerDependencies:
       '@firebase/app': 0.x
 
   '@firebase/database-compat@2.1.5':
     resolution: {integrity: sha512-m2KZDNXrg8DBzXWQNbbrjOhsJnM+ctsSFaDYKrqj1gEetQ8BSAwRuMUdeWLM9a6qPBgOvOA+o09j1BSEzdFqOg==}
+    engines: {node: '>=20.0.0'}
+    peerDependencies:
+      '@firebase/app': 0.x
+      '@firebase/app-compat': 0.x
+    peerDependenciesMeta:
+      '@firebase/app':
+        optional: true
+      '@firebase/app-compat':
+        optional: true
+
+  '@firebase/database-compat@2.1.6':
+    resolution: {integrity: sha512-mu7S/75UIajB1A5M9Vfojk69LttW55uABp9nHEtWrV/mIaSEwvoaIe9GySsEzS2EKFK5/3f5okcAuUbihhYeJg==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@firebase/app': 0.x
@@ -2372,6 +2384,9 @@ packages:
   '@types/node@26.1.2':
     resolution: {integrity: sha512-Vu4a5UFA9rIIFJ7rB/Vaafh9lrCQszopTCx6KjFboXTGQbPNasehVR5TEiithSDGyd1DEiUByggTZsg8jukeIg==}
 
+  '@types/node@26.2.0':
+    resolution: {integrity: sha512-5IviulTZeRNp2vAJ514cc/HUlY5nZ9fCbq9DMyC52BrhFZACo3nI0R7qBxhQmo/d27NFe96ur/b7Wwxklda+kg==}
+
   '@types/nodemailer@6.4.24':
     resolution: {integrity: sha512-Ww4u0rT9wQNXh4JiQaIwx3QWdcOFXzOjQA2zc+jtFYNmQiT4mIUqcDin51bDFdkzKubFnQCZNK7FIHlPKQ/q9w==}
 
@@ -3482,8 +3497,8 @@ packages:
     resolution: {integrity: sha512-zfs5PdccEgjX479bbMmz95Rqc7ttQ4LV3qkGFlPiqOaOu/suBZc3fG52Qzn2hQjiSHkBM4NP2AZV5r2NvAt0TQ==}
     engines: {node: '>=22'}
 
-  firebase@12.17.0:
-    resolution: {integrity: sha512-8iENFg2/k7asnybijN3ZrmTag0BuyiihUXrRZkX+yCW+YocknpzPZ4DUkdbyA/rdrdaCssBqHH8zpdDliv+4ng==}
+  firebase@12.17.1:
+    resolution: {integrity: sha512-dhp41ye9jMQvhx5FwjMkf/hjDHJApl7gXmvzOZGvP0M7c/GZGUnQ4qvsvlOBkF0Pa7wAwHMdcpL0ON2pXCQ4Sw==}
 
   flat-cache@4.0.1:
     resolution: {integrity: sha512-f7ccFPK3SXFHpx15UIGyRJ/FJQctuKZ0zVuN3frBo4HnK3cay9VEW0R6yPYFHC0AgqhukPzKjq22t5DmAyqGyw==}
@@ -5613,7 +5628,7 @@ snapshots:
       '@firebase/util': 1.15.2
       tslib: 2.8.1
 
-  '@firebase/data-connect@0.7.2(@firebase/app@0.16.0)':
+  '@firebase/data-connect@0.7.3(@firebase/app@0.16.0)':
     dependencies:
       '@firebase/app': 0.16.0
       '@firebase/auth-interop-types': 0.2.5
@@ -5623,6 +5638,18 @@ snapshots:
       tslib: 2.8.1
 
   '@firebase/database-compat@2.1.5(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)':
+    dependencies:
+      '@firebase/component': 0.7.4
+      '@firebase/database': 1.1.4
+      '@firebase/database-types': 1.0.21
+      '@firebase/logger': 0.5.1
+      '@firebase/util': 1.15.2
+      tslib: 2.8.1
+    optionalDependencies:
+      '@firebase/app': 0.16.0
+      '@firebase/app-compat': 0.5.16
+
+  '@firebase/database-compat@2.1.6(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)':
     dependencies:
       '@firebase/component': 0.7.4
       '@firebase/database': 1.1.4
@@ -5841,9 +5868,9 @@ snapshots:
 
   '@floating-ui/utils@0.2.12': {}
 
-  '@genkit-ai/ai@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0))(supports-color@7.2.0)':
+  '@genkit-ai/ai@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(supports-color@7.2.0))(supports-color@7.2.0)':
     dependencies:
-      '@genkit-ai/core': 1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0))(supports-color@7.2.0)
+      '@genkit-ai/core': 1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(supports-color@7.2.0))(supports-color@7.2.0)
       '@opentelemetry/api': 1.9.1
       '@types/node': 20.19.43
       colorette: 2.0.20
@@ -5864,7 +5891,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@genkit-ai/core@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0))(supports-color@7.2.0)':
+  '@genkit-ai/core@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(supports-color@7.2.0))(supports-color@7.2.0)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/api-logs': 0.52.1
@@ -5888,7 +5915,7 @@ snapshots:
       zod-to-json-schema: 3.25.2(zod@3.25.76)
     optionalDependencies:
       '@cfworker/json-schema': 4.1.1
-      '@genkit-ai/firebase': 1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0))(supports-color@7.2.0)
+      '@genkit-ai/firebase': 1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(supports-color@7.2.0))(supports-color@7.2.0)
     transitivePeerDependencies:
       - '@google-cloud/firestore'
       - bufferutil
@@ -5899,20 +5926,20 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@genkit-ai/firebase@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0))(supports-color@7.2.0)':
+  '@genkit-ai/firebase@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(supports-color@7.2.0))(supports-color@7.2.0)':
     dependencies:
-      '@genkit-ai/google-cloud': 1.40.1(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0))(supports-color@7.2.0)
+      '@genkit-ai/google-cloud': 1.40.1(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(supports-color@7.2.0))(supports-color@7.2.0)
       '@google-cloud/firestore': 7.11.6(supports-color@7.2.0)
       firebase-admin: 14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0)
-      genkit: 1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0)
+      genkit: 1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(supports-color@7.2.0)
     optionalDependencies:
-      firebase: 12.17.0
+      firebase: 12.17.1
     transitivePeerDependencies:
       - encoding
       - supports-color
     optional: true
 
-  '@genkit-ai/google-cloud@1.40.1(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0))(supports-color@7.2.0)':
+  '@genkit-ai/google-cloud@1.40.1(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(supports-color@7.2.0))(supports-color@7.2.0)':
     dependencies:
       '@google-cloud/firestore': 7.11.6(supports-color@7.2.0)
       '@google-cloud/logging-winston': 6.0.2(supports-color@7.2.0)(winston@3.19.0)
@@ -5930,7 +5957,7 @@ snapshots:
       '@opentelemetry/sdk-metrics': 1.25.1(@opentelemetry/api@1.9.1)
       '@opentelemetry/sdk-node': 0.221.0(@opentelemetry/api@1.9.1)(supports-color@7.2.0)
       '@opentelemetry/sdk-trace-base': 1.25.1(@opentelemetry/api@1.9.1)
-      genkit: 1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0)
+      genkit: 1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(supports-color@7.2.0)
       google-auth-library: 9.15.1(supports-color@7.2.0)
       node-fetch: 3.3.2
       winston: 3.19.0
@@ -5939,19 +5966,19 @@ snapshots:
       - supports-color
     optional: true
 
-  '@genkit-ai/googleai@1.28.0(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0))(supports-color@7.2.0)':
+  '@genkit-ai/googleai@1.28.0(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(supports-color@7.2.0))(supports-color@7.2.0)':
     dependencies:
       '@google/generative-ai': 0.24.1
-      genkit: 1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0)
+      genkit: 1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(supports-color@7.2.0)
       google-auth-library: 9.15.1(supports-color@7.2.0)
       node-fetch: 3.3.2
     transitivePeerDependencies:
       - encoding
       - supports-color
 
-  '@genkit-ai/next@1.40.1(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0))(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(zod@3.25.76)':
+  '@genkit-ai/next@1.40.1(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(supports-color@7.2.0))(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(zod@3.25.76)':
     dependencies:
-      genkit: 1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0)
+      genkit: 1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(supports-color@7.2.0)
       next: 15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       zod: 3.25.76
 
@@ -6167,7 +6194,7 @@ snapshots:
   '@grpc/grpc-js@1.9.16':
     dependencies:
       '@grpc/proto-loader': 0.7.15
-      '@types/node': 26.1.2
+      '@types/node': 26.2.0
 
   '@grpc/proto-loader@0.7.15':
     dependencies:
@@ -7821,10 +7848,10 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@tanstack-query-firebase/react@2.1.1(@tanstack/react-query@5.101.4(react@18.3.1))(firebase@12.17.0)':
+  '@tanstack-query-firebase/react@2.1.1(@tanstack/react-query@5.101.4(react@18.3.1))(firebase@12.17.1)':
     dependencies:
       '@tanstack/react-query': 5.101.4(react@18.3.1)
-      firebase: 12.17.0
+      firebase: 12.17.1
 
   '@tanstack/query-core@5.101.4': {}
 
@@ -7909,6 +7936,10 @@ snapshots:
       undici-types: 6.21.0
 
   '@types/node@26.1.2':
+    dependencies:
+      undici-types: 8.3.0
+
+  '@types/node@26.2.0':
     dependencies:
       undici-types: 8.3.0
 
@@ -9200,7 +9231,7 @@ snapshots:
       - encoding
       - supports-color
 
-  firebase@12.17.0:
+  firebase@12.17.1:
     dependencies:
       '@firebase/ai': 2.14.0(@firebase/app-types@0.9.5)(@firebase/app@0.16.0)
       '@firebase/analytics': 0.10.23(@firebase/app@0.16.0)
@@ -9212,9 +9243,9 @@ snapshots:
       '@firebase/app-types': 0.9.5
       '@firebase/auth': 1.13.4(@firebase/app@0.16.0)
       '@firebase/auth-compat': 0.6.9(@firebase/app-compat@0.5.16)(@firebase/app-types@0.9.5)(@firebase/app@0.16.0)
-      '@firebase/data-connect': 0.7.2(@firebase/app@0.16.0)
+      '@firebase/data-connect': 0.7.3(@firebase/app@0.16.0)
       '@firebase/database': 1.1.4
-      '@firebase/database-compat': 2.1.5(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)
+      '@firebase/database-compat': 2.1.6(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)
       '@firebase/firestore': 4.17.0(@firebase/app@0.16.0)
       '@firebase/firestore-compat': 0.4.12(@firebase/app-compat@0.5.16)(@firebase/app-types@0.9.5)(@firebase/app@0.16.0)
       '@firebase/functions': 0.13.6(@firebase/app@0.16.0)
@@ -9368,10 +9399,10 @@ snapshots:
 
   genkit-cli@0.0.2: {}
 
-  genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0):
+  genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(supports-color@7.2.0):
     dependencies:
-      '@genkit-ai/ai': 1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0))(supports-color@7.2.0)
-      '@genkit-ai/core': 1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0))(supports-color@7.2.0)
+      '@genkit-ai/ai': 1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(supports-color@7.2.0))(supports-color@7.2.0)
+      '@genkit-ai/core': 1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.1)(supports-color@7.2.0))(supports-color@7.2.0)
       uuid: 14.0.1
     transitivePeerDependencies:
       - '@google-cloud/firestore'
