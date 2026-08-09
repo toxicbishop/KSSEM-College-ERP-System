@@ -1,7 +1,11 @@
 version: 2
 updates:
-  - package-ecosystem: "pnpm"
+  - package-ecosystem: "npm"
     directory: "/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "gomod"
+    directory: "/server"
     schedule:
       interval: "weekly"
   - package-ecosystem: "github-actions"
