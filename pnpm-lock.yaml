@@ -25,13 +25,13 @@ importers:
     dependencies:
       '@as-integrations/next':
         specifier: ^4.1.0
-        version: 4.1.0(@apollo/server@5.5.1(graphql@16.14.2)(supports-color@7.2.0))(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
+        version: 4.1.0(@apollo/server@5.5.1(graphql@16.14.2)(supports-color@7.2.0))(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
       '@genkit-ai/googleai':
         specifier: ^1.28.0
         version: 1.28.0(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0))(supports-color@7.2.0)
       '@genkit-ai/next':
         specifier: ^1.39.0
-        version: 1.40.1(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0))(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(zod@3.25.76)
+        version: 1.40.1(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0))(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(zod@3.25.76)
       '@google-cloud/firestore':
         specifier: ^7.11.6
         version: 7.11.6(supports-color@7.2.0)
@@ -115,10 +115,10 @@ importers:
         version: 5.101.4(react@18.3.1)
       '@vercel/analytics':
         specifier: ^2.0.1
-        version: 2.0.1(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 2.0.1(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@vercel/speed-insights':
         specifier: ^2.0.0
-        version: 2.0.0(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 2.0.0(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -154,7 +154,7 @@ importers:
         version: 0.475.0(react@18.3.1)
       next:
         specifier: ^15.5.21
-        version: 15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       nodemailer:
         specifier: ^9.0.3
         version: 9.0.3
@@ -190,8 +190,8 @@ importers:
         version: 3.25.76
     devDependencies:
       '@types/node':
-        specifier: ^26.1.1
-        version: 26.1.2
+        specifier: ^26.2.0
+        version: 26.2.0
       '@types/nodemailer':
         specifier: ^6.4.24
         version: 6.4.24
@@ -697,6 +697,7 @@ packages:
   '@google-cloud/opentelemetry-cloud-monitoring-exporter@0.19.0':
     resolution: {integrity: sha512-5SOPXwC6RET4ZvXxw5D97dp8fWpqWEunHrzrUUGXhG4UAeedQe1KvYV8CK+fnaAbN2l2ha6QDYspT6z40TVY0g==}
     engines: {node: '>=14'}
+    deprecated: Google Cloud Platform now supports native OpenTelemetry Protocol (OTLP) endpoints via the Telemetry API. Please follow https://github.com/GoogleCloudPlatform/opentelemetry-operations-js/blob/main/MIGRATION.md
     peerDependencies:
       '@opentelemetry/api': ^1.0.0
       '@opentelemetry/core': '>=1.30.1'
@@ -706,6 +707,7 @@ packages:
   '@google-cloud/opentelemetry-cloud-trace-exporter@2.4.1':
     resolution: {integrity: sha512-Dq2IyAyA9PCjbjLOn86i2byjkYPC59b5ic8k/L4q5bBWH0Jro8lzMs8C0G5pJfqh2druj8HF+oAIAlSdWQ+Z9Q==}
     engines: {node: '>=14'}
+    deprecated: Google Cloud Platform now supports native OpenTelemetry Protocol (OTLP) endpoints via the Telemetry API. Please follow https://github.com/GoogleCloudPlatform/opentelemetry-operations-js/blob/main/MIGRATION.md
     peerDependencies:
       '@opentelemetry/api': ^1.0.0
       '@opentelemetry/core': '>=1.30.1'
@@ -715,6 +717,7 @@ packages:
   '@google-cloud/opentelemetry-resource-util@2.4.0':
     resolution: {integrity: sha512-/7ujlMoKtDtrbQlJihCjQnm31n2s2RTlvJqcSbt2jV3OkCzPAdo3u31Q13HNugqtIRUSk7bUoLx6AzhURkhW4w==}
     engines: {node: '>=14'}
+    deprecated: Google Cloud Platform now supports native OpenTelemetry Protocol (OTLP) endpoints via the Telemetry API. Please follow https://github.com/GoogleCloudPlatform/opentelemetry-operations-js/blob/main/MIGRATION.md
     peerDependencies:
       '@opentelemetry/resources': ^1.0.0
 
@@ -2369,8 +2372,8 @@ packages:
   '@types/node@20.19.43':
     resolution: {integrity: sha512-6oYBAi5ikg4Pl+kGsoYtawUMBT2zZMCvPNF7pVLnHZfd1zf38DRiWn/gT01RYCdUqkv7Fhr+C9ot4/tb+2sVvA==}
 
-  '@types/node@26.1.2':
-    resolution: {integrity: sha512-Vu4a5UFA9rIIFJ7rB/Vaafh9lrCQszopTCx6KjFboXTGQbPNasehVR5TEiithSDGyd1DEiUByggTZsg8jukeIg==}
+  '@types/node@26.2.0':
+    resolution: {integrity: sha512-5IviulTZeRNp2vAJ514cc/HUlY5nZ9fCbq9DMyC52BrhFZACo3nI0R7qBxhQmo/d27NFe96ur/b7Wwxklda+kg==}
 
   '@types/nodemailer@6.4.24':
     resolution: {integrity: sha512-Ww4u0rT9wQNXh4JiQaIwx3QWdcOFXzOjQA2zc+jtFYNmQiT4mIUqcDin51bDFdkzKubFnQCZNK7FIHlPKQ/q9w==}
@@ -5415,10 +5418,10 @@ snapshots:
 
   '@apollo/utils.withrequired@3.0.0': {}
 
-  '@as-integrations/next@4.1.0(@apollo/server@5.5.1(graphql@16.14.2)(supports-color@7.2.0))(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))':
+  '@as-integrations/next@4.1.0(@apollo/server@5.5.1(graphql@16.14.2)(supports-color@7.2.0))(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))':
     dependencies:
       '@apollo/server': 5.5.1(graphql@16.14.2)(supports-color@7.2.0)
-      next: 15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
   '@babel/runtime@7.29.7': {}
 
@@ -5949,10 +5952,10 @@ snapshots:
       - encoding
       - supports-color
 
-  '@genkit-ai/next@1.40.1(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0))(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(zod@3.25.76)':
+  '@genkit-ai/next@1.40.1(genkit@1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0))(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(zod@3.25.76)':
     dependencies:
       genkit: 1.40.1(@google-cloud/firestore@7.11.6(supports-color@7.2.0))(firebase-admin@14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@7.2.0))(firebase@12.17.0)(supports-color@7.2.0)
-      next: 15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       zod: 3.25.76
 
   '@google-cloud/common@6.1.0(supports-color@7.2.0)':
@@ -6167,7 +6170,7 @@ snapshots:
   '@grpc/grpc-js@1.9.16':
     dependencies:
       '@grpc/proto-loader': 0.7.15
-      '@types/node': 26.1.2
+      '@types/node': 26.2.0
 
   '@grpc/proto-loader@0.7.15':
     dependencies:
@@ -7845,14 +7848,14 @@ snapshots:
 
   '@types/bunyan@1.8.11':
     dependencies:
-      '@types/node': 26.1.2
+      '@types/node': 26.2.0
     optional: true
 
   '@types/caseless@0.12.5': {}
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 26.1.2
+      '@types/node': 26.2.0
     optional: true
 
   '@types/d3-array@3.2.2': {}
@@ -7888,37 +7891,37 @@ snapshots:
   '@types/jsonwebtoken@9.0.10':
     dependencies:
       '@types/ms': 2.1.0
-      '@types/node': 26.1.2
+      '@types/node': 26.2.0
 
   '@types/long@4.0.2': {}
 
   '@types/memcached@2.2.10':
     dependencies:
-      '@types/node': 26.1.2
+      '@types/node': 26.2.0
     optional: true
 
   '@types/ms@2.1.0': {}
 
   '@types/mysql@2.15.27':
     dependencies:
-      '@types/node': 26.1.2
+      '@types/node': 26.2.0
     optional: true
 
   '@types/node@20.19.43':
     dependencies:
       undici-types: 6.21.0
 
-  '@types/node@26.1.2':
+  '@types/node@26.2.0':
     dependencies:
       undici-types: 8.3.0
 
   '@types/nodemailer@6.4.24':
     dependencies:
-      '@types/node': 26.1.2
+      '@types/node': 26.2.0
 
   '@types/oracledb@6.5.2':
     dependencies:
-      '@types/node': 26.1.2
+      '@types/node': 26.2.0
     optional: true
 
   '@types/pg-pool@2.0.7':
@@ -7928,7 +7931,7 @@ snapshots:
 
   '@types/pg@8.15.6':
     dependencies:
-      '@types/node': 26.1.2
+      '@types/node': 26.2.0
       pg-protocol: 1.15.0
       pg-types: 2.2.0
     optional: true
@@ -7947,7 +7950,7 @@ snapshots:
   '@types/request@2.48.13':
     dependencies:
       '@types/caseless': 0.12.5
-      '@types/node': 26.1.2
+      '@types/node': 26.2.0
       '@types/tough-cookie': 4.0.5
       form-data: 2.5.6
 
@@ -7962,7 +7965,7 @@ snapshots:
 
   '@types/tedious@4.0.14':
     dependencies:
-      '@types/node': 26.1.2
+      '@types/node': 26.2.0
     optional: true
 
   '@types/tough-cookie@4.0.5': {}
@@ -8131,14 +8134,14 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
 
-  '@vercel/analytics@2.0.1(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
+  '@vercel/analytics@2.0.1(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
     optionalDependencies:
-      next: 15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
 
-  '@vercel/speed-insights@2.0.0(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
+  '@vercel/speed-insights@2.0.0(next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
     optionalDependencies:
-      next: 15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
 
   '@whatwg-node/promise-helpers@1.3.2':
@@ -10138,7 +10141,7 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  next@15.5.22(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@next/env': 15.5.22
       '@swc/helpers': 0.5.15
@@ -10157,7 +10160,7 @@ snapshots:
       '@next/swc-win32-arm64-msvc': 15.5.22
       '@next/swc-win32-x64-msvc': 15.5.22
       '@opentelemetry/api': 1.9.1
-      sharp: 0.35.3(@types/node@26.1.2)
+      sharp: 0.35.3(@types/node@26.2.0)
     transitivePeerDependencies:
       - '@babel/core'
       - '@types/node'
@@ -10433,7 +10436,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.2
-      '@types/node': 26.1.2
+      '@types/node': 26.2.0
       long: 5.3.2
 
   proxy-addr@2.0.7:
@@ -10770,7 +10773,7 @@ snapshots:
       safe-buffer: 5.2.1
       to-buffer: 1.2.2
 
-  sharp@0.35.3(@types/node@26.1.2):
+  sharp@0.35.3(@types/node@26.2.0):
     dependencies:
       '@img/colour': 1.1.0
       detect-libc: 2.1.2
@@ -10801,7 +10804,7 @@ snapshots:
       '@img/sharp-win32-arm64': 0.35.3
       '@img/sharp-win32-ia32': 0.35.3
       '@img/sharp-win32-x64': 0.35.3
-      '@types/node': 26.1.2
+      '@types/node': 26.2.0
     optional: true
 
   shebang-command@2.0.0:
