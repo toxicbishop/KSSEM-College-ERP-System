@@ -20,6 +20,7 @@ import type {
 import { fetchStudentClassrooms, fetchClassmates } from "../classrooms/actions";
 
 import sanitizeHtml from 'sanitize-html';
+import { sanitizeImageUrl } from '@/lib/sanitize-url';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -1088,12 +1089,12 @@ function ProfileDetailsLoader() {
                   : profile.uploadedSignatureUrl
               ) ? (
                 <img
-                  src={
+                  src={sanitizeImageUrl(
                     isEditMode &&
                     typeof editableProfile.uploadedSignatureUrl === "string"
                       ? editableProfile.uploadedSignatureUrl
-                      : profile.uploadedSignatureUrl!
-                  }
+                      : profile.uploadedSignatureUrl
+                  )}
                   alt="Uploaded Signature"
                   width={200}
                   height={80}
