@@ -8,7 +8,7 @@ RUN corepack enable
 WORKDIR /app
 
 # Install deps first (layer-cached unless lockfile changes)
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
 # Copy source and build
