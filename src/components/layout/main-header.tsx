@@ -1,8 +1,6 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import Link from "next/link";
+
+import { Link } from "react-router-dom";
 import { getSystemSettings } from "@/services/system-settings";
 import { useEffect, useState } from "react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
@@ -16,12 +14,11 @@ import {
 import { Sidebar } from "./sidebar";
 import { useAuth } from "@/context/auth-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { usePathname } from "next/navigation";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Bell, Menu, UserCircle, LogOut } from "lucide-react";
 import { auth } from "@/lib/firebase/client";
 import { signOut } from "firebase/auth";
 import { getStudentProfile } from "@/services/profile";
-import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { deleteCookie } from "@/lib/utils";
 
@@ -48,10 +45,10 @@ export function MainHeader() {
   const isMobile = useIsMobile();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user } = useAuth();
-  const pathname = usePathname();
+  const pathname = useLocation().pathname;
   const [userName, setUserName] = useState<string | null>(null);
   const [scholarId, setScholarId] = useState<string | null>(null);
-  const router = useRouter();
+  const router = useNavigate();
   const { toast } = useToast();
 
   const handleLogout = async () => {
@@ -64,7 +61,7 @@ export function MainHeader() {
           title: "Logged Out",
           description: "You have been successfully logged out.",
         });
-        router.push("/signin");
+        router("/signin");
       } catch (error) {
         console.error("Logout failed:", error);
         toast({
@@ -162,7 +159,7 @@ export function MainHeader() {
             </Sheet>
           ) : (
             <div className="bg-white p-1 rounded-sm flex items-center justify-center">
-              <Image
+              <img
                 src="/Favicon/collage-logo.png"
                 alt="KSSEM Logo"
                 width={32}
@@ -188,7 +185,7 @@ export function MainHeader() {
             return (
               <Link
                 key={link.href}
-                href={link.href}
+                to={link.href}
                 className={`text-sm font-medium transition-colors relative ${
                   active
                     ? "text-kssem-gold font-semibold after:content-[''] after:absolute after:-bottom-[22px] after:left-0 after:w-full after:h-[3px] after:bg-kssem-gold"
@@ -216,7 +213,7 @@ export function MainHeader() {
           </button>
 
           <div className="h-6 w-px bg-white/20 hidden sm:block"></div>
-          <Link href="/profile" className="flex items-center gap-3">
+          <Link to="/profile" className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
               <p className="text-white text-sm font-semibold leading-tight">
                 {userName || "Student"}

@@ -1,6 +1,4 @@
 
-'use client';
-
 /**
  * Escapes a value for CSV format. If the value contains a comma, double quote, or newline,
  * it will be enclosed in double quotes. Existing double quotes will be escaped by doubling them.

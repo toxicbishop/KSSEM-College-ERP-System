@@ -1,8 +1,6 @@
-"use client";
+import { Link } from "react-router-dom";
 
-import Link from "next/link";
-import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
   Home,
@@ -61,9 +59,9 @@ const adminMobileNavItems = [
 ];
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
+  const pathname = useLocation().pathname;
   const { user, loading } = useAuth();
-  const router = useRouter();
+  const router = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(isMobile);
@@ -131,7 +129,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           title: "Logged Out",
           description: "You have been successfully logged out.",
         });
-        router.push("/signin");
+        router("/signin");
       } catch (error) {
         console.error("Logout failed:", error);
         toast({
@@ -212,7 +210,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 "flex items-center mb-10",
                 isSidebarCollapsed ? "justify-center pt-2" : "space-x-3",
               )}>
-              <Image
+              <img
                 src="/Favicon/collage-logo.png"
                 alt={`${collegeName} Admin Logo`}
                 width={isSidebarCollapsed ? 32 : 40}
@@ -250,7 +248,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                     <TooltipTrigger asChild>
                       <Link
                         key={item.href}
-                        href={item.href}
+                        to={item.href}
                         className={cn(
                           "flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                           isSidebarCollapsed ? "justify-center" : "",
@@ -316,7 +314,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    onClick={() => router.push("/signin")}
+                    onClick={() => router("/signin")}
                     className={cn(
                       "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium justify-start text-[#8A99BB] hover:bg-white/5 hover:text-white",
                       isSidebarCollapsed ? "justify-center" : "",

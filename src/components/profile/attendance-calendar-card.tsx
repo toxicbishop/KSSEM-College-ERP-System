@@ -1,6 +1,4 @@
 
-'use client';
-
 import type { AttendanceRecord } from '@/services/attendance';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Calendar } from '@/components/ui/calendar';

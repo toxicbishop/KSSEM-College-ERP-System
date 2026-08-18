@@ -1,5 +1,3 @@
-"use client";
-
 import type { Grade } from "@/services/grades";
 import { ArrowUp, ArrowDown, Lightbulb } from "lucide-react";
 import type { GradeAnalysisOutput } from "@/services/grades";
