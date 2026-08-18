@@ -24,6 +24,7 @@ module.exports = [
       "@typescript-eslint/no-require-imports": "off",
       "react/no-unescaped-entities": "off",
       "react-hooks/set-state-in-effect": "off",
+      "@next/next/no-img-element": "off",
     },
   },
 ];

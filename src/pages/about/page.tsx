@@ -16,7 +16,7 @@ export default function AboutPage() {
             transition={{ duration: 0.6 }}
             className="mx-auto flex max-w-4xl flex-col items-center gap-8">
             <div className="flex flex-col items-center gap-4 text-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+              { }
               <img
                 src="/profile-avatar.png"
                 alt="Pranav Arun"

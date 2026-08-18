@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/auth-context";
 import { auth as clientAuth } from "@/lib/firebase/client";
 import { getAllUsers } from "@/services/admin-users";

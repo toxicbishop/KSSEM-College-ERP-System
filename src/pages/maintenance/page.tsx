@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ShieldAlert } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getSystemSettings } from "@/services/system-settings";
 import type { SystemSettings } from "@/services/system-settings";
 
