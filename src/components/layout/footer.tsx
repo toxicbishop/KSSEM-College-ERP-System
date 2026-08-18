@@ -1,6 +1,4 @@
-"use client";
-
-import Link from "next/link";
+import { Link } from "react-router-dom";
 
 export function Footer() {
   return (
@@ -17,17 +15,17 @@ export function Footer() {
         </div>
         <div className="flex gap-6">
           <Link
-            href="/privacy-policy"
+            to="/privacy-policy"
             className="text-slate-400 hover:text-white text-xs font-medium transition-colors">
             Privacy Policy
           </Link>
           <Link
-            href="/contact"
+            to="/contact"
             className="text-slate-400 hover:text-white text-xs font-medium transition-colors">
             Support
           </Link>
           <Link
-            href="/terms-of-service"
+            to="/terms-of-service"
             className="text-slate-400 hover:text-white text-xs font-medium transition-colors">
             Terms of Service
           </Link>

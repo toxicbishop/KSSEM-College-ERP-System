@@ -1,6 +1,4 @@
 
-"use client";
-
 import { useState, useEffect } from "react";
 
 const MOBILE_BREAKPOINT = 768; // Tailwind's `md` breakpoint

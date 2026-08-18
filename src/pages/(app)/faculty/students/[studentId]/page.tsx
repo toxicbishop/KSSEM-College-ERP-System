@@ -1,0 +1,250 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useAuth } from "@/context/auth-context";
+import { useToast } from "@/hooks/use-toast";
+import { MainHeader } from "@/components/layout/main-header";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import {
+  ArrowLeft,
+  UserSquare,
+  AlertTriangle,
+} from "lucide-react";
+import { auth as clientAuth } from "@/lib/firebase/client";
+import { getStudentProfile } from "@/services/profile";
+import type { StudentProfile } from "@/services/profile";
+import type { AttendanceRecord } from "@/services/attendance";
+import type { Grade } from "@/services/grades";
+import type { GradeAnalysisOutput } from "@/services/grades";
+import {
+  fetchAttendanceForStudent,
+  fetchGradesForStudent,
+  analyzeStudentGradesData,
+} from "./actions";
+import { GradesChartCard } from "@/components/dashboard/grades-chart-card";
+import { AttendanceCalendarCard } from "@/components/profile/attendance-calendar-card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+// Helper function to get initials from a name
+const getInitials = (name: string) => {
+  if (!name) return "U";
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .substring(0, 2)
+    .toUpperCase();
+};
+
+interface StudentData {
+  profile: StudentProfile;
+  attendance: AttendanceRecord[];
+  grades: Grade[];
+  analysis: GradeAnalysisOutput;
+}
+
+const defaultGradeAnalysis: GradeAnalysisOutput = {
+  overallSummary:
+    "AI analysis is currently unavailable. Please check the API key or try again later.",
+  strengths: [],
+  areasForImprovement: [],
+};
+
+export default function FacultyStudentDetailPage() {
+  const { user, loading: authLoading } = useAuth();
+  const params = useParams();
+  const router = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { toast } = useToast();
+  const studentId = params.studentId as string;
+  const classroomIdFromUrl = searchParams.get("classroomId");
+
+  const [studentData, setStudentData] = useState<StudentData | null>(null);
+  const [loadingData, setLoadingData] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchStudentData = async () => {
+    if (!user || !clientAuth || !clientAuth.currentUser) return;
+    setLoadingData(true);
+    setError(null);
+    try {
+            const attendancePromise = fetchAttendanceForStudent(studentId);
+      const profilePromise = getStudentProfile(studentId);
+      const gradesPromise = fetchGradesForStudent(studentId);
+
+      const [profile, attendance, grades] = await Promise.all([
+        profilePromise,
+        attendancePromise,
+        gradesPromise,
+      ]);
+
+      if (!profile) {
+        throw new Error("Student profile not found.");
+      }
+
+      let analysis: GradeAnalysisOutput;
+      try {
+        analysis = await analyzeStudentGradesData(grades);
+      } catch (aiError) {
+        console.error(
+          "Faculty Student Detail Page: AI grade analysis failed.",
+          aiError,
+        );
+        toast({
+          title: "AI Analysis Unavailable",
+          description: "Could not generate AI grade analysis for this student.",
+          variant: "default",
+        });
+        analysis = defaultGradeAnalysis;
+      }
+
+      setStudentData({ profile, attendance, grades, analysis });
+    } catch (err) {
+      setError((err as Error).message || "Failed to load student data.");
+      toast({
+        title: "Error",
+        description: (err as Error).message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user && !authLoading && studentId) {
+      fetchStudentData();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading, studentId]);
+
+  const handleGoBack = () => {
+    const backUrl = classroomIdFromUrl
+      ? `/faculty/students?classroomId=${classroomIdFromUrl}`
+      : "/faculty/students";
+    router(backUrl);
+  };
+
+  if (loadingData || authLoading) {
+    return (
+      <>
+        <MainHeader />
+        <div className="p-4 md:p-6 space-y-6">
+          <Skeleton className="h-10 w-48" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-1 space-y-6">
+              <Skeleton className="h-64 w-full" />
+            </div>
+            <div className="lg:col-span-2 space-y-6">
+              <Skeleton className="h-80 w-full" />
+              <Skeleton className="h-80 w-full" />
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <MainHeader />
+        <div className="p-6 text-center">
+          <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />
+          <h2 className="mt-4 text-xl font-semibold">Error Loading Data</h2>
+          <p className="text-muted-foreground">{error}</p>
+          <Button onClick={handleGoBack} className="mt-4">
+            <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
+          </Button>
+        </div>
+      </>
+    );
+  }
+
+  if (!studentData) {
+    return (
+      <>
+        <MainHeader />
+        <div className="p-6 text-center">
+          <p>No data available for this student.</p>
+          <Button onClick={handleGoBack} className="mt-4">
+            <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
+          </Button>
+        </div>
+      </>
+    );
+  }
+
+  const { profile, attendance, grades, analysis } = studentData;
+
+  return (
+    <>
+      <MainHeader />
+      <div className="p-4 md:p-6 space-y-6">
+        <div>
+          <Button variant="outline" onClick={handleGoBack}>
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Student List
+          </Button>
+          <h2 className="text-2xl font-bold tracking-tight md:text-3xl mt-4">
+            Student Profile: {profile.name}
+          </h2>
+          <p className="text-muted-foreground">Roll No: {profile.studentId}</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1 space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center text-xl">
+                  <UserSquare className="mr-3 h-6 w-6 text-primary" />
+                  Personal Details
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                <div className="flex justify-center mb-4">
+                  <Avatar className="h-[120px] w-[120px] shadow-md text-3xl">
+                    <AvatarImage
+                      src={profile.profilePhotoUrl || ""}
+                      alt={profile.name || "Profile Photo"}
+                      className="object-cover"
+                      data-ai-hint="student headshot"
+                    />
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      {getInitials(profile.name || profile.email || "Student")}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+                <div>
+                  <strong className="text-muted-foreground">Email:</strong>{" "}
+                  {profile.email}
+                </div>
+                <div>
+                  <strong className="text-muted-foreground">Contact:</strong>{" "}
+                  {profile.contactNumber}
+                </div>
+                <div>
+                  <strong className="text-muted-foreground">Course:</strong>{" "}
+                  {profile.courseProgram}
+                </div>
+                <div>
+                  <strong className="text-muted-foreground">Batch:</strong>{" "}
+                  {profile.sectionOrBatch}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="lg:col-span-2 space-y-6">
+            <GradesChartCard grades={grades} analysis={analysis} />
+            <AttendanceCalendarCard attendanceRecords={attendance} />
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}

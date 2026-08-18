@@ -1,7 +1,5 @@
-"use client";
-
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 
@@ -16,7 +14,7 @@ interface MobileNavProps {
 }
 
 export function MobileNav({ items }: MobileNavProps) {
-  const pathname = usePathname();
+  const pathname = useLocation().pathname;
 
   const displayItems = items.slice(0, 5);
 
@@ -39,7 +37,7 @@ export function MobileNav({ items }: MobileNavProps) {
         return (
           <Link
             key={item.href}
-            href={item.href}
+            to={item.href}
             className={cn(
               "flex flex-col items-center justify-center gap-1 transition-colors",
               finalIsActive

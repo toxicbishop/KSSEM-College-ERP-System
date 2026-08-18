@@ -1,21 +1,18 @@
-"use client";
 
-import Image from "next/image";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/context/auth-context";
 import { Button } from "@/components/ui/button";
-import { usePathname } from "next/navigation";
+import { useNavigate, useLocation } from "react-router-dom";
 import { LayoutDashboard, UserCircle, LogIn, LogOut } from "lucide-react";
 import { auth } from "@/lib/firebase/client";
 import { signOut } from "firebase/auth";
-import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { deleteCookie } from "@/lib/utils";
 
 export function PublicHeader() {
   const { user, loading } = useAuth();
-  const pathname = usePathname();
-  const router = useRouter();
+  const pathname = useLocation().pathname;
+  const router = useNavigate();
   const { toast } = useToast();
 
   const handleLogout = async () => {
@@ -27,7 +24,7 @@ export function PublicHeader() {
           title: "Logged Out",
           description: "You have been successfully logged out.",
         });
-        router.push("/signin");
+        router("/signin");
       } catch (error) {
         console.error("Logout failed:", error);
         toast({
@@ -50,9 +47,9 @@ export function PublicHeader() {
     <header className="sticky top-0 z-50 w-full bg-kssem-navy/95 backdrop-blur-md shadow-lg border-b border-white/10">
       <div className="container flex h-16 items-center px-6 mx-auto max-w-7xl justify-between">
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2 group">
+          <Link to="/" className="flex items-center gap-2 group">
             <div className="bg-white p-1 rounded-sm flex items-center justify-center group-hover:rotate-3 transition-transform duration-300 shadow-sm">
-              <Image
+              <img
                 src="/Favicon/collage-logo.png"
                 alt="KSSEM Logo"
                 width={30}
@@ -77,7 +74,7 @@ export function PublicHeader() {
               return (
                 <Link
                   key={link.href}
-                  href={link.href}
+                  to={link.href}
                   className={`transition-all duration-200 relative py-1 ${
                     isActive
                       ? "text-kssem-gold after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[2px] after:bg-kssem-gold"
@@ -97,7 +94,7 @@ export function PublicHeader() {
               {user ? (
                 <div className="flex items-center gap-6">
                   <Link
-                    href="/dashboard"
+                    to="/dashboard"
                     className="hidden sm:flex items-center gap-2 text-slate-300 text-xs font-bold uppercase tracking-widest hover:text-kssem-gold transition-colors">
                     <LayoutDashboard className="h-4 w-4" />
                     Portal
@@ -109,7 +106,7 @@ export function PublicHeader() {
                     Logout
                   </button>
                   <Link
-                    href="/profile"
+                    to="/profile"
                     className="flex items-center gap-3 group/profile">
                     <div className="text-right hidden sm:block">
                       <p className="text-white text-xs font-bold leading-tight group-hover/profile:text-kssem-gold transition-colors">
@@ -121,7 +118,7 @@ export function PublicHeader() {
                     </div>
                     <div className="rounded-full border border-kssem-gold/30 p-0.5 group-hover/profile:border-kssem-gold transition-colors bg-white/5">
                       {user.photoURL ? (
-                        <Image
+                        <img
                           src={user.photoURL}
                           alt="Profile"
                           width={28}
@@ -137,12 +134,12 @@ export function PublicHeader() {
               ) : (
                 <div className="flex items-center gap-4">
                   <Link
-                    href="/signin"
+                    to="/signin"
                     className="text-slate-300 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors flex items-center gap-1.5">
                     <LogIn className="h-4 w-4" />
                     Sign In
                   </Link>
-                  <Link href="/signup">
+                  <Link to="/signup">
                     <Button className="bg-kssem-gold text-kssem-navy hover:bg-[#c4a030] h-9 px-6 font-bold text-[10px] uppercase tracking-[0.15em] rounded-sm transition-all shadow-lg active:scale-95 hover:-translate-y-0.5">
                       Sign Up
                     </Button>

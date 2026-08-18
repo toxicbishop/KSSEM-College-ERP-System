@@ -1,5 +1,3 @@
-"use client";
-
 import type { AttendanceRecord } from "@/services/attendance";
 import {
   Table,
@@ -11,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { format, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 
 interface AttendanceOverviewCardProps {
   attendanceRecords: AttendanceRecord[];
@@ -39,7 +37,7 @@ export function AttendanceOverviewCard({
           Recent Attendance
         </h2>
         <Link
-          href="/attendance"
+          to="/attendance"
           className="text-kssem-navy text-sm font-bold hover:underline">
           View Full
         </Link>

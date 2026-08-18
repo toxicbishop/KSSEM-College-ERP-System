@@ -1,8 +1,6 @@
-"use client";
+import { Link } from "react-router-dom";
 
-import Link from "next/link";
-import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
   Home,
@@ -65,9 +63,9 @@ const facultyMobileNavItems = [
 ];
 
 export function FacultyLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
+  const pathname = useLocation().pathname;
   const { user, loading } = useAuth();
-  const router = useRouter();
+  const router = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(isMobile);
@@ -135,7 +133,7 @@ export function FacultyLayout({ children }: { children: React.ReactNode }) {
           title: "Logged Out",
           description: "You have been successfully logged out.",
         });
-        router.push("/signin");
+        router("/signin");
       } catch (error) {
         console.error("Logout failed:", error);
         toast({
@@ -216,7 +214,7 @@ export function FacultyLayout({ children }: { children: React.ReactNode }) {
                 "flex items-center mb-10",
                 isSidebarCollapsed ? "justify-center pt-2" : "space-x-3",
               )}>
-              <Image
+              <img
                 src="/Favicon/collage-logo.png"
                 alt={`${collegeName} Faculty Logo`}
                 width={isSidebarCollapsed ? 32 : 40}
@@ -248,7 +246,7 @@ export function FacultyLayout({ children }: { children: React.ReactNode }) {
                   <Tooltip key={item.href}>
                     <TooltipTrigger asChild>
                       <Link
-                        href={item.href}
+                        to={item.href}
                         className={cn(
                           "flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                           isSidebarCollapsed ? "justify-center" : "",
@@ -335,7 +333,7 @@ export function FacultyLayout({ children }: { children: React.ReactNode }) {
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    onClick={() => router.push("/signin")}
+                    onClick={() => router("/signin")}
                     className={cn(
                       "w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium justify-start text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
                       isSidebarCollapsed ? "justify-center" : "",

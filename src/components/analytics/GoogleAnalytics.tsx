@@ -1,55 +1,58 @@
-
 // src/components/analytics/GoogleAnalytics.tsx
-'use client';
-
-import { usePathname, useSearchParams } from 'next/navigation';
-import Script from 'next/script';
+import { useLocation, useSearchParams } from "react-router-dom";
 import { useEffect } from 'react';
 import { pageview, GA_TRACKING_ID } from '@/lib/gtag';
 
 export default function GoogleAnalytics() {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const pathname = useLocation().pathname;
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     if (!GA_TRACKING_ID || typeof window.gtag !== 'function') {
       return;
     }
-
-    const pathWithSearch = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '');
-    pageview(pathWithSearch);
-
+    
+    let url = pathname;
+    if (searchParams.toString()) {
+      url += `?${searchParams.toString()}`;
+    }
+    
+    pageview(url);
   }, [pathname, searchParams]);
 
   if (!GA_TRACKING_ID) {
-    // Optionally log that GA is not configured, or just render nothing.
-    // console.warn("Google Analytics Measurement ID (NEXT_PUBLIC_GA_MEASUREMENT_ID) is not set. Tracking is disabled.");
     return null;
   }
-  // Whitelist simple GA measurement ID formats to avoid injection
+
   const sanitizeGid = (gid: string) => {
-    const s = String(gid).trim()
-    // Accept UA-*, G-*, or GA4-like IDs (alphanumeric, dashes, underscores)
+    const s = String(gid).trim();
     if (/^(G|UA|MEASUREMENT)\-[A-Z0-9\-_]+$/i.test(s) || /^G\-[A-Z0-9\-_]+$/i.test(s)) {
-      return s
+      return s;
     }
-    return null
-  }
+    return null;
+  };
 
-  const safeId = sanitizeGid(GA_TRACKING_ID)
-  if (!safeId) return null
-
-  const inline = `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', '${safeId}', {page_path: window.location.pathname + window.location.search});`
+  const safeId = sanitizeGid(GA_TRACKING_ID);
+  if (!safeId) return null;
 
   return (
     <>
-      <Script
-        strategy="afterInteractive"
+      <script
+        async
         src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(safeId)}`}
       />
-      <Script id="gtag-init" strategy="afterInteractive">
-        {inline}
-      </Script>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${safeId}', {
+              page_path: window.location.pathname + window.location.search
+            });
+          `,
+        }}
+      />
     </>
-  )
+  );
 }

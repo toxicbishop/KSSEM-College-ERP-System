@@ -2,21 +2,20 @@
   "name": "kssem-erp-system",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "license": "GPL-3.0-or-later",
   "packageManager": "pnpm@11.20.0+sha512.9a6f330a95b66446ea088faf1521405a8a01f07fde7124cc9958dfed52d4bb436737e65b08f85f37b46fcba375092558ac51262b816844b22f63406ed166bfee",
   "scripts": {
-    "dev": "next dev --turbopack -p 9002",
+    "dev": "vite",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
     "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
-    "build": "next build",
-    "start": "next start",
+    "build": "vite build",
+    "preview": "vite preview",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@as-integrations/next": "^4.1.0",
     "@genkit-ai/googleai": "^1.28.0",
-    "@genkit-ai/next": "^1.39.0",
     "@google-cloud/firestore": "^7.11.6",
     "@google-cloud/vertexai": "^1.12.0",
     "@grpc/grpc-js": "^1.14.4",
@@ -76,11 +75,14 @@
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
     "@types/sanitize-html": "^2.16.1",
+    "@vitejs/plugin-react": "^6.0.5",
     "eslint": "^9.39.5",
     "eslint-config-next": "15.0.0",
     "genkit-cli": "^0.0.2",
     "postcss": "^8.5.19",
+    "react-router-dom": "^7.18.2",
     "tailwindcss": "^3.4.19",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite": "^8.2.1"
   }
 }

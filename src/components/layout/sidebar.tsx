@@ -1,8 +1,6 @@
-"use client";
+import { Link } from "react-router-dom";
 
-import Link from "next/link";
-import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
   Home,
@@ -65,9 +63,9 @@ export function Sidebar({
   toggleCollapse,
   onLinkClick,
 }: SidebarProps) {
-  const pathname = usePathname();
+  const pathname = useLocation().pathname;
   const { user, loading } = useAuth();
-  const router = useRouter();
+  const router = useNavigate();
   const { toast } = useToast();
   const [collegeName, setCollegeName] = useState("KSSEM");
   const [appNameLoading, setAppNameLoading] = useState(true);
@@ -101,7 +99,7 @@ export function Sidebar({
           description: "You have been successfully logged out.",
         });
         if (onLinkClick) onLinkClick();
-        router.push("/signin");
+        router("/signin");
       } catch (error) {
         console.error("Logout failed:", error);
         toast({
@@ -174,7 +172,7 @@ export function Sidebar({
               "flex items-center mb-10",
               isCollapsed ? "justify-center pt-2" : "space-x-3",
             )}>
-            <Image
+            <img
               src="/Favicon/collage-logo.png"
               alt={`${collegeName} Logo`}
               width={isCollapsed ? 32 : 40}
@@ -201,7 +199,7 @@ export function Sidebar({
                 <Tooltip key={item.href}>
                   <TooltipTrigger asChild>
                     <Link
-                      href={item.href}
+                      to={item.href}
                       onClick={onLinkClick}
                       className={cn(
                         "flex items-center space-x-3 px-3 py-3 md:py-2.5 rounded-lg text-sm font-medium transition-colors",
@@ -283,7 +281,7 @@ export function Sidebar({
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
-                  onClick={() => router.push("/signin")}
+                  onClick={() => router("/signin")}
                   className={cn(
                     "w-full flex items-center space-x-3 px-3 py-2.5 rounded-sm text-sm font-medium justify-start text-slate-300 hover:bg-white/5 hover:text-white",
                     isCollapsed ? "justify-center" : "",
