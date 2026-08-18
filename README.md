@@ -178,7 +178,7 @@ Confirm it's up: `curl http://localhost:8080/health` should return `{"status":"o
 pnpm dev
 ```
 
-Open `http://localhost:9002` (or `https://localhost:9002` if you've set up local HTTPS — see below).
+Open `http://localhost:9002`.
 
 ### Step 14: Create Your First User
 
@@ -205,16 +205,6 @@ node scripts/find_missing_profiles.js
 
 Same as before — create a GA4 property, add a Web data stream, and set `NEXT_PUBLIC_GA_MEASUREMENT_ID` in `.env.local`.
 
-### Step 17 (Optional): Local HTTPS
-
-```bash
-# macOS
-brew install mkcert
-# Windows (Scoop)
-scoop install mkcert
-mkcert -install
-```
-`pnpm dev` already includes `--experimental-https` and will auto-generate certs.
 
 ## Deploying
 
