@@ -15,6 +15,7 @@ vendor/
 out/
 build/
 coverage/
+dist/
 bin/
 
 #———————————Environment & Secrets———————————————————
