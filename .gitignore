@@ -61,6 +61,7 @@ yarn-error.log*
 .pnpm-debug.log*
 
 #  ———————————Operating System ———————————————————————
-.DS_Storecreds.json
+.DS_Store
+creds.json
 server/creds.json
 scripts/
