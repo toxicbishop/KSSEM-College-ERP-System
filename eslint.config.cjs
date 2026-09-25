@@ -12,6 +12,8 @@ module.exports = [
       ".next/**",
       "node_modules/**",
       "out/**",
+      "dist/**",
+      "build/**",
       "public/pwa/**",
       "next-env.d.ts",
       "*.tsbuildinfo",
