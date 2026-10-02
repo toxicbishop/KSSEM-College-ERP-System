@@ -39,6 +39,11 @@ func RegisterRoutes(r chi.Router) {
 		r.Get("/grades/student/{studentId}", GetStudentGrades)
 		r.Get("/grades/classroom/{classroomId}", GetClassroomGrades)
 		r.Delete("/grades/{gradeId}", DeleteGrade)
+
+		// Official Reports & Document Generation (PDF)
+		r.Get("/reports/fee-receipt", GenerateFeeReceiptPDF)
+		r.Get("/reports/grade-transcript", GenerateGradeReportPDF)
+		r.Get("/reports/attendance-eligibility", GenerateAttendanceReportPDF)
 	})
 }
 

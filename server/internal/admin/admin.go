@@ -9,6 +9,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/toxicbishop/kssem-college-erp-system/server/pkg/firebase"
 	"github.com/toxicbishop/kssem-college-erp-system/server/pkg/logger"
+	"github.com/toxicbishop/kssem-college-erp-system/server/pkg/worker"
 )
 
 func RegisterRoutes(r chi.Router) {
@@ -42,9 +43,6 @@ func WriteError(w http.ResponseWriter, status int, message string) {
 }
 
 func writeAuditLog(ctx context.Context, action string, entity string, entityId string, performedBy string, details string) {
-	if firebase.Firestore == nil {
-		return
-	}
 	if performedBy == "" {
 		performedBy = "system"
 	}
@@ -58,10 +56,17 @@ func writeAuditLog(ctx context.Context, action string, entity string, entityId s
 		"timestamp":   firestore.ServerTimestamp,
 	}
 
-	_, _, err := firebase.Firestore.Collection("auditLogs").Add(ctx, logEntry)
-	if err != nil {
-		logger.Error(ctx, "Failed to write audit log", "error", err)
-	}
+	worker.SubmitJob(func(jobCtx context.Context) error {
+		if firebase.Firestore == nil {
+			return nil
+		}
+		_, _, err := firebase.Firestore.Collection("auditLogs").Add(jobCtx, logEntry)
+		if err != nil {
+			logger.Error(jobCtx, "Failed to write audit log in background", "error", err)
+			return err
+		}
+		return nil
+	})
 }
 
 // Handler implementations to follow
