@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "packageManager": "pnpm@11.20.0+sha512.9a6f330a95b66446ea088faf1521405a8a01f07fde7124cc9958dfed52d4bb436737e65b08f85f37b46fcba375092558ac51262b816844b22f63406ed166bfee",
   "scripts": {
     "dev": "vite",
@@ -54,7 +54,7 @@
     "graphql-request": "^7.4.0",
     "graphql-tag": "^2.12.7",
     "lucide-react": "^0.475.0",
-    "next": "^16.3.6",
+    "next": "^16.3.8",
     "nodemailer": "^10.0.9",
     "patch-package": "^8.0.1",
     "react": "^18.3.1",
