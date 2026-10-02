@@ -2,8 +2,10 @@ package academic
 
 import (
 	"net/http"
+	"time"
 
 	"cloud.google.com/go/firestore"
+	"github.com/toxicbishop/kssem-college-erp-system/server/pkg/cache"
 	"github.com/toxicbishop/kssem-college-erp-system/server/pkg/firebase"
 	"google.golang.org/api/iterator"
 )
@@ -18,6 +20,15 @@ type AcademicEvent struct {
 
 func GetAcademicCalendarEvents(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+
+	// Check in-memory cache first to avoid expensive Firestore reads
+	const cacheKey = "academic_events"
+	if cached, found := cache.Default().Get(cacheKey); found {
+		if events, ok := cached.([]AcademicEvent); ok {
+			WriteJSON(w, http.StatusOK, map[string]interface{}{"events": events})
+			return
+		}
+	}
 
 	if firebase.Firestore == nil {
 		WriteError(w, http.StatusNotImplemented, "Firestore is not initialized")
@@ -44,6 +55,9 @@ func GetAcademicCalendarEvents(w http.ResponseWriter, r *http.Request) {
 		ev.Id = doc.Ref.ID
 		events = append(events, ev)
 	}
+
+	// Cache result for 10 minutes
+	cache.Default().Set(cacheKey, events, 10*time.Minute)
 
 	WriteJSON(w, http.StatusOK, map[string]interface{}{"events": events})
 }

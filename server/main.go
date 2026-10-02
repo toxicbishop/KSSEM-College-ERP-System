@@ -18,6 +18,7 @@ import (
 	"github.com/toxicbishop/kssem-college-erp-system/server/internal/academic"
 	"github.com/toxicbishop/kssem-college-erp-system/server/internal/admin"
 	"github.com/toxicbishop/kssem-college-erp-system/server/internal/communication"
+	"github.com/toxicbishop/kssem-college-erp-system/server/pkg/docs"
 	"github.com/toxicbishop/kssem-college-erp-system/server/pkg/firebase"
 	"github.com/toxicbishop/kssem-college-erp-system/server/pkg/health"
 	"github.com/toxicbishop/kssem-college-erp-system/server/pkg/logger"
@@ -74,6 +75,9 @@ func main() {
 	r.Get("/health", health.LivenessHandler)
 	r.Get("/health/live", health.LivenessHandler)
 	r.Get("/health/ready", health.ReadinessHandler)
+
+	// Interactive OpenAPI Documentation & Reference UI
+	docs.RegisterRoutes(r)
 
 	// Authenticated API routes
 	r.Route("/api", func(r chi.Router) {
