@@ -47,8 +47,8 @@ importers:
         specifier: ^5.4.0
         version: 5.9.1(ajv@8.20.0)(react-hook-form@7.90.0(@types/react@18.3.31)(react@18.3.1))(zod@3.25.76)
       '@next/bundle-analyzer':
-        specifier: ^16.2.10
-        version: 16.3.1
+        specifier: ^16.4.5
+        version: 16.4.5
       '@radix-ui/react-accordion':
         specifier: ^1.3.1
         version: 1.3.1(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -992,8 +992,8 @@ packages:
       '@emnapi/core': ^1.7.1 || ^2.0.0-alpha.4
       '@emnapi/runtime': ^1.7.1 || ^2.0.0-alpha.4
 
-  '@next/bundle-analyzer@16.3.1':
-    resolution: {integrity: sha512-/6XQeYPHM6jF1gTeJ82Mu6yXOHQIFVxzAn3DkPtHDp5v6SDXoCicBMTHloN+2h4WKFCQujSLCgLZHItJ3jN1uw==}
+  '@next/bundle-analyzer@16.4.5':
+    resolution: {integrity: sha512-kIlb+9t1i/Zg7yuRXN7I9nhEb92UGbnMfIzpZPps7YoCgmneCMpmN6zG6mduUluhI+y00MGLytkDsccVCujrGw==}
 
   '@next/env@16.4.0':
     resolution: {integrity: sha512-pyLlT5oafGlX8X7xjgGNXz5dNIDSxREm+qD6i9VLSZiZFopA/XWl8NM/KPmLx/8EG/++c49iid3gNWSQW1+2dQ==}
@@ -2936,6 +2936,11 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
+  acorn@8.19.0:
+    resolution: {integrity: sha512-oJlA3XiRm7Cyk6qFD2Jn8ak9B7jSy0qy00ADO3+8dpT0LSjFihQYv4C02LFCSYJV3Q37xYwwRy5m+IpIiUzqWw==}
+    engines: {node: '>=0.4.0'}
+    hasBin: true
+
   agent-base@6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
@@ -4149,10 +4154,6 @@ packages:
   is-obj@2.0.0:
     resolution: {integrity: sha512-drqDG3cbczxxEJRoOXcOjtdp1J/lyp1mNn0xaznRs8+muBhgQcrnbspox5X5fOw0HnMnbfDzvnEMEtqDEJEo8w==}
     engines: {node: '>=8'}
-
-  is-plain-object@5.0.0:
-    resolution: {integrity: sha512-VRSzKkbMm5jMDoKLbltAkFQ5Qr7VDiTFGXxYFXXowVj387GeGNOCsOH6Msy00SGZ3Fp84b1Naa1psqgcCIEP5Q==}
-    engines: {node: '>=0.10.0'}
 
   is-plain-object@5.1.0:
     resolution: {integrity: sha512-bUi/yjmtKYcRVUtWRGr0UA6xEFh2I6zWUwMrUXB3s7bmYCaZ8a+0ZsTRkrawh/mzlSD1Y0Ph8bp/U+TvBpWDNw==}
@@ -6602,7 +6603,7 @@ snapshots:
       '@tybys/wasm-util': 0.10.3
     optional: true
 
-  '@next/bundle-analyzer@16.3.1':
+  '@next/bundle-analyzer@16.4.5':
     dependencies:
       webpack-bundle-analyzer: 4.10.1
     transitivePeerDependencies:
@@ -8717,9 +8718,11 @@ snapshots:
 
   acorn-walk@8.3.5:
     dependencies:
-      acorn: 8.18.0
+      acorn: 8.19.0
 
   acorn@8.18.0: {}
+
+  acorn@8.19.0: {}
 
   agent-base@6.0.2(supports-color@7.2.0):
     dependencies:
@@ -10330,8 +10333,6 @@ snapshots:
   is-obj@2.0.0:
     optional: true
 
-  is-plain-object@5.0.0: {}
-
   is-plain-object@5.1.0: {}
 
   is-regex@1.2.1:
@@ -11900,14 +11901,14 @@ snapshots:
   webpack-bundle-analyzer@4.10.1:
     dependencies:
       '@discoveryjs/json-ext': 0.5.7
-      acorn: 8.18.0
+      acorn: 8.19.0
       acorn-walk: 8.3.5
       commander: 7.2.0
       debounce: 1.2.1
       escape-string-regexp: 4.0.0
       gzip-size: 6.0.0
       html-escaper: 2.0.2
-      is-plain-object: 5.0.0
+      is-plain-object: 5.1.0
       opener: 1.5.2
       picocolors: 1.1.1
       sirv: 2.0.4
