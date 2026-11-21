@@ -45,7 +45,7 @@ importers:
         version: 1.14.7
       '@hookform/resolvers':
         specifier: ^5.4.0
-        version: 5.9.1(ajv@8.20.0)(react-hook-form@7.90.0(@types/react@18.3.31)(react@18.3.1))(zod@3.25.76)
+        version: 5.9.1(ajv@8.20.0)(react-hook-form@7.90.0(@types/react@18.3.31)(react@18.3.1))(zod@4.6.7)
       '@next/bundle-analyzer':
         specifier: ^16.4.5
         version: 16.4.5
@@ -182,8 +182,8 @@ importers:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.19(yaml@2.9.0))
       zod:
-        specifier: ^3.25.76
-        version: 3.25.76
+        specifier: ^4.6.7
+        version: 4.6.7
     devDependencies:
       '@types/node':
         specifier: ^26.6.3
@@ -5697,6 +5697,9 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
+  zod@4.6.7:
+    resolution: {integrity: sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg==}
+
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
@@ -6459,13 +6462,13 @@ snapshots:
       protobufjs: 7.6.6
       yargs: 17.7.3
 
-  '@hookform/resolvers@5.9.1(ajv@8.20.0)(react-hook-form@7.90.0(@types/react@18.3.31)(react@18.3.1))(zod@3.25.76)':
+  '@hookform/resolvers@5.9.1(ajv@8.20.0)(react-hook-form@7.90.0(@types/react@18.3.31)(react@18.3.1))(zod@4.6.7)':
     dependencies:
       '@standard-schema/utils': 0.3.0
       react-hook-form: 7.90.0(@types/react@18.3.31)(react@18.3.1)
     optionalDependencies:
       ajv: 8.20.0
-      zod: 3.25.76
+      zod: 4.6.7
 
   '@humanfs/core@0.19.2':
     dependencies:
@@ -12084,3 +12087,5 @@ snapshots:
       zod: 3.25.76
 
   zod@3.25.76: {}
+
+  zod@4.6.7: {}
